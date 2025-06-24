@@ -401,8 +401,8 @@ This message has no fields defined.
 
 
 | Name | Number | Description |
-| ---- | ------ | ----------- |
-| REASON_UNSPECIFIED | 0 | TODO: ensure CREATE_PAYMENT_RESPONSE_FAILURE_ prefix? |
+| ---- | ------ |-------------|
+| REASON_UNSPECIFIED | 0 |             |
 
 
 

@@ -112,7 +112,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [string](#string) |  | TODO: should we include details in the transaction? |
+| payment_id | [string](#string) |  |  |
 
 
 
@@ -171,8 +171,6 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 <a name="network-v1-provider-AppendLedgerEntriesRequest-Transaction-ProviderSettlement"></a>
 
 ### AppendLedgerEntriesRequest.Transaction.ProviderSettlement
-TODO: naming? CreditSettlement, ParticipantSettlement, ProviderSettlement ?
-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -398,8 +396,18 @@ This message has no fields defined.
 
 
 | Name | Number | Description |
-| ---- | ------ | ----------- |
-| ACCOUNT_TYPE_UNSPECIFIED | 0 | TODO: chart of account |
+| ---- | ------ |-------------|
+| ACCOUNT_TYPE_UNSPECIFIED | 0 |             |
+| ACCOUNT_TYPE_USER_PAYABLE | 1 | Reflects the user's payable balance, the amount that the provider owes to the user. |
+| ACCOUNT_TYPE_CASH | 2 | Reflects the cash balance of the provider. |
+| ACCOUNT_TYPE_RESERVE | 3 | This is the reserve account of the provider, which reflects the reserve of balance to reduce the limit available from one provider to another. |
+| ACCOUNT_TYPE_RESERVE_USAGE | 4 | This is the mirror account for the reserve. To keep the double entry accounting principle. |
+| ACCOUNT_TYPE_PROVIDER_PAYABLE | 5 | Reflects how much the provider owes to the network or other participants. |
+| ACCOUNT_TYPE_PROVIDER_RECEIVABLE | 6 | Reflects how much the provider is owed by the network or other participants. |
+| ACCOUNT_TYPE_FEE_PAYABLE | 7 | Reflects the fees that the provider owes to the network. |
+| ACCOUNT_TYPE_FEE_RECEIVABLE | 8 | Reflects the fees that the network is owed by the provider. |
+| ACCOUNT_TYPE_FEE_EXPENSE | 9 | Reflects the fees that the provider has to pay for the services provided by the network. |
+| ACCOUNT_TYPE_PROVIDER_SETTLEMENT | 10 | Reflects the settlement balance of the provider with the network or other participants. |
 
 
 
