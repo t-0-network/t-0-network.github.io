@@ -1,6 +1,6 @@
 ---
 weight: 100
-title: "Network Client"
+title: "Network"
 description: ""
 icon: "article"
 date: "2025-06-16T12:09:09+02:00"

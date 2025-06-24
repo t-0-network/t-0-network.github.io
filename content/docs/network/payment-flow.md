@@ -1,5 +1,5 @@
 ---
-weight: 2500
+weight: 250
 title: "Payment Flow"
 description: ""
 icon: "article"
@@ -41,8 +41,8 @@ sequenceDiagram
     rect rgb(248, 255, 248)
         Note over PIP, BC: Settlement
         
-        PIP->>BC: 6. USDC Settlement Transfer (Pay-in to Payout)
-        BC->>N: 7. USDC Transaction Notification (Pay-in to Payout)
+        PIP->>BC: 6. USDT Settlement Transfer (Pay-in to Payout)
+        BC->>N: 7. USDT Transaction Notification (Pay-in to Payout)
         N->>PIP: Append Ledger Entries (Credit Usage)
         N->>POP: Append Ledger Entries (Credit Usage)
     end

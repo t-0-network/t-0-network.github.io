@@ -1,6 +1,6 @@
 ---
 weight: 200
-title: "Provider Service"
+title: "Provider"
 description: ""
 icon: "article"
 date: "2025-06-16T12:09:09+02:00"

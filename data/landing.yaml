@@ -17,7 +17,7 @@ hero:
     soft: true # boolean
 
   title: "T-0 Network"
-  subtitle: Highly efficient method for correspondent banks, fin-techs and payment companies to co-ordinate instant fiat-to-fiat cross-border payments
+  subtitle: Highly efficient method for correspondent banks, fintechs and payment companies to co-ordinate instant fiat-to-fiat cross-border payments
 
   image:
     path: "images" # path to image under configured assets directory. default 'images'
@@ -35,7 +35,7 @@ hero:
 #    btnText: "Integration Docs"
 #    url: "/docs/example-page"
 
-  info: "**Open Source** MIT Licensed."
+  info: ""
 
 featureGrid:
   enable: true
@@ -58,7 +58,7 @@ featureGrid:
 #        url: /docs/
     - title: Low fees # 4
       icon: price_check # 3
-      description: Always get the best price locally from our market-based Order
+      description: Always get the best price locally from our market-based Order Book
 #      ctaLink: # 6
 #        text: learn more
 #        url: /docs/

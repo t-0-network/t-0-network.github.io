@@ -9,7 +9,6 @@ draft: false
 toc: true
 ---
 
-## Integration Overview
 Payment providers can integrate with the T-0 Network through two primary approaches: using the provided Software Development Kit (SDK) for simplified integration, or implementing the underlying protocols directly for maximum flexibility and control. Both approaches utilize the Connect RPC framework, which provides native support for both gRPC and REST/JSON encoding, allowing providers to choose the communication protocol that best fits their existing infrastructure.
 
 The integration process requires implementing both client-side capabilities for calling network services and server-side endpoints for receiving network callbacks. All communications within the network utilize cryptographic signatures for authentication and integrity verification, ensuring secure and verifiable message exchange between all participants.
