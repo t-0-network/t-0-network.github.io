@@ -1,5 +1,5 @@
 ---
-weight: 200
+weight: 220
 title: "Quote management"
 description: ""
 icon: "article"

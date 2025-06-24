@@ -1,5 +1,5 @@
 ---
-weight: 400
+weight: 250
 title: "Fee Settlement"
 description: ""
 icon: "article"

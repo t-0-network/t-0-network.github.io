@@ -1,5 +1,5 @@
 ---
-weight: 250
+weight: 230
 title: "Payment Flow"
 description: ""
 icon: "article"
