@@ -74,7 +74,8 @@ openssl ec -in private_key.pem -text -noout 2>/dev/null | grep -A 5 'pub:' | tai
 
 ### Service Interface
 
-Implement the `networkconnect.ProviderServiceHandler` interface to create your provider service:
+Implement the `networkconnect.ProviderServiceHandler` interface to create your provider service. You can check the 
+detailed description of each rpc in the [API Reference](https://t-0-network.github.io/docs/integration-guidance/api-reference/provider/)
 
 ```go
 type ProviderServiceHandler interface {

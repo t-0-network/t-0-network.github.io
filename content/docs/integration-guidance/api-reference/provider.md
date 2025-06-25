@@ -11,9 +11,9 @@ toc: true
 <a name="network-v1-provider-ProviderService"></a>
 
 ## ProviderService
-This service must be implemented by the provider.
+This service should be implemented by the provider.
 
-All methods of this service must be idempotent, meaning they are safe to retry and multiple calls with the same parameters must not have additional effect.
+All methods of this service should be idempotent, meaning they are safe to retry and multiple calls with the same parameters should not have additional effect.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
