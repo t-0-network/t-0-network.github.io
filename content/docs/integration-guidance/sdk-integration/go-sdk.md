@@ -77,41 +77,16 @@ openssl ec -in private_key.pem -text -noout 2>/dev/null | grep -A 5 'pub:' | tai
 Implement the `networkconnect.ProviderServiceHandler` interface to create your provider service:
 
 ```go
-type ProviderServiceImplementation struct{}
-
-func (s *ProviderServiceImplementation) AppendLedgerEntries(
-    ctx context.Context, req *connect.Request[networkproto.AppendLedgerEntriesRequest],
-) (*connect.Response[networkproto.AppendLedgerEntriesResponse], error) {
-    // Implement ledger entry logic
-    return connect.NewResponse(&networkproto.AppendLedgerEntriesResponse{}), nil
-}
-
-func (s *ProviderServiceImplementation) CreatePayInDetails(
-    ctx context.Context, req *connect.Request[networkproto.CreatePayInDetailsRequest],
-) (*connect.Response[networkproto.CreatePayInDetailsResponse], error) {
-    // Implement pay-in details creation logic
-    return connect.NewResponse(&networkproto.CreatePayInDetailsResponse{}), nil
-}
-
-func (s *ProviderServiceImplementation) PayOut(
-    ctx context.Context, req *connect.Request[networkproto.PayoutRequest],
-) (*connect.Response[networkproto.PayoutResponse], error) {
-    // Implement payout logic
-    return connect.NewResponse(&networkproto.PayoutResponse{}), nil
-}
-
-func (s *ProviderServiceImplementation) UpdateLimit(
-    ctx context.Context, req *connect.Request[networkproto.UpdateLimitRequest],
-) (*connect.Response[networkproto.UpdateLimitResponse], error) {
-    // Implement limit update logic
-    return connect.NewResponse(&networkproto.UpdateLimitResponse{}), nil
-}
-
-func (s *ProviderServiceImplementation) UpdatePayment(
-    ctx context.Context, req *connect.Request[networkproto.UpdatePaymentRequest],
-) (*connect.Response[networkproto.UpdatePaymentResponse], error) {
-    // Implement payment update logic
-    return connect.NewResponse(&networkproto.UpdatePaymentResponse{}), nil
+type ProviderServiceHandler interface {
+    PayOut(context.Context, *connect.Request[network.PayoutRequest]) (*connect.Response[network.PayoutResponse], error)
+	
+    UpdatePayment(context.Context, *connect.Request[network.UpdatePaymentRequest]) (*connect.Response[network.UpdatePaymentResponse], error)
+	
+    CreatePayInDetails(context.Context, *connect.Request[network.CreatePayInDetailsRequest]) (*connect.Response[network.CreatePayInDetailsResponse], error)
+	
+    UpdateLimit(context.Context, *connect.Request[network.UpdateLimitRequest]) (*connect.Response[network.UpdateLimitResponse], error)
+	
+    AppendLedgerEntries(context.Context, *connect.Request[network.AppendLedgerEntriesRequest]) (*connect.Response[network.AppendLedgerEntriesResponse], error)
 }
 ```
 
