@@ -99,11 +99,11 @@ Initialize the provider handler with the T-ZERO Network public key and your serv
 networkPublicKey := "0x049bb924680bfba3f64d924bf9040c45dcc215b124b5b9ee73ca8e32c050d042c0bbd8dbb98e3929ed5bc2967f28c3a3b72dd5e24312404598bbf6c6cc47708dc7"
 
 providerServiceHandler, err := provider.NewProviderHandler(
-    provider.NetworkPublicKeyHexed(networkPublicKey),
-    &ProviderServiceImplementation{},
+    provider.NetworkPublicKeyHexed(networkPublicKey), // T-ZERO Network public key
+    &ProviderServiceImplementation{}, // This is your service implementation - replace with your actual implementation
     // optional configuration
-    provider.WithVerifySignatureFn(verifySignatureFn)
-    provider.WithConnectHandlerOptions(HandlerOptions)
+    provider.WithVerifySignatureFn(verifySignatureFn) // Custom signature verification function
+    provider.WithConnectHandlerOptions(HandlerOptions) // Additional Connect handler options
 )
 if err != nil {
     log.Fatalf("Failed to create provider service handler: %v", err)
@@ -116,7 +116,7 @@ This step is optional, you can register and serve the handler using your existin
 #### Launch an HTTP server with the provider handler:
 
 ```go
-shutdownFunc := provider.StartServer(
+shutdownFunc := provider.StartServer( // Start the HTTP server with the provider service handler, one-liner, you can also use your own HTTP server implementation 
     providerServiceHandler,
     // optional configuration
     provider.WithAddr(":8080"),
