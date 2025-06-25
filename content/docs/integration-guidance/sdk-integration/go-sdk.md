@@ -1,5 +1,5 @@
 ---
-weight: 351
+weight: 352
 title: "Golang SDK"
 description: ""
 icon: "article"
@@ -8,8 +8,6 @@ lastmod: "2025-06-16T12:09:09+02:00"
 draft: false
 toc: true
 ---
-
-# Provider SDK
 
 ## Overview
 
