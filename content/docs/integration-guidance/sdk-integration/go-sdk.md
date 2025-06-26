@@ -185,5 +185,7 @@ if err != nil {
 ## Examples
 
 Comprehensive examples are available in:
+- [Pay-In Provider flow Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/payin_provider_flow_test.go)
+- [Payout Provider flow Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/payout_provider_flow_test.go)
 - [Provider Service Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/network_client_test.go)
 - [Network Client Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/provider_service_test.go)
