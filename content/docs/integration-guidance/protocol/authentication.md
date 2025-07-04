@@ -15,7 +15,7 @@ Every request to the network must include three critical HTTP headers for authen
 
 The signing process begins by obtaining the current **Unix timestamp in milliseconds** as a 64-bit signed integer, encoded in **little-endian** format. This timestamp is then prepended to the request body, and the combined data is hashed using **Keccak-256**. The resulting hash is signed using the provider's **ECDSA** private key to produce the final signature.
 
-The `X-Signature-PublicKey` header contains the hex-encoded public key corresponding to the private key used for signing. The network accepts both compressed (33 bytes) and uncompressed (65 bytes) public key formats, though compressed format is preferred for efficiency.
+The `X-PublicKey` header contains the hex-encoded public key corresponding to the private key used for signing. The network accepts both compressed (33 bytes) and uncompressed (65 bytes) public key formats, though compressed format is preferred for efficiency.
 
 The `X-Signature-Timestamp` header contains the **Unix timestamp in milliseconds** used as the prefix during signature generation. The network validates that this timestamp is within one minute of the current time, rejecting requests with timestamps outside this window to prevent replay attacks.
 
