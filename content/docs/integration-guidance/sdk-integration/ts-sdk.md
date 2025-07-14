@@ -1,21 +1,21 @@
 ---
 weight: 352
-title: "Golang SDK"
+title: "NodeJS SDK"
 description: ""
 icon: "article"
 date: "2025-06-16T12:09:09+02:00"
-lastmod: "2025-06-16T12:09:09+02:00"
+lastmod: "2025-07-14T12:09:09+02:00"
 draft: false
 toc: true
 ---
 
 ## Overview
-
-The Provider SDK is a NodeJS library that enables payment processing services to integrate with the T-ZERO Network. The SDK provides comprehensive functionality for implementing provider services, handling cryptographic authentication, and managing network communications.
+[ts-sdk.md](ts-sdk.md)
+The Provider SDK is a Node.js library that enables payment processing services to integrate with the T-ZERO Network. The SDK provides comprehensive functionality for implementing provider services, handling cryptographic authentication, and managing network communications.
 
 ## Architecture
 
-The SDK consists of two main components:
+The SDK consists of two main elements:
 
 - **Provider Service Handler**: Enables you to create services that respond to T-ZERO Network requests
 - **Network Client**: Allows direct interaction with T-ZERO Network services
@@ -23,6 +23,12 @@ The SDK consists of two main components:
 ## Prerequisites
 
 - NodeJS v20 or later
+
+## Installation
+The following command will install the provider SDK
+```bash
+npm i @t-0/provider-sdk
+```
 
 ## Provider Service Implementation
 
@@ -74,7 +80,7 @@ const CreateProviderService = () => {
 
 ### HTTP Server Configuration
 
-Register and serve the handler using HTTP server.
+Register and serve the handler using the HTTP server.
 
 ```typescript
 import createService, {signatureValidation} from "@t-0/provider-sdk";
@@ -105,7 +111,7 @@ const networkClient = createNetworkClient(privateKeyHex, endpoint);
 
 ### Network Service Operations
 
-Example of quote pushing operation
+Example of a quote pushing operation
 
 ```typescript
 import {Decimal, DecimalSchema} from "@t-0/provider-sdk";
