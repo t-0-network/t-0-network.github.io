@@ -112,7 +112,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | TODO: should we include details in the transaction? |
+| payment_id | [uint64](#uint64) |  |  |
 
 
 
