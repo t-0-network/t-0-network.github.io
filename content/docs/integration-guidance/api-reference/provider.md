@@ -11,9 +11,9 @@ toc: true
 <a name="network-v1-provider-ProviderService"></a>
 
 ## ProviderService
-This service should be implemented by the provider.
+This service must be implemented by the provider.
 
-All methods of this service should be idempotent, meaning they are safe to retry and multiple calls with the same parameters should not have additional effect.
+All methods of this service must be idempotent, meaning they are safe to retry and multiple calls with the same parameters must not have additional effect.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -112,7 +112,7 @@ All methods of this service should be idempotent, meaning they are safe to retry
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [string](#string) |  |  |
+| payment_id | [uint64](#uint64) |  | TODO: should we include details in the transaction? |
 
 
 
@@ -128,7 +128,7 @@ All methods of this service should be idempotent, meaning they are safe to retry
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [string](#string) |  |  |
+| payment_id | [uint64](#uint64) |  |  |
 
 
 
@@ -144,7 +144,7 @@ All methods of this service should be idempotent, meaning they are safe to retry
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [string](#string) |  |  |
+| payment_id | [uint64](#uint64) |  |  |
 
 
 
@@ -160,7 +160,7 @@ All methods of this service should be idempotent, meaning they are safe to retry
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [string](#string) |  |  |
+| payment_id | [uint64](#uint64) |  |  |
 
 
 
@@ -171,6 +171,8 @@ All methods of this service should be idempotent, meaning they are safe to retry
 <a name="network-v1-provider-AppendLedgerEntriesRequest-Transaction-ProviderSettlement"></a>
 
 ### AppendLedgerEntriesRequest.Transaction.ProviderSettlement
+
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
@@ -302,11 +304,27 @@ All the amounts are in USD
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| version | [int64](#int64) |  | Incrementally growing for the provider - same as in Ledger. Different providers have different versions. |
-| provider_id | [int32](#int32) |  | the Id of the counterparty (creditor) provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
+| limits | [UpdateLimitRequest.Limit](#network-v1-provider-UpdateLimitRequest-Limit) | repeated | can contain one or more Limit messages, each representing a credit limit for a specific counterparty provider. |
+
+
+
+
+
+
+
+<a name="network-v1-provider-UpdateLimitRequest-Limit"></a>
+
+### UpdateLimitRequest.Limit
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| version | [int64](#int64) |  | Incrementally growing for the provider - same as in Ledger. |
+| creditor_id | [int32](#int32) |  | the Id of the counterparty (creditor) provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
 | payout_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
 | credit_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
-| credit_usage | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more settlements than payouts. |
+| credit_usage | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than maid payouts (pre-settlement). |
 
 
 
@@ -335,6 +353,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| payment_id | [uint64](#uint64) |  | payment_id is a payment id in the T-0 network. |
 | payment_client_id | [string](#string) |  | payment_client_id is a payment id assigned by the client, this is the same id that was provided in the CreatePaymentRequest. |
 | success | [UpdatePaymentRequest.Success](#network-v1-provider-UpdatePaymentRequest-Success) |  | Success response - means the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
 | failure | [UpdatePaymentRequest.Failure](#network-v1-provider-UpdatePaymentRequest-Failure) |  | Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout. |
@@ -396,8 +415,8 @@ This message has no fields defined.
 
 
 | Name | Number | Description |
-| ---- | ------ |-------------|
-| ACCOUNT_TYPE_UNSPECIFIED | 0 |             |
+| ---- | ------ | ----------- |
+| ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
 | ACCOUNT_TYPE_USER_PAYABLE | 1 | Reflects the user's payable balance, the amount that the provider owes to the user. |
 | ACCOUNT_TYPE_CASH | 2 | Reflects the cash balance of the provider. |
 | ACCOUNT_TYPE_RESERVE | 3 | This is the reserve account of the provider, which reflects the reserve of balance to reduce the limit available from one provider to another. |
@@ -422,6 +441,7 @@ This message has no fields defined.
 
 
  <!-- end enums -->
+
 
 
 
