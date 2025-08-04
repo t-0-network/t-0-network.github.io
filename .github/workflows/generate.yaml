@@ -8,7 +8,7 @@ on:
       - "content/docs/**"
 
 jobs:
-  test:
+  generate:
     runs-on: ubuntu-latest
     steps:
       - name: Generate GitHub APP Token
