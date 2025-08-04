@@ -18,7 +18,7 @@ jobs:
           app-id: ${{ vars.CI_APP_ID }}
           private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
           owner: ${{ github.repository_owner }}
-          repositories: t-0-network.github.io.git
+          repositories: t-0-network.github.io
 
       - name: Checkout
         uses: actions/checkout@v4
