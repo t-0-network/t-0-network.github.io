@@ -1,0 +1,37 @@
+name: Generate Docs
+
+on:
+  pull_request:
+    types: [opened, synchronize]
+    paths:
+      - "proto/**"
+      - "content/docs/**"
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Generate GitHub APP Token
+        uses: actions/create-github-app-token@v2
+        id: app-token
+        with:
+          app-id: ${{ vars.CI_APP_ID }}
+          private-key: ${{ secrets.CI_APP_PRIVATE_KEY }}
+          owner: ${{ github.repository_owner }}
+          repositories: t-0-network.github.io.git
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          show-progress: false
+          token: ${{ steps.app-token.outputs.token }}
+          ref: ${{ github.head_ref }}
+
+      - name: Generate Clients
+        run: ./_gen/gen.sh
+
+      - name: Commit generated files
+        uses: stefanzweifel/git-auto-commit-action@v5
+        with:
+          commit_message: "Auto-generate docs"
+          file_pattern: "content/docs/**"

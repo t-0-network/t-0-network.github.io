@@ -1,0 +1,71 @@
+---
+weight: %%WEIGHT%%
+title: "%%TITLE%%"
+description: ""
+icon: "article"
+date: "2025-06-16T12:09:09+02:00"
+lastmod: "2025-06-16T12:09:09+02:00"
+draft: false
+toc: true
+---
+{{range .Files}}
+{{$file_name := .Name}}
+{{range .Services}}
+<a name="{{.FullName | anchor}}"></a>
+
+## {{.Name}}
+{{.Description}}
+
+| Method Name | Request Type | Response Type | Description |
+| ----------- | ------------ | ------------- | ------------|
+{{range .Methods -}}
+  | {{.Name}} | [{{.RequestLongType}}](#{{.RequestFullType | anchor}}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}](#{{.ResponseFullType | anchor}}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} |
+{{end}}
+{{end}} <!-- end services -->
+{{end}}
+
+##  Requests And Response Types
+{{range .Files}}
+{{range .Messages}}
+<a name="{{.FullName | anchor}}"></a>
+
+### {{.LongName}}
+{{.Description}}
+
+{{if .HasFields}}
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+{{range .Fields -}}
+  | {{.Name}} | [{{.LongType}}](#{{.FullType | anchor}}) | {{.Label}} | {{if (index .Options "deprecated"|default false)}}**Deprecated.** {{end}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+{{end}}
+
+{{else}}
+This message has no fields defined.
+
+{{end}}
+
+{{if .HasExtensions}}
+| Extension | Type | Base | Number | Description |
+| --------- | ---- | ---- | ------ | ----------- |
+{{range .Extensions -}}
+  | {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+{{end}}
+{{end}}
+
+{{end}} <!-- end messages -->
+
+{{range .Enums}}
+<a name="{{.FullName | anchor}}"></a>
+
+### {{.LongName}}
+{{.Description}}
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+{{range .Values -}}
+  | {{.Name}} | {{.Number}} | {{nobr .Description}} |
+{{end}}
+
+{{end}} <!-- end enums -->
+
+{{end}}
