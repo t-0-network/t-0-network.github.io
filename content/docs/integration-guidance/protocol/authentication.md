@@ -11,7 +11,7 @@ toc: true
 All network communications require cryptographic authentication using ECDSA signatures with Keccak-256 hashing. This approach provides strong authentication and message integrity verification while maintaining compatibility with Ethereum-based cryptographic standards.
 
 ## Request Signing Process
-Every request to the network must include three critical HTTP headers for authentication. The `X-Signature` header contains the ECDSA signature of the request body, suffixed with the current Unix timestamp in milliseconds. The timestamp suffix prevents replay attacks by ensuring each signature is unique and time-bounded.
+Every request to the network must include three critical HTTP headers for authentication. The `X-Signature` header contains the hex-encoded ECDSA signature of the request body, suffixed with the current Unix timestamp in milliseconds. The timestamp suffix prevents replay attacks by ensuring each signature is unique and time-bounded.
 
 The signing process begins by obtaining the current **Unix timestamp in milliseconds** as a **_64-bit unsigned integer_**, encoded in **little-endian** format. This timestamp is then appended to the request body, and the combined data is hashed using **Keccak-256**. The resulting hash is signed using the provider's **ECDSA** private key to produce the final signature.
 
