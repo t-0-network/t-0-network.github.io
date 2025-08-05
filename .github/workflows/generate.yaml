@@ -27,7 +27,7 @@ jobs:
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.head_ref }}
 
-      - name: Generate Clients
+      - name: Generate Docs
         run: ./_gen/gen.sh
 
       - name: Commit generated files
