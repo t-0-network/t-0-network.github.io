@@ -266,7 +266,7 @@ All the amounts are in USD
 | creditor_id | [int32](#int32) |  | the Id of the counterparty (creditor) provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
 | payout_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
 | credit_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
-| credit_usage | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than maid payouts (pre-settlement). |
+| credit_usage | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than made payouts (pre-settlement). |
 
 
 
@@ -359,16 +359,17 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
-| ACCOUNT_TYPE_USER_PAYABLE | 1 | Reflects the user's payable balance, the amount that the provider owes to the user. |
-| ACCOUNT_TYPE_CASH | 2 | Reflects the cash balance of the provider. |
-| ACCOUNT_TYPE_RESERVE | 3 | This is the reserve account of the provider, which reflects the reserve of balance to reduce the limit available from one provider to another. |
-| ACCOUNT_TYPE_RESERVE_USAGE | 4 | This is the mirror account for the reserve. To keep the double entry accounting principle. |
-| ACCOUNT_TYPE_PROVIDER_PAYABLE | 5 | Reflects how much the provider owes to the network or other participants. |
-| ACCOUNT_TYPE_PROVIDER_RECEIVABLE | 6 | Reflects how much the provider is owed by the network or other participants. |
-| ACCOUNT_TYPE_FEE_PAYABLE | 7 | Reflects the fees that the provider owes to the network. |
-| ACCOUNT_TYPE_FEE_RECEIVABLE | 8 | Reflects the fees that the network is owed by the provider. |
-| ACCOUNT_TYPE_FEE_EXPENSE | 9 | Reflects the fees that the provider has to pay for the services provided by the network. |
-| ACCOUNT_TYPE_PROVIDER_SETTLEMENT | 10 | Reflects the settlement balance of the provider with the network or other participants. |
+| ACCOUNT_TYPE_USER_PAYABLE | 10 | Reflects the user's payable balance, the amount that the provider owes to the user. |
+| ACCOUNT_TYPE_CASH | 20 | Reflects the cash balance of the provider. |
+| ACCOUNT_TYPE_RESERVE | 30 | This is the reserve account of the provider, which reflects the reserve of balance to reduce the limit available from one provider to another. |
+| ACCOUNT_TYPE_RESERVE_USAGE | 40 | This is the mirror account for the reserve. To keep the double entry accounting principle. |
+| ACCOUNT_TYPE_PROVIDER_PAYABLE | 50 | Reflects how much the provider owes to the network or other participants. |
+| ACCOUNT_TYPE_PROVIDER_RECEIVABLE | 60 | Reflects how much the provider is owed by the network or other participants. |
+| ACCOUNT_TYPE_PROVIDER_SETTLEMENT | 70 | Reflects the settlement balance of the provider with the network or other participants. |
+| ACCOUNT_TYPE_FEE_PAYABLE | 80 | Reflects the fees that the provider owes to the network. |
+| ACCOUNT_TYPE_FEE_RECEIVABLE | 90 | Reflects the fees that the network is owed by the provider. |
+| ACCOUNT_TYPE_FEE_EXPENSE | 100 | Reflects the fees that the provider has to pay for the services provided by the network. |
+| ACCOUNT_TYPE_FEE_SETTLEMENT | 110 |  |
 
 
 

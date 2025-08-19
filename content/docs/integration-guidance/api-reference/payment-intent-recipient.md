@@ -19,6 +19,7 @@ NetworkService is used by recipient to create a payment intents
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-recipient-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse) |  |
+| GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-recipient-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-recipient-GetQuoteResponse) |  |
 
 
 <a name="tzero-v1-payment_intent-recipient-RecipientService"></a>
@@ -28,26 +29,13 @@ RecipientService is implemented by recipient in order to get updates on payment 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| ConfirmPayment | [ConfirmPaymentRequest](#tzero-v1-payment_intent-recipient-ConfirmPaymentRequest) | [ConfirmPaymentIntentResponse](#tzero-v1-payment_intent-recipient-ConfirmPaymentIntentResponse) | notifies recipient about successful payment |
+| ConfirmPayment | [ConfirmPaymentRequest](#tzero-v1-payment_intent-recipient-ConfirmPaymentRequest) | [ConfirmPaymentResponse](#tzero-v1-payment_intent-recipient-ConfirmPaymentResponse) | notifies recipient about successful payment |
 | RejectPaymentIntent | [RejectPaymentIntentRequest](#tzero-v1-payment_intent-recipient-RejectPaymentIntentRequest) | [RejectPaymentIntentResponse](#tzero-v1-payment_intent-recipient-RejectPaymentIntentResponse) | notifies recipient about failed payment |
 
  <!-- end services -->
 
 
 ##  Requests And Response Types
-
-
-<a name="tzero-v1-payment_intent-recipient-ConfirmPaymentIntentResponse"></a>
-
-### ConfirmPaymentIntentResponse
-
-
-
-This message has no fields defined.
-
-
-
-
 
 
 <a name="tzero-v1-payment_intent-recipient-ConfirmPaymentRequest"></a>
@@ -68,6 +56,19 @@ This message has no fields defined.
 
 
 
+<a name="tzero-v1-payment_intent-recipient-ConfirmPaymentResponse"></a>
+
+### ConfirmPaymentResponse
+
+
+
+This message has no fields defined.
+
+
+
+
+
+
 <a name="tzero-v1-payment_intent-recipient-CreatePaymentIntentRequest"></a>
 
 ### CreatePaymentIntentRequest
@@ -76,16 +77,10 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_reference | [string](#string) |  | Idempotency Key payment reference to identify payment by client.
-
-idempotency key |
-| pay_in_currency | [string](#string) |  | Pay-in currency
-
-pay-in currency |
+| payment_reference | [string](#string) |  | Idempotency Key payment reference to identify payment by client. |
+| pay_in_currency | [string](#string) |  | Pay-in currency |
 | pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount denominated in the pay-in currency |
-| pay_out_currency | [string](#string) |  | Payout currency
-
-pay-out currency |
+| pay_out_currency | [string](#string) |  | Payout currency |
 | pay_out_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | Payout payment method |
 
 
@@ -122,6 +117,73 @@ pay-out currency |
 | payment_url | [string](#string) |  |  |
 | provider_id | [uint32](#uint32) |  |  |
 | payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-recipient-GetQuoteRequest"></a>
+
+### GetQuoteRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| pay_in_currency | [string](#string) |  | Pay-in currency |
+| pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount denominated in the pay-in currency |
+| pay_out_currency | [string](#string) |  | Payout currency |
+| pay_in_payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the pay-in, e.g. bank transfer, card, etc. |
+| pay_out_payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the pay-out, e.g. bank transfer, card, etc. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse"></a>
+
+### GetQuoteResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| quote | [GetQuoteResponse.Quote](#tzero-v1-payment_intent-recipient-GetQuoteResponse-Quote) |  |  |
+| not_found | [GetQuoteResponse.NotFound](#tzero-v1-payment_intent-recipient-GetQuoteResponse-NotFound) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse-NotFound"></a>
+
+### GetQuoteResponse.NotFound
+
+
+
+This message has no fields defined.
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse-Quote"></a>
+
+### GetQuoteResponse.Quote
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Rate of pay-in currency to pay-out |
+| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Time until when quote is valid. Used only for reference. Actual quote is determined at the moment of payment. |
 
 
 

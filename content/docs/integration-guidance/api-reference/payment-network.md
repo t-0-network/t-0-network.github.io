@@ -41,11 +41,12 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 | ----- | ---- | ----- | ----------- |
 | payment_client_id | [string](#string) |  | unique client generated id for this payment |
 | payout_currency | [string](#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
+| payout_details | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |
 | amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in the payin currency, by default USD (if the payIn currency is not specified) |
 | payin_currency | [string](#string) | optional | if not specified, USD is used |
 | sender | [CreatePaymentRequest.Sender](#tzero-v1-payment-CreatePaymentRequest-Sender) |  | optional or option in the oneof? |
 | recipient | [CreatePaymentRequest.Recipient](#tzero-v1-payment-CreatePaymentRequest-Recipient) |  | optional or option in the oneof? |
-| reference | [string](#string) | optional | optional reference for the payment, up to 140 characters |
+| reference | [string](#string) | optional | **Deprecated.** optional reference for the payment, up to 140 characters |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) | optional | if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method |
 
 
@@ -162,6 +163,7 @@ This message has no fields defined.
 | payout_currency | [string](#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
 | amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in quote currency, only USD is supported |
 | quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | type of the quote, e.g. real-time or guaranteed |
+| payout_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |
 
 
 
