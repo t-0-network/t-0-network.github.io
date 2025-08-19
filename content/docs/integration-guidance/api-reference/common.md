@@ -74,9 +74,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| sepa | [SepaPaymentMethod](#tzero-v1-common-SepaPaymentMethod) |  |  |
-| swift | [SwiftPaymentMethod](#tzero-v1-common-SwiftPaymentMethod) |  |  |
-| stablecoin | [StablecoinPaymentMethod](#tzero-v1-common-StablecoinPaymentMethod) |  |  |
+| sepa | [SepaPaymentDetails](#tzero-v1-common-SepaPaymentDetails) |  |  |
+| swift | [SwiftPaymentDetails](#tzero-v1-common-SwiftPaymentDetails) |  |  |
+| stablecoin | [StablecoinPaymentDetails](#tzero-v1-common-StablecoinPaymentDetails) |  |  |
 
 
 
@@ -84,9 +84,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-SepaPaymentMethod"></a>
+<a name="tzero-v1-common-SepaPaymentDetails"></a>
 
-### SepaPaymentMethod
+### SepaPaymentDetails
 
 
 
@@ -102,9 +102,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-StablecoinPaymentMethod"></a>
+<a name="tzero-v1-common-StablecoinPaymentDetails"></a>
 
-### StablecoinPaymentMethod
+### StablecoinPaymentDetails
 
 
 
@@ -120,9 +120,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-SwiftPaymentMethod"></a>
+<a name="tzero-v1-common-SwiftPaymentDetails"></a>
 
-### SwiftPaymentMethod
+### SwiftPaymentDetails
 
 
 
