@@ -3,6 +3,7 @@ syntax = "proto3";
 package tzero.v1.payment;
 
 import "tzero/v1/common/payment_method.proto";
+import "tzero/v1/common/payment_receipt.proto";
 import "tzero/v1/common/common.proto";
 import "google/protobuf/timestamp.proto";
 
@@ -190,7 +191,30 @@ message PayoutRequest {
   uint32 pay_in_provider_id = 80;
 }
 
-message PayoutResponse {}
+message PayoutResponse {
+  oneof result {
+    /**
+     * Success response - means the payout was executed successfully and the payment is now complete. This happens when
+     * the payout is successfully processed by the payout provider, and the payment was made to the recipient.
+     */
+    Accepted accepted = 20;
+    /**
+     * Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout.
+     */
+    Failed failed = 30;
+  }
+
+  message Accepted {
+  }
+
+  message Failed {
+    Reason reason = 10;
+
+    enum Reason {
+      REASON_UNSPECIFIED = 0;
+    }
+  }
+}
 
 message UpdatePaymentRequest {
   /**
@@ -204,26 +228,43 @@ message UpdatePaymentRequest {
 
   oneof result {
     /**
-     * Success response - means the payout was executed successfully and the payment is now complete. This happens when
-     * the payout is successfully processed by the payout provider, and the payment was made to the recipient.
+     * Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to
+     * make a pay-out.
      */
-    Success success = 20;
+    Accepted accepted = 20;
+
     /**
-     * Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout.
+    * Payment failed and would not be retried.
      */
-    Failure failure = 30;
+    Failed failed = 30;
+    /**
+     * Confirmed response - final state meaning the payout was executed successfully and the payment is now complete.
+     * This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient.
+     */
+    Confirmed confirmed = 40;
   }
 
-  message Success {
+  message Accepted {
     tzero.v1.common.Decimal payout_amount = 10; // amount in currency of the payout
-    google.protobuf.Timestamp paid_out_at = 50; // time of the payout
   }
 
-  message Failure {
+  message Failed {
+    Reason reason = 10;
+
     enum Reason {
       REASON_UNSPECIFIED = 0;
     }
   }
+
+  message Confirmed {
+    google.protobuf.Timestamp paid_out_at = 10; // time of the payout
+
+    /**
+    * Payment receipt might contain metadata about payment recognizable by pay-in provider.
+    */
+    tzero.v1.common.PaymentReceipt receipt = 20;
+  }
+
 }
 message UpdatePaymentResponse {}
 

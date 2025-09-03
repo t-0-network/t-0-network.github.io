@@ -4,6 +4,7 @@ package tzero.v1.payment_intent.recipient;
 
 import "tzero/v1/common/common.proto";
 import "tzero/v1/common/payment_method.proto";
+import "tzero/v1/common/payment_receipt.proto";
 import "google/protobuf/timestamp.proto";
 
 /**
@@ -23,6 +24,13 @@ service NetworkService {
 * RecipientService is implemented by recipient in order to get updates on payment intents
 */
 service RecipientService {
+  /**
+  * notifies recipient that pay-in providers received payment from payer
+  */
+  rpc ConfirmPayIn(ConfirmPayInRequest) returns (ConfirmPayInResponse){
+    option idempotency_level = IDEMPOTENT;
+  };
+
   /**
   * notifies recipient about successful payment
   */
@@ -120,10 +128,29 @@ message GetQuoteResponse {
   message NotFound{}
 }
 
+message ConfirmPayInRequest {
+  uint64 payment_intent_id = 10; // payment_intent_id from the CreatePaymentIntentResponse
+  string payment_reference = 20; // payment_reference from the CreatePaymentIntentRequest
+  tzero.v1.common.PaymentMethodType payment_method = 30; // pay-in payment method
+}
+
+message ConfirmPayInResponse {
+
+}
+
 message ConfirmPaymentRequest {
-  uint64 payment_intent_id = 10; // payment_intent_id from the CreatePaymentIntentRequest
-  string payment_reference = 20;
-  tzero.v1.common.PaymentMethodType payment_method = 30;
+  uint64 payment_intent_id = 10; // payment_intent_id from the CreatePaymentIntentResponse
+  string payment_reference = 20; // payment_reference from the CreatePaymentIntentRequest
+  tzero.v1.common.PaymentMethodType payment_method = 30;  // pay-in payment method
+  /**
+  * amount which will be paid out denominated in pay_out_currency of the payment intent
+  **/
+  tzero.v1.common.Decimal pay_out_amount = 40;
+
+  /**
+  * Payment receipt might contain metadata about payment recognizable by pay-in provider.
+  */
+  tzero.v1.common.PaymentReceipt receipt = 50;
 }
 
 message ConfirmPaymentResponse {
@@ -131,7 +158,7 @@ message ConfirmPaymentResponse {
 }
 
 message RejectPaymentIntentRequest {
-  uint64 payment_intent_id = 10; // payment_intent_id from the CreatePaymentIntentRequest
+  uint64 payment_intent_id = 10; // payment_intent_id from the CreatePaymentIntentResponse
   string payment_reference = 20; // payment_reference from the CreatePaymentIntentRequest
   string reason = 30;
 }
