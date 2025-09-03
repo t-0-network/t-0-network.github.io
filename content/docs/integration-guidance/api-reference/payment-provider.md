@@ -231,7 +231,40 @@ This message has no fields defined.
 
 
 
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| accepted | [PayoutResponse.Accepted](#tzero-v1-payment-PayoutResponse-Accepted) |  | Success response - means the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
+| failed | [PayoutResponse.Failed](#tzero-v1-payment-PayoutResponse-Failed) |  | Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-PayoutResponse-Accepted"></a>
+
+### PayoutResponse.Accepted
+
+
+
 This message has no fields defined.
+
+
+
+
+
+
+<a name="tzero-v1-payment-PayoutResponse-Failed"></a>
+
+### PayoutResponse.Failed
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [PayoutResponse.Failed.Reason](#tzero-v1-payment-PayoutResponse-Failed-Reason) |  |  |
+
 
 
 
@@ -297,8 +330,9 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | payment_id | [uint64](#uint64) |  | payment_id is a payment id in the T-0 network. |
 | payment_client_id | [string](#string) |  | payment_client_id is a payment id assigned by the client, this is the same id that was provided in the CreatePaymentRequest. |
-| success | [UpdatePaymentRequest.Success](#tzero-v1-payment-UpdatePaymentRequest-Success) |  | Success response - means the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
-| failure | [UpdatePaymentRequest.Failure](#tzero-v1-payment-UpdatePaymentRequest-Failure) |  | Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout. |
+| accepted | [UpdatePaymentRequest.Accepted](#tzero-v1-payment-UpdatePaymentRequest-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
+| failed | [UpdatePaymentRequest.Failed](#tzero-v1-payment-UpdatePaymentRequest-Failed) |  | Payment failed and would not be retried. |
+| confirmed | [UpdatePaymentRequest.Confirmed](#tzero-v1-payment-UpdatePaymentRequest-Confirmed) |  | Confirmed response - final state meaning the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
 
 
 
@@ -306,29 +340,48 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-payment-UpdatePaymentRequest-Failure"></a>
+<a name="tzero-v1-payment-UpdatePaymentRequest-Accepted"></a>
 
-### UpdatePaymentRequest.Failure
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment-UpdatePaymentRequest-Success"></a>
-
-### UpdatePaymentRequest.Success
+### UpdatePaymentRequest.Accepted
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payout_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-UpdatePaymentRequest-Confirmed"></a>
+
+### UpdatePaymentRequest.Confirmed
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
 | paid_out_at | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | time of the payout |
+| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) |  | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-UpdatePaymentRequest-Failed"></a>
+
+### UpdatePaymentRequest.Failed
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [UpdatePaymentRequest.Failed.Reason](#tzero-v1-payment-UpdatePaymentRequest-Failed-Reason) |  |  |
 
 
 
@@ -373,9 +426,20 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-payment-UpdatePaymentRequest-Failure-Reason"></a>
+<a name="tzero-v1-payment-PayoutResponse-Failed-Reason"></a>
 
-### UpdatePaymentRequest.Failure.Reason
+### PayoutResponse.Failed.Reason
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| REASON_UNSPECIFIED | 0 |  |
+
+
+
+<a name="tzero-v1-payment-UpdatePaymentRequest-Failed-Reason"></a>
+
+### UpdatePaymentRequest.Failed.Reason
 
 
 | Name | Number | Description |

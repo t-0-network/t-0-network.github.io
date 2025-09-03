@@ -20,15 +20,46 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Used by the provider to publish pay-in and pay-out quotes (FX rates) into the network. These quotes include tiered pricing bands and an expiration timestamp. This method is idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
+| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Used by the provider to publish pay-in and pay-out quotes (FX rates) into the network. These quotes include tiered pricing bands and an expiration timestamp. |
 | GetPayoutQuote | [GetPayoutQuoteRequest](#tzero-v1-payment-GetPayoutQuoteRequest) | [GetPayoutQuoteResponse](#tzero-v1-payment-GetPayoutQuoteResponse) | Request the best available quote for a payout in a specific currency, for a given amount. If the payout quote exists, but the credit limit is exceeded, this quote will not be considered. |
-| CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Submit a request to create a new payment. PayIn currency and QuoteId are the optional parameters. If the payIn currency is not specified, the network will use USD as the default payIn currency, and considering the amount in USD. If specified, it must be a valid currency code - in this case the network will try to find the payIn quote for the specified currency and considering the band from the provider initiated this request. So this is only possible, if this provider already submitted the payIn quote for the specified currency using UpdateQuote rpc. If the quoteID is specified, it must be a valid quoteId that was previously returned by the GetPayoutQuote method. If the quoteId is not specified, the network will try to find a suitable quote for the payout currency and amount, same way as GetPayoutQuote rpc. This method is idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
-| UpdatePayout | [UpdatePayoutRequest](#tzero-v1-payment-UpdatePayoutRequest) | [UpdatePayoutResponse](#tzero-v1-payment-UpdatePayoutResponse) | Inform the network that a payout has been completed or failed. This endpoint is called by the payout provider, specifying the payment ID and payout ID, which was provided when the payout request was made to this provider. This method is idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
+| CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Submit a request to create a new payment. PayIn currency and QuoteId are the optional parameters. If the payIn currency is not specified, the network will use USD as the default payIn currency, and considering the amount in USD. If specified, it must be a valid currency code - in this case the network will try to find the payIn quote for the specified currency and considering the band from the provider initiated this request. So this is only possible, if this provider already submitted the payIn quote for the specified currency using UpdateQuote rpc. If the quoteID is specified, it must be a valid quoteId that was previously returned by the GetPayoutQuote method. If the quoteId is not specified, the network will try to find a suitable quote for the payout currency and amount, same way as GetPayoutQuote rpc. |
+| ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Inform the network that a payout has been completed. This endpoint is called by the payout provider, specifying the payment ID and payout ID, which was provided when the payout request was made to this provider. |
 
  <!-- end services -->
 
 
 ##  Requests And Response Types
+
+
+<a name="tzero-v1-payment-ConfirmPayoutRequest"></a>
+
+### ConfirmPayoutRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_id | [int64](#int64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
+| payout_id | [int64](#int64) |  | payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest |
+| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) |  | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-ConfirmPayoutResponse"></a>
+
+### ConfirmPayoutResponse
+
+
+
+This message has no fields defined.
+
+
+
+
 
 
 <a name="tzero-v1-payment-CreatePaymentRequest"></a>
@@ -200,64 +231,6 @@ This message has no fields defined.
 | quote_id | [int64](#int64) |  | unique identifier of the quote within the specified provider |
 | provider_id | [int32](#int32) |  | provider id of the quote |
 
-
-
-
-
-
-
-<a name="tzero-v1-payment-UpdatePayoutRequest"></a>
-
-### UpdatePayoutRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_id | [int64](#int64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
-| payout_id | [int64](#int64) |  | payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest |
-| success | [UpdatePayoutRequest.Success](#tzero-v1-payment-UpdatePayoutRequest-Success) |  | success response with the details of the payout |
-| failure | [UpdatePayoutRequest.Failure](#tzero-v1-payment-UpdatePayoutRequest-Failure) |  | failure response with the reason of the failure |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment-UpdatePayoutRequest-Failure"></a>
-
-### UpdatePayoutRequest.Failure
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment-UpdatePayoutRequest-Success"></a>
-
-### UpdatePayoutRequest.Success
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment-UpdatePayoutResponse"></a>
-
-### UpdatePayoutResponse
-
-
-
-This message has no fields defined.
 
 
 

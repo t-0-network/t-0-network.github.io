@@ -101,6 +101,7 @@ ProviderService is implemented by provider to provide pay-in details fpr payment
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_intent_id | [uint64](#uint64) |  | payment_intent_id from CreatePaymentIntentRequest |
+| payment_id | [uint64](#uint64) |  | corresponding payment_id for this payment intent |
 
 
 
