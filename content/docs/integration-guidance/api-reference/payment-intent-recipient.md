@@ -29,6 +29,7 @@ RecipientService is implemented by recipient in order to get updates on payment 
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
+| ConfirmPayIn | [ConfirmPayInRequest](#tzero-v1-payment_intent-recipient-ConfirmPayInRequest) | [ConfirmPayInResponse](#tzero-v1-payment_intent-recipient-ConfirmPayInResponse) | notifies recipient that pay-in providers received payment from payer |
 | ConfirmPayment | [ConfirmPaymentRequest](#tzero-v1-payment_intent-recipient-ConfirmPaymentRequest) | [ConfirmPaymentResponse](#tzero-v1-payment_intent-recipient-ConfirmPaymentResponse) | notifies recipient about successful payment |
 | RejectPaymentIntent | [RejectPaymentIntentRequest](#tzero-v1-payment_intent-recipient-RejectPaymentIntentRequest) | [RejectPaymentIntentResponse](#tzero-v1-payment_intent-recipient-RejectPaymentIntentResponse) | notifies recipient about failed payment |
 
@@ -36,6 +37,37 @@ RecipientService is implemented by recipient in order to get updates on payment 
 
 
 ##  Requests And Response Types
+
+
+<a name="tzero-v1-payment_intent-recipient-ConfirmPayInRequest"></a>
+
+### ConfirmPayInRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
+| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
+| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | pay-in payment method |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-recipient-ConfirmPayInResponse"></a>
+
+### ConfirmPayInResponse
+
+
+
+This message has no fields defined.
+
+
+
+
 
 
 <a name="tzero-v1-payment_intent-recipient-ConfirmPaymentRequest"></a>
@@ -46,9 +78,11 @@ RecipientService is implemented by recipient in order to get updates on payment 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentRequest |
-| payment_reference | [string](#string) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
+| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
+| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
+| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | pay-in payment method |
+| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount which will be paid out denominated in pay_out_currency of the payment intent |
+| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) |  | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
 
@@ -199,7 +233,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentRequest |
+| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
 | payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
 | reason | [string](#string) |  |  |
 

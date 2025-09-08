@@ -4,6 +4,7 @@ package tzero.v1.payment;
 
 import "tzero/v1/common/common.proto";
 import "tzero/v1/common/payment_method.proto";
+import "tzero/v1/common/payment_receipt.proto";
 import "google/protobuf/timestamp.proto";
 
 //import "validate/validate.proto";
@@ -18,7 +19,6 @@ service NetworkService {
   /**
     * Used by the provider to publish pay-in and pay-out quotes (FX rates) into the network.
     * These quotes include tiered pricing bands and an expiration timestamp.
-    * This method is idempotent, meaning that multiple calls with the same parameters will have no additional effect.
    */
   rpc UpdateQuote(UpdateQuoteRequest) returns (UpdateQuoteResponse)  {
     option idempotency_level = IDEMPOTENT;
@@ -42,18 +42,16 @@ service NetworkService {
     * If the quoteID is specified, it must be a valid quoteId that was previously returned by the GetPayoutQuote method.
     * If the quoteId is not specified, the network will try to find a suitable quote for the payout currency and amount,
     * same way as GetPayoutQuote rpc.
-    * This method is idempotent, meaning that multiple calls with the same parameters will have no additional effect.
    */
   rpc CreatePayment(CreatePaymentRequest) returns (CreatePaymentResponse) {
     option idempotency_level = IDEMPOTENT;
   };
 
   /**
-   * Inform the network that a payout has been completed or failed. This endpoint is called by the payout
+   * Inform the network that a payout has been completed. This endpoint is called by the payout
    * provider, specifying the payment ID and payout ID, which was provided when the payout request was made to this provider.
-   * This method is idempotent, meaning that multiple calls with the same parameters will have no additional effect.
    */
-  rpc UpdatePayout(UpdatePayoutRequest) returns (UpdatePayoutResponse)  {
+  rpc ConfirmPayout(ConfirmPayoutRequest) returns (ConfirmPayoutResponse)  {
     option idempotency_level = IDEMPOTENT;
   };
 }
@@ -174,25 +172,17 @@ message CreatePaymentResponse {
   }
 }
 
-message UpdatePayoutRequest{
+message ConfirmPayoutRequest{
   int64 payment_id = 10; // payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest
   int64 payout_id = 20; // payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest
 
-  oneof result {
-    Success success = 30; // success response with the details of the payout
-    Failure failure = 40; // failure response with the reason of the failure
-  }
-
-  message Success {
-
-  }
-
-  message Failure {
-
-  }
+  /**
+  * Payment receipt might contain metadata about payment recognizable by pay-in provider.
+  */
+  tzero.v1.common.PaymentReceipt receipt = 30;
 }
 
-message UpdatePayoutResponse{}
+message ConfirmPayoutResponse{}
 
 
 enum QuoteType {
