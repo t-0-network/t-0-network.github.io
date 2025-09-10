@@ -131,8 +131,8 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  |  |
-| pay_in_payment_methods | [CreatePaymentIntentResponse.PaymentMethod](#tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse-PaymentMethod) | repeated |  |
+| payment_intent_id | [uint64](#uint64) |  | Payment intent ID must be positive |
+| pay_in_payment_methods | [CreatePaymentIntentResponse.PaymentMethod](#tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse-PaymentMethod) | repeated | At least one payment method should be provided |
 
 
 
@@ -148,9 +148,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_url | [string](#string) |  |  |
-| provider_id | [uint32](#uint32) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
+| payment_url | [string](#string) |  | Payment URL must be a valid URL |
+| provider_id | [uint32](#uint32) |  | Provider ID must be positive |
+| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
 
 
 

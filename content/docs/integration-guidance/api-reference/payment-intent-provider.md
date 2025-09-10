@@ -47,8 +47,10 @@ ProviderService is implemented by provider to provide pay-in details fpr payment
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from CreatePaymentIntentRequest |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
+| payment_intent_id | [uint64](#uint64) |  | Payment intent ID must be positive
+
+payment_intent_id from CreatePaymentIntentRequest |
+| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
 
 
 
@@ -161,9 +163,15 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | idempotency key |
-| currency | [string](#string) |  | pay-in currency |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | pay-in amount |
+| payment_intent_id | [uint64](#uint64) |  | Payment intent ID must be positive
+
+idempotency key |
+| currency | [string](#string) |  | ISO 4217 currency code (3 uppercase letters)
+
+pay-in currency |
+| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount is required
+
+pay-in amount |
 
 
 
@@ -179,7 +187,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_methods | [CreatePaymentIntentResponse.PaymentMethod](#tzero-v1-payment_intent-provider-CreatePaymentIntentResponse-PaymentMethod) | repeated |  |
+| payment_methods | [CreatePaymentIntentResponse.PaymentMethod](#tzero-v1-payment_intent-provider-CreatePaymentIntentResponse-PaymentMethod) | repeated | At least one payment method should be provided |
 
 
 
@@ -195,8 +203,8 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_url | [string](#string) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
+| payment_url | [string](#string) |  | Payment URL must be a valid URL |
+| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
 
 
 

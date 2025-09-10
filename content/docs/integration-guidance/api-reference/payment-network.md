@@ -39,8 +39,12 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [int64](#int64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
-| payout_id | [int64](#int64) |  | payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest |
+| payment_id | [int64](#int64) |  | Payment ID must be positive
+
+payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
+| payout_id | [int64](#int64) |  | Payout ID must be positive
+
+payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest |
 | receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) |  | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
@@ -70,11 +74,21 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_client_id | [string](#string) |  | unique client generated id for this payment |
-| payout_currency | [string](#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
-| payout_details | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in the payin currency, by default USD (if the payIn currency is not specified) |
-| payin_currency | [string](#string) | optional | if not specified, USD is used |
+| payment_client_id | [string](#string) |  | Payment client ID must be non-empty and reasonable length
+
+unique client generated id for this payment |
+| payout_currency | [string](#string) |  | ISO 4217 currency code (3 uppercase letters)
+
+ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
+| payout_details | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | Payout details are required
+
+payment method to use for the payout, e.g. bank transfer, card, etc. |
+| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount is required
+
+amount in the payin currency, by default USD (if the payIn currency is not specified) |
+| payin_currency | [string](#string) | optional | If specified, must be valid ISO 4217 currency code
+
+if not specified, USD is used |
 | sender | [CreatePaymentRequest.Sender](#tzero-v1-payment-CreatePaymentRequest-Sender) |  | optional or option in the oneof? |
 | recipient | [CreatePaymentRequest.Recipient](#tzero-v1-payment-CreatePaymentRequest-Recipient) |  | optional or option in the oneof? |
 | reference | [string](#string) | optional | **Deprecated.** optional reference for the payment, up to 140 characters |
@@ -94,9 +108,9 @@ Work in progress
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| private_person_client_id | [string](#string) |  |  |
-| first_name | [string](#string) |  |  |
-| last_name | [string](#string) |  |  |
+| private_person_client_id | [string](#string) |  | Private person client ID must be non-empty |
+| first_name | [string](#string) |  | First name must be non-empty and reasonable length |
+| last_name | [string](#string) |  | Last name must be non-empty and reasonable length |
 
 
 
@@ -144,7 +158,9 @@ Work in progress
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_client_id | [string](#string) |  | client generated id supplied in the request |
+| payment_client_id | [string](#string) |  | Payment client ID must be non-empty
+
+client generated id supplied in the request |
 | success | [CreatePaymentResponse.Success](#tzero-v1-payment-CreatePaymentResponse-Success) |  | Success response - means the payment was accepted, but the payout is not yet completed. This means, the network found a suitable quote for the payout currency and amount, and instructed the payout provider to process the payout. |
 | failure | [CreatePaymentResponse.Failure](#tzero-v1-payment-CreatePaymentResponse-Failure) |  | Failure response - means the payment was not accepted, e.g. the network could not find a suitable quote for the payout currency and amount, or the credit limit is exceeded for the available quotes. |
 
@@ -175,7 +191,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [int64](#int64) |  | payment id assigned by the network |
+| payment_id | [int64](#int64) |  | Payment ID must be positive
+
+payment id assigned by the network |
 
 
 
@@ -191,10 +209,18 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payout_currency | [string](#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in quote currency, only USD is supported |
-| quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | type of the quote, e.g. real-time or guaranteed |
-| payout_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |
+| payout_currency | [string](#string) |  | ISO 4217 currency code (3 uppercase letters)
+
+ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
+| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount is required
+
+amount in quote currency, only USD is supported |
+| quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | Quote type must be specified
+
+type of the quote, e.g. real-time or guaranteed |
+| payout_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | Payout method must be specified
+
+payment method to use for the payout, e.g. bank transfer, card, etc. |
 
 
 
@@ -210,9 +236,13 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | rate in USD/currency, e.g. 1.2345 for 1 USD = 1.2345 EUR |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | expiration time of the quote |
-| quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  |  |
+| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Rate is required
+
+rate in USD/currency, e.g. 1.2345 for 1 USD = 1.2345 EUR |
+| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Expiration must be in the future
+
+expiration time of the quote |
+| quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | Quote ID is required |
 
 
 
@@ -228,8 +258,12 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| quote_id | [int64](#int64) |  | unique identifier of the quote within the specified provider |
-| provider_id | [int32](#int32) |  | provider id of the quote |
+| quote_id | [int64](#int64) |  | Quote ID must be positive
+
+unique identifier of the quote within the specified provider |
+| provider_id | [int32](#int32) |  | Provider ID must be positive
+
+provider id of the quote |
 
 
 
@@ -262,12 +296,22 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| currency | [string](#string) |  | BRL, EUR, GBP, etc. (ISO 4217 currency code) |
-| quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | type of the quote, e.g. real-time or guaranteed |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
-| bands | [UpdateQuoteRequest.Quote.Band](#tzero-v1-payment-UpdateQuoteRequest-Quote-Band) | repeated | list of bands for this quote |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | expiration time of the quote |
-| timestamp | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | timestamp quote was created |
+| currency | [string](#string) |  | ISO 4217 currency code (3 uppercase letters)
+
+BRL, EUR, GBP, etc. (ISO 4217 currency code) |
+| quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | Quote type must be specified
+
+type of the quote, e.g. real-time or guaranteed |
+| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
+| bands | [UpdateQuoteRequest.Quote.Band](#tzero-v1-payment-UpdateQuoteRequest-Quote-Band) | repeated | At least one band is required
+
+list of bands for this quote |
+| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Expiration must be in the future
+
+expiration time of the quote |
+| timestamp | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Timestamp is required
+
+timestamp quote was created |
 
 
 
@@ -283,9 +327,15 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| client_quote_id | [string](#string) |  | unique client generated id for this band |
-| max_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | USD/currency rate |
+| client_quote_id | [string](#string) |  | Client quote ID must be non-empty and reasonable length
+
+unique client generated id for this band |
+| max_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Max amount is required
+
+max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
+| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Rate is required and must be positive
+
+USD/currency rate |
 
 
 
