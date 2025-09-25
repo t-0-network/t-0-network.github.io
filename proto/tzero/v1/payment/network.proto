@@ -27,7 +27,7 @@ service NetworkService {
    * Request the best available quote for a payout in a specific currency, for a given amount.
    * If the payout quote exists, but the credit limit is exceeded, this quote will not be considered.
    */
-  rpc GetPayoutQuote(GetPayoutQuoteRequest) returns (GetPayoutQuoteResponse) {
+  rpc GetQuote(GetQuoteRequest) returns (GetQuoteResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
   };
 
@@ -71,37 +71,32 @@ message UpdateQuoteRequest {
   repeated Quote pay_in = 20;
 
   message Quote {
-    // ISO 4217 currency code (3 uppercase letters)
     string currency = 10 [(buf.validate.field).string = {
       len: 3,
       pattern: "^[A-Z]{3}$"
     }]; // BRL, EUR, GBP, etc. (ISO 4217 currency code)
-    // Quote type must be specified
-    QuoteType quote_type = 20 [(buf.validate.field).enum = {
-      not_in: [0]
-    }]; // type of the quote, e.g. real-time or guaranteed
+
+    QuoteType quote_type = 20 [(buf.validate.field).required = true];
     // Payment method must be specified
-    tzero.v1.common.PaymentMethodType payment_method = 25 [(buf.validate.field).enum = {
-      not_in: [0]
-    }];
-    // At least one band is required
+    tzero.v1.common.PaymentMethodType payment_method = 25 [(buf.validate.field).required = true];
+
     repeated Band bands = 30 [(buf.validate.field).repeated = {
       min_items: 1
     }]; // list of bands for this quote
-    // Expiration must be in the future
+
     google.protobuf.Timestamp expiration = 60 [(buf.validate.field).timestamp.gt_now = true]; // expiration time of the quote
-    // Timestamp is required
+
     google.protobuf.Timestamp timestamp = 70 [(buf.validate.field).required = true]; // timestamp quote was created
 
     message Band {
-      // Client quote ID must be non-empty and reasonable length
+
       string client_quote_id = 10 [(buf.validate.field).string = {
         min_len: 1,
         max_len: 64
       }]; // unique client generated id for this band
-      // Max amount is required
+
       tzero.v1.common.Decimal max_amount = 40 [(buf.validate.field).required = true]; // max amount of USD this quote is applicable for. Please look into documentation for valid amounts.
-      // Rate is required and must be positive
+
       tzero.v1.common.Decimal rate = 50 [(buf.validate.field).required = true]; // USD/currency rate
     }
   }
@@ -109,105 +104,57 @@ message UpdateQuoteRequest {
 
 message UpdateQuoteResponse {}
 
-message GetPayoutQuoteRequest {
-  // ISO 4217 currency code (3 uppercase letters)
-  string payout_currency = 10 [(buf.validate.field).string = {
-    len: 3,
-    pattern: "^[A-Z]{3}$"
-  }]; // ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made
-  // Amount is required
-  tzero.v1.common.Decimal amount = 20 [(buf.validate.field).required = true]; // amount in quote currency, only USD is supported
-  // Quote type must be specified
-  QuoteType quote_type = 30 [(buf.validate.field).enum = {
-    not_in: [0]
-  }]; // type of the quote, e.g. real-time or guaranteed
-  // Payout method must be specified
-  tzero.v1.common.PaymentMethodType payout_method = 40 [(buf.validate.field).enum = {
-    not_in: [0]
-  }]; // payment method to use for the payout, e.g. bank transfer, card, etc.
+message GetQuoteRequest {
+  string pay_in_currency = 10 [(buf.validate.field).string = {len: 3, pattern: "^[A-Z]{3}$"}]; // ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made
+  tzero.v1.common.Decimal pay_in_amount = 20 [(buf.validate.field).required = true]; // amount in pay-in currency
+  tzero.v1.common.PaymentMethodType pay_in_method = 30 [(buf.validate.field).required = true]; // payment method to use for the payout, e.g. bank transfer, card, etc.
+
+  string pay_out_currency = 40 [(buf.validate.field).string = {len: 3, pattern: "^[A-Z]{3}$"}]; // ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made
+  tzero.v1.common.PaymentMethodType pay_out_method = 50 [(buf.validate.field).required = true]; // payment method to use for the payout, e.g. bank transfer, card, etc.
+
+  QuoteType quote_type = 60 [(buf.validate.field).required = true]; // type of the quote, e.g. real-time or guaranteed
 }
 
-message GetPayoutQuoteResponse {
-  // Rate is required
+message GetQuoteResponse {
   tzero.v1.common.Decimal rate = 10 [(buf.validate.field).required = true]; // rate in USD/currency, e.g. 1.2345 for 1 USD = 1.2345 EUR
-  // Expiration must be in the future
+
   google.protobuf.Timestamp expiration = 20 [(buf.validate.field).timestamp.gt_now = true]; // expiration time of the quote
-  // Quote ID is required
+
   QuoteId quote_id = 30 [(buf.validate.field).required = true]; //
 }
 
 message CreatePaymentRequest{
-  // Payment client ID must be non-empty and reasonable length
   string payment_client_id = 10 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 64
   }]; // unique client generated id for this payment
 
-  // ISO 4217 currency code (3 uppercase letters)
-  string payout_currency = 20 [(buf.validate.field).string = {
-    len: 3,
-    pattern: "^[A-Z]{3}$"
-  }]; // ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made
-  // Payout details are required
-  tzero.v1.common.PaymentMethod payout_details = 25 [(buf.validate.field).required = true]; // payment method to use for the payout, e.g. bank transfer, card, etc.
-  // Amount is required
-  tzero.v1.common.Decimal amount = 30 [(buf.validate.field).required = true]; // amount in the payin currency, by default USD (if the payIn currency is not specified)
-  // If specified, must be valid ISO 4217 currency code
-  optional string payin_currency = 40 [(buf.validate.field).string = {
-    len: 3,
-    pattern: "^[A-Z]{3}$"
-  }]; // if not specified, USD is used
-
-  Sender sender = 50; // optional or option in the oneof?
-  Recipient recipient = 60; // optional or option in the oneof?
+  PaymentAmount amount = 30 [(buf.validate.field).required = true];
+  PayIn pay_in = 40 [(buf.validate.field).required = true];
+  PayOut pay_out = 45 [(buf.validate.field).required = true];
 
   optional string reference = 70 [deprecated = true, (buf.validate.field).string.max_len = 140]; // optional reference for the payment, up to 140 characters
 
-  optional QuoteId quote_id = 100; // if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method
-
-  // Work in progress
-  message Sender {
-    oneof sender {
-      PrivatePerson private_person = 10;
-    }
+  // Provider must submit quotes to the network for the specified pay-in currency and payment method
+  message PayIn {
+    string currency = 10 [(buf.validate.field).string = {len: 3, pattern: "^[A-Z]{3}$"}];
+    tzero.v1.common.PaymentMethodType payment_method = 20 [(buf.validate.field).required = true];
   }
 
-  // Work in progress
-  message Recipient {
-    oneof recipient {
-      PrivatePerson private_person = 10;
-    }
-  }
-
-  // Work in progress
-  message PrivatePerson {
-    // Private person client ID must be non-empty
-    string private_person_client_id = 10 [(buf.validate.field).string = {
-      min_len: 1,
-      max_len: 64
-    }];
-    // First name must be non-empty and reasonable length
-    string first_name = 20 [(buf.validate.field).string = {
-      min_len: 1,
-      max_len: 50
-    }];
-    // Last name must be non-empty and reasonable length
-    string last_name = 30 [(buf.validate.field).string = {
-      min_len: 1,
-      max_len: 50
-    }];
+  message PayOut {
+    string currency = 10 [(buf.validate.field).string = {len: 3, pattern: "^[A-Z]{3}$"}];
+    tzero.v1.common.PaymentMethod payment_method = 20 [(buf.validate.field).required = true];
+    optional QuoteId quote_id = 100; // if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method otherwise last available quote will be used
   }
 }
 
 message QuoteId {
-  // Quote ID must be positive
   int64 quote_id = 30 [(buf.validate.field).int64.gt = 0]; // unique identifier of the quote within the specified provider
-  // Provider ID must be positive
+
   int32 provider_id = 40 [(buf.validate.field).int32.gt = 0]; // provider id of the quote
 }
 
 message CreatePaymentResponse {
-  // Payment client ID must be non-empty
   string payment_client_id = 10 [(buf.validate.field).string.min_len = 1]; // client generated id supplied in the request
 
   oneof result {
@@ -225,8 +172,9 @@ message CreatePaymentResponse {
   };
 
   message Success {
-    // Payment ID must be positive
-    int64 payment_id = 10 [(buf.validate.field).int64.gt = 0]; // payment id assigned by the network
+    uint64 payment_id = 10 [(buf.validate.field).uint64.gt = 0]; // payment id assigned by the network
+    tzero.v1.common.Decimal pay_in_amount = 20 [(buf.validate.field).required = true];
+    tzero.v1.common.Decimal settlement_amount = 30 [(buf.validate.field).required = true];
   }
 
   message Failure {
@@ -238,10 +186,9 @@ message CreatePaymentResponse {
 }
 
 message ConfirmPayoutRequest{
-  // Payment ID must be positive
-  int64 payment_id = 10 [(buf.validate.field).int64.gt = 0]; // payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest
-  // Payout ID must be positive
-  int64 payout_id = 20 [(buf.validate.field).int64.gt = 0]; // payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest
+  uint64 payment_id = 10 [(buf.validate.field).uint64.gt = 0]; // payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest
+
+  uint64 payout_id = 20 [(buf.validate.field).uint64.gt = 0]; // payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest
 
   /**
   * Payment receipt might contain metadata about payment recognizable by pay-in provider.
@@ -251,6 +198,15 @@ message ConfirmPayoutRequest{
 
 message ConfirmPayoutResponse{}
 
+// Payment amount could be specified eiter as pay-in amount and then converted to corresponding amount of pay-out amount
+// or as pay-out amount, so that pay-in and settlement amounts are calculated accordingly
+message PaymentAmount {
+  oneof amount {
+    option (buf.validate.oneof).required = true;
+    tzero.v1.common.Decimal pay_in_amount = 10; // Amount in the pay-in currency
+    tzero.v1.common.Decimal pay_out_amount = 20; // Amount in the pay-out currency
+  }
+}
 
 enum QuoteType {
   QUOTE_TYPE_UNSPECIFIED = 0;

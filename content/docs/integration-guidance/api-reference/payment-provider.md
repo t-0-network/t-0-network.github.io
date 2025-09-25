@@ -208,8 +208,8 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [int64](#int64) |  | payment id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
-| payout_id | [int64](#int64) |  | payout id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
+| payment_id | [uint64](#uint64) |  | payment id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
+| payout_id | [uint64](#uint64) |  | payout id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
 | currency | [string](#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
 | client_quote_id | [string](#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
 | amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient.
