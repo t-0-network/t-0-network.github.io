@@ -212,12 +212,10 @@ This message has no fields defined.
 | payout_id | [uint64](#uint64) |  | payout id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
 | currency | [string](#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
 | client_quote_id | [string](#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient.
-
-* payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
-| payout_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) | optional |  |
+| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
+| payout_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) | optional | payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
 | pay_in_provider_id | [uint32](#uint32) |  | Pay-in provider id which initiated the pay out. |
-| travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional |  |
+| travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional | travel rule data for the payout |
 
 
 

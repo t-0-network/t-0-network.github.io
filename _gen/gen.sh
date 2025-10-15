@@ -35,3 +35,6 @@ gen "integration-guidance/api-reference" "payment-provider.md" "Payment Provider
 
 gen "integration-guidance/api-reference" "payment-intent-provider.md" "Payment Intent Provider" 333 tzero/v1/payment_intent/provider/provider.proto
 gen "integration-guidance/api-reference" "payment-intent-recipient.md" "Payment Intent Recipient" 334 tzero/v1/payment_intent/recipient/recipient.proto
+
+gen "integration-guidance/api-reference" "travel-rule.md" "Travel Rule Data" 335 tzero/v1/payment_intent/recipient/recipient.proto
+gen "integration-guidance/api-reference" "travel-rule-enums.md" "Travel Rule Data Constants" 336 tzero/v1/payment_intent/recipient/recipient.proto

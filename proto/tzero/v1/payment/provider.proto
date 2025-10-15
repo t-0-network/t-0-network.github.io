@@ -181,7 +181,6 @@ message PayoutRequest {
    * payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc.
    * This is used to specify how the payout should be made.
    */
-
   optional tzero.v1.common.PaymentMethod payout_method = 60;
 
   /**
@@ -189,7 +188,9 @@ message PayoutRequest {
    */
   uint32 pay_in_provider_id = 80;
 
-
+  /**
+   * travel rule data for the payout
+   */
   optional TravelRuleData travel_rule_data = 200;
 
   message TravelRuleData {
