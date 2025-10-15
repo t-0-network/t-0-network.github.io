@@ -10,252 +10,102 @@ toc: true
 ---
 
 
-
-<a name="tzero-v1-payment_intent-recipient-NetworkService"></a>
-
-## NetworkService
-NetworkService is used by recipient to create a payment intents
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-recipient-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse) |  |
-| GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-recipient-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-recipient-GetQuoteResponse) |  |
-
-
-<a name="tzero-v1-payment_intent-recipient-RecipientService"></a>
-
-## RecipientService
-RecipientService is implemented by recipient in order to get updates on payment intents
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| ConfirmPayIn | [ConfirmPayInRequest](#tzero-v1-payment_intent-recipient-ConfirmPayInRequest) | [ConfirmPayInResponse](#tzero-v1-payment_intent-recipient-ConfirmPayInResponse) | notifies recipient that pay-in providers received payment from payer |
-| ConfirmPayment | [ConfirmPaymentRequest](#tzero-v1-payment_intent-recipient-ConfirmPaymentRequest) | [ConfirmPaymentResponse](#tzero-v1-payment_intent-recipient-ConfirmPaymentResponse) | notifies recipient about successful payment |
-| RejectPaymentIntent | [RejectPaymentIntentRequest](#tzero-v1-payment_intent-recipient-RejectPaymentIntentRequest) | [RejectPaymentIntentResponse](#tzero-v1-payment_intent-recipient-RejectPaymentIntentResponse) | notifies recipient about failed payment |
-
  <!-- end services -->
 
 
 ##  Requests And Response Types
 
-
-<a name="tzero-v1-payment_intent-recipient-ConfirmPayInRequest"></a>
-
-### ConfirmPayInRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
-| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | pay-in payment method |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-ConfirmPayInResponse"></a>
-
-### ConfirmPayInResponse
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-ConfirmPaymentRequest"></a>
-
-### ConfirmPaymentRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
-| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | pay-in payment method |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount which will be paid out denominated in pay_out_currency of the payment intent |
-| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) |  | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-ConfirmPaymentResponse"></a>
-
-### ConfirmPaymentResponse
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-CreatePaymentIntentRequest"></a>
-
-### CreatePaymentIntentRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_reference | [string](#string) |  | Idempotency Key payment reference to identify payment by client. |
-| pay_in_currency | [string](#string) |  | Pay-in currency |
-| pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount denominated in the pay-in currency |
-| pay_out_currency | [string](#string) |  | Payout currency |
-| pay_out_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | Payout payment method |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse"></a>
-
-### CreatePaymentIntentResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  |  |
-| pay_in_payment_methods | [CreatePaymentIntentResponse.PaymentMethod](#tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse-PaymentMethod) | repeated |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse-PaymentMethod"></a>
-
-### CreatePaymentIntentResponse.PaymentMethod
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_url | [string](#string) |  |  |
-| provider_id | [uint32](#uint32) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-GetQuoteRequest"></a>
-
-### GetQuoteRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| pay_in_currency | [string](#string) |  | Pay-in currency |
-| pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount denominated in the pay-in currency |
-| pay_out_currency | [string](#string) |  | Payout currency |
-| pay_in_payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the pay-in, e.g. bank transfer, card, etc. |
-| pay_out_payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the pay-out, e.g. bank transfer, card, etc. |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse"></a>
-
-### GetQuoteResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| quote | [GetQuoteResponse.Quote](#tzero-v1-payment_intent-recipient-GetQuoteResponse-Quote) |  |  |
-| not_found | [GetQuoteResponse.NotFound](#tzero-v1-payment_intent-recipient-GetQuoteResponse-NotFound) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse-NotFound"></a>
-
-### GetQuoteResponse.NotFound
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse-Quote"></a>
-
-### GetQuoteResponse.Quote
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Rate of pay-in currency to pay-out |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Time until when quote is valid. Used only for reference. Actual quote is determined at the moment of payment. |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-RejectPaymentIntentRequest"></a>
-
-### RejectPaymentIntentRequest
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
-| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
-| reason | [string](#string) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-RejectPaymentIntentResponse"></a>
-
-### RejectPaymentIntentResponse
-
-
-
-This message has no fields defined.
-
-
-
-
-
  <!-- end messages -->
+
+
+<a name="ivms101-AddressTypeCode"></a>
+
+### AddressTypeCode
+Definition: Identifies the nature of the address.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ADDRESS_TYPE_CODE_MISC | 0 | Unspecified An address the category of which the sender is unable to determine. Use GEOG instead of this code in general use. Not an official part of the IVMS 101 Standard |
+| ADDRESS_TYPE_CODE_HOME | 1 | Residential Address is the home address. |
+| ADDRESS_TYPE_CODE_BIZZ | 2 | Business Address is the business address. |
+| ADDRESS_TYPE_CODE_GEOG | 3 | Geographic Address is the unspecified physical (geographical) address suitable for identification of the natural or legal person. |
+
+
+
+<a name="ivms101-LegalPersonNameTypeCode"></a>
+
+### LegalPersonNameTypeCode
+Definition: A single value corresponding to the nature of name being specified
+for the legal person.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| LEGAL_PERSON_NAME_TYPE_CODE_MISC | 0 | Unspecified A name by which a legal person may be known but which cannot otherwise be categorized or the category of which the sender is unable to determine. Not an official part of the IVMS 101 Standard |
+| LEGAL_PERSON_NAME_TYPE_CODE_LEGL | 1 | Legal name Official name under which an organisation is registered. |
+| LEGAL_PERSON_NAME_TYPE_CODE_SHRT | 2 | Short name Specifies the short name of the organisation. |
+| LEGAL_PERSON_NAME_TYPE_CODE_TRAD | 3 | Trading name Name used by a business for commercial purposes, although its registered legal name, used for contracts and other formal situations, may be another. |
+
+
+
+<a name="ivms101-NationalIdentifierTypeCode"></a>
+
+### NationalIdentifierTypeCode
+Definition: Identifies the national identification type.
+NationalIdentifierTypeCode applies a restriction over the codes present in ISO20022
+datatype ‘TypeOfIdentification4Code’.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| NATIONAL_IDENTIFIER_TYPE_CODE_MISC | 0 | Unspecified A national identifier which may be known but which cannot otherwise be categorized or the category of which the sender is unable to determine. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_ARNU | 1 | Alien registration number Number assigned by a government agency to identify foreign nationals. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_CCPT | 2 | Passport number Number assigned by a passport authority. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_RAID | 3 | Registration authority identifier Identifier of a legal entity as maintained by a registration authority. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_DRLC | 4 | Driver license number Number assigned to a driver's license. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_FIIN | 5 | Foreign investment identity number Number assigned to a foreign investor (other than the alien number). |
+| NATIONAL_IDENTIFIER_TYPE_CODE_TXID | 6 | Tax identification number Number assigned by a tax authority to an entity. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_SOCS | 7 | Social security number Number assigned by a social security agency. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_IDCD | 8 | Identity card number Number assigned by a national authority to an identity card. |
+| NATIONAL_IDENTIFIER_TYPE_CODE_LEIX | 9 | Legal Entity Identifier Legal Entity Identifier (LEI) assigned in accordance with ISO 17442. The LEI is a 20-character, alpha-numeric code that enables clear and unique identification of legal entities participating in financial transactions. |
+
+
+
+<a name="ivms101-NaturalPersonNameTypeCode"></a>
+
+### NaturalPersonNameTypeCode
+Definition: A single value corresponding to the nature of name being adopted.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| NATURAL_PERSON_NAME_TYPE_CODE_MISC | 0 | Unspecified A name by which a natural person may be known but which cannot otherwise be categorized or the category of which the sender is unable to determine. |
+| NATURAL_PERSON_NAME_TYPE_CODE_ALIA | 1 | Alias name A name other than the legal name by which a natural person is also known. |
+| NATURAL_PERSON_NAME_TYPE_CODE_BIRT | 2 | Name at birth The name given to a natural person at birth. |
+| NATURAL_PERSON_NAME_TYPE_CODE_MAID | 3 | Maiden name The original name of a natural person who has changed their name after marriage. |
+| NATURAL_PERSON_NAME_TYPE_CODE_LEGL | 4 | Legal name Identifies a natural person for legal, official or administrative purposes. |
+
+
+
+<a name="ivms101-TransliterationMethodCode"></a>
+
+### TransliterationMethodCode
+Definition: Identifies the national script from which transliteration to Latin
+script is applied.
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| TRANSLITERATION_METHOD_CODE_OTHR | 0 | Script other than those listed below Unspecified Standard |
+| TRANSLITERATION_METHOD_CODE_ARAB | 1 | Arabic (Arabic language) ISO 233-2:1993 |
+| TRANSLITERATION_METHOD_CODE_ARAN | 2 | Arabic (Persian language) ISO 233-3:1999 |
+| TRANSLITERATION_METHOD_CODE_ARMN | 3 | Armenian ISO 9985:1996 |
+| TRANSLITERATION_METHOD_CODE_CYRL | 4 | Cyrillic ISO 9:1995 |
+| TRANSLITERATION_METHOD_CODE_DEVA | 5 | Devanagari & related Indic ISO 15919:2001 |
+| TRANSLITERATION_METHOD_CODE_GEOR | 6 | Georgian ISO 9984:1996 |
+| TRANSLITERATION_METHOD_CODE_GREK | 7 | Greek ISO 843:1997 |
+| TRANSLITERATION_METHOD_CODE_HANI | 8 | Han (Hanzi, Kanji, Hanja) ISO 7098:2015 |
+| TRANSLITERATION_METHOD_CODE_HEBR | 9 | Hebrew ISO 259-2:1994 |
+| TRANSLITERATION_METHOD_CODE_KANA | 10 | Kana ISO 3602:1989 |
+| TRANSLITERATION_METHOD_CODE_KORE | 11 | Korean Revised Romanization of Korean |
+| TRANSLITERATION_METHOD_CODE_THAI | 12 | Thai ISO 11940-2:2007 |
+
 
  <!-- end enums -->
 

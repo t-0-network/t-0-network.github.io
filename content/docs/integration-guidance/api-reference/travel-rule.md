@@ -10,46 +10,101 @@ toc: true
 ---
 
 
-
-<a name="tzero-v1-payment_intent-recipient-NetworkService"></a>
-
-## NetworkService
-NetworkService is used by recipient to create a payment intents
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-recipient-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse) |  |
-| GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-recipient-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-recipient-GetQuoteResponse) |  |
-
-
-<a name="tzero-v1-payment_intent-recipient-RecipientService"></a>
-
-## RecipientService
-RecipientService is implemented by recipient in order to get updates on payment intents
-
-| Method Name | Request Type | Response Type | Description |
-| ----------- | ------------ | ------------- | ------------|
-| ConfirmPayIn | [ConfirmPayInRequest](#tzero-v1-payment_intent-recipient-ConfirmPayInRequest) | [ConfirmPayInResponse](#tzero-v1-payment_intent-recipient-ConfirmPayInResponse) | notifies recipient that pay-in providers received payment from payer |
-| ConfirmPayment | [ConfirmPaymentRequest](#tzero-v1-payment_intent-recipient-ConfirmPaymentRequest) | [ConfirmPaymentResponse](#tzero-v1-payment_intent-recipient-ConfirmPaymentResponse) | notifies recipient about successful payment |
-| RejectPaymentIntent | [RejectPaymentIntentRequest](#tzero-v1-payment_intent-recipient-RejectPaymentIntentRequest) | [RejectPaymentIntentResponse](#tzero-v1-payment_intent-recipient-RejectPaymentIntentResponse) | notifies recipient about failed payment |
-
  <!-- end services -->
 
 
 ##  Requests And Response Types
 
 
-<a name="tzero-v1-payment_intent-recipient-ConfirmPayInRequest"></a>
+<a name="ivms101-Address"></a>
 
-### ConfirmPayInRequest
+### Address
+Constraint: ValidAddress
+There must be at least one occurrence of the element addressLine or (streetName and
+buildingName and/or buildingNumber).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| address_type | [AddressTypeCode](#ivms101-AddressTypeCode) |  | Definition: Identifies the nature of the address. |
+| department | [string](#string) |  | Definition: Identification of a division of a large organisation or building. |
+| sub_department | [string](#string) |  | Definition: Identification of a sub-division of a large organisation or building. |
+| street_name | [string](#string) |  | Definition: Name of a street or thoroughfare. |
+| building_number | [string](#string) |  | Definition: Number that identifies the position of a building on a street. |
+| building_name | [string](#string) |  | Definition: Name of the building or house. |
+| floor | [string](#string) |  | Definition: Floor or storey within a building. |
+| post_box | [string](#string) |  | Definition: Numbered box in a post office, assigned to a person or organisation, where letters are kept until called for. |
+| room | [string](#string) |  | Definition: Building room number. |
+| post_code | [string](#string) |  | Definition: Identifier consisting of a group of letters and/or numbers that is added to a postal address to assist the sorting of mail. |
+| town_name | [string](#string) |  | Definition: Name of a built-up area, with defined boundaries and a local government. |
+| town_location_name | [string](#string) |  | Definition: Specific location name within the town. |
+| district_name | [string](#string) |  | Definition: Identifies a subdivision within a country subdivision. |
+| country_sub_division | [string](#string) |  | Definition: Identifies a subdivision of a country for example, state, region, province, départment or county. |
+| address_line | [string](#string) | repeated | Definition: Information that locates and identifies a specific address, as defined by postal services, presented in free format text. |
+| country | [string](#string) |  | Constraint: The value used for the field country must be present on the ISO-3166-1 alpha-2 codes or the value XX. |
+
+
+
+
+
+
+
+<a name="ivms101-DateAndPlaceOfBirth"></a>
+
+### DateAndPlaceOfBirth
+Constraint: DateInPast
+If dateOfBirth is specified, the date specified must be a historic date (i.e. a date
+prior to the current date)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| date_of_birth | [string](#string) |  | Definition: Date on which a person is born. Definition: A point in time, represented as a day within the calendar year. Compliant with ISO 8601. Format: YYYY-MM-DD |
+| place_of_birth | [string](#string) |  | Definition: The town and/or the city and/or the suburb and/or the country subdivision and/or the country where the person was born. |
+
+
+
+
+
+
+
+<a name="ivms101-LegalPerson"></a>
+
+### LegalPerson
+Definition: refers to any entity other than a natural person that can establish a
+permanent customer relationship with an affected entity or otherwise own property.
+This can include companies, bodies corporate, foundations, anstalt, partnerships, or
+associations and other relevantly similar entities.
+Constraint: OriginatorInformationLegalPerson
+If the originator is a LegalPerson either geographicAddress (with an addressType
+value of ‘GEOG’) and/or nationalIdentification and/or customerNumber is required.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [LegalPersonName](#ivms101-LegalPersonName) |  | Definition: The name of the legal person. Constraint: LegalNamePresentLegalPerson At least one occurrence of legalPersonNameIdentifier must have the value ‘LEGL’ specified in the element legalPersonNameIdentifierType. |
+| geographic_addresses | [Address](#ivms101-Address) | repeated | Definition: The address of the legal person. |
+| customer_number | [string](#string) |  | Definition: The unique identification number applied by the VASP to customer. NOTE The specification has a descrepency in that 5.2.9.3.3 specifies an element name as "customerNumber", while the table in 5.2.9.1 calls that element "customerIdentification" |
+| national_identification | [NationalIdentification](#ivms101-NationalIdentification) |  | Definition: A distinct identifier used by governments of countries to uniquely identify a natural or legal person. |
+| country_of_registration | [string](#string) |  | Definition: The country in which the legal person is registered. Constraint: The value used for the field country must be present on the ISO-3166-1 alpha-2 codes or the value XX. |
+
+
+
+
+
+
+
+<a name="ivms101-LegalPersonName"></a>
+
+### LegalPersonName
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
-| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | pay-in payment method |
+| name_identifiers | [LegalPersonNameId](#ivms101-LegalPersonNameId) | repeated | Definition: The name and type of name by which the legal person is known. Constraint: LegalNamePresent At least one occurrence of legalPersonNameIdentifier must have the value ‘LEGL’ specified in the element legalPersonNameIdentifierType. |
+| local_name_identifiers | [LocalLegalPersonNameId](#ivms101-LocalLegalPersonNameId) | repeated | Definition: The name and type of name by which the legal person is known using local characters. |
+| phonetic_name_identifiers | [LocalLegalPersonNameId](#ivms101-LocalLegalPersonNameId) | repeated | Definition: The name and type of name by which the legal person is known using local characters. |
 
 
 
@@ -57,32 +112,16 @@ RecipientService is implemented by recipient in order to get updates on payment 
 
 
 
-<a name="tzero-v1-payment_intent-recipient-ConfirmPayInResponse"></a>
+<a name="ivms101-LegalPersonNameId"></a>
 
-### ConfirmPayInResponse
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-ConfirmPaymentRequest"></a>
-
-### ConfirmPaymentRequest
+### LegalPersonNameId
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
-| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | pay-in payment method |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount which will be paid out denominated in pay_out_currency of the payment intent |
-| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) |  | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| legal_person_name | [string](#string) |  | Definition: Name by which the legal person is known. |
+| legal_person_name_identifier_type | [LegalPersonNameTypeCode](#ivms101-LegalPersonNameTypeCode) |  | Definition: The nature of the name specified. |
 
 
 
@@ -90,32 +129,16 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-payment_intent-recipient-ConfirmPaymentResponse"></a>
+<a name="ivms101-LocalLegalPersonNameId"></a>
 
-### ConfirmPaymentResponse
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-CreatePaymentIntentRequest"></a>
-
-### CreatePaymentIntentRequest
+### LocalLegalPersonNameId
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_reference | [string](#string) |  | Idempotency Key payment reference to identify payment by client. |
-| pay_in_currency | [string](#string) |  | Pay-in currency |
-| pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount denominated in the pay-in currency |
-| pay_out_currency | [string](#string) |  | Payout currency |
-| pay_out_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | Payout payment method |
+| legal_person_name | [string](#string) |  | Definition: Name by which the legal person is known. |
+| legal_person_name_identifier_type | [LegalPersonNameTypeCode](#ivms101-LegalPersonNameTypeCode) |  | Definition: The nature of the name specified. |
 
 
 
@@ -123,34 +146,17 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse"></a>
+<a name="ivms101-LocalNaturalPersonNameId"></a>
 
-### CreatePaymentIntentResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  |  |
-| pay_in_payment_methods | [CreatePaymentIntentResponse.PaymentMethod](#tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse-PaymentMethod) | repeated |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-CreatePaymentIntentResponse-PaymentMethod"></a>
-
-### CreatePaymentIntentResponse.PaymentMethod
+### LocalNaturalPersonNameId
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_url | [string](#string) |  |  |
-| provider_id | [uint32](#uint32) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
+| primary_identifier | [string](#string) |  | Definition: This may be the family name, the maiden name or the married name, the main name, the surname, and in some cases, the entire name where the natural person’s name cannot be divided into two parts, or where the sender is unable to divide the natural person’s name into two parts. |
+| secondary_identifier | [string](#string) |  | Definition: These may be the forenames, familiar names, given names, initials, prefixes, suffixes or Roman numerals (where considered to be legally part of the name) or any other secondary names. |
+| name_identifier_type | [NaturalPersonNameTypeCode](#ivms101-NaturalPersonNameTypeCode) |  | Definition: The nature of the name specified. |
 
 
 
@@ -158,19 +164,66 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-payment_intent-recipient-GetQuoteRequest"></a>
+<a name="ivms101-NationalIdentification"></a>
 
-### GetQuoteRequest
+### NationalIdentification
+Constraint: ValidNationalIdentifierLegalPerson
+A legal person must have a value for nationalIdentifierType of either ‘RAID’ or
+‘MISC’ or ‘LEIX’ or ‘TXID’.
+Constraint: CompleteNationalIdentifierLegalPerson
+A LegalPerson must not have a value for countryOfIssue and must have a value for the
+element RegistrationAuthority if the value for nationalIdentifierType is not ‘LEIX’
+Constraint: ValidLEI
+A LegalPerson with a nationalIdentifierType of ‘LEIX’ must have a value for the
+element nationalIdentifier that adheres to the convention as stated in datatype
+‘LEIText’.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| national_identifier | [string](#string) |  | Definition: An identifier issued by an appropriate issuing authority. Constraint: ValidLEI |
+| national_identifier_type | [NationalIdentifierTypeCode](#ivms101-NationalIdentifierTypeCode) |  | Definition: Specifies the type of identifier specified. |
+| country_of_issue | [string](#string) |  | Definition: Country of the issuing authority. |
+| registration_authority | [string](#string) |  | Definition: A code specifying the registration authority. Constraint: The value used for the applicable element must be present on the GLEIF Registration Authorities List. |
+
+
+
+
+
+
+
+<a name="ivms101-NaturalPerson"></a>
+
+### NaturalPerson
+Definition: refers to a uniquely distinguishable individual; one single person
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| name | [NaturalPersonName](#ivms101-NaturalPersonName) |  | Definition: the distinct words used as identification for an individual. |
+| geographic_addresses | [Address](#ivms101-Address) | repeated | Definition: the particulars of a location at which a person may be communicated with. |
+| national_identification | [NationalIdentification](#ivms101-NationalIdentification) |  | Definition: a distinct identifier used by governments of countries to uniquely identify a natural or legal person. |
+| customer_identification | [string](#string) |  | Definition: a distinct identifier that uniquely identifies the person to the institution in context. |
+| date_and_place_of_birth | [DateAndPlaceOfBirth](#ivms101-DateAndPlaceOfBirth) |  | Definition: date and place of birth of a person. |
+| country_of_residence | [string](#string) |  | Definition: country in which a person resides (the place of a person's home). The value used for the field country must be present on the ISO-3166-1 alpha-2 codes or the value XX. |
+
+
+
+
+
+
+
+<a name="ivms101-NaturalPersonName"></a>
+
+### NaturalPersonName
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_in_currency | [string](#string) |  | Pay-in currency |
-| pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount denominated in the pay-in currency |
-| pay_out_currency | [string](#string) |  | Payout currency |
-| pay_in_payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the pay-in, e.g. bank transfer, card, etc. |
-| pay_out_payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the pay-out, e.g. bank transfer, card, etc. |
+| name_identifiers | [NaturalPersonNameId](#ivms101-NaturalPersonNameId) | repeated | At least one occurrence of naturalPersonNameID must have the value ‘LEGL’ specified in the element naturalPersonNameIdentifierType. Definition: full name separated into primary and secondary identifier. |
+| local_name_identifiers | [LocalNaturalPersonNameId](#ivms101-LocalNaturalPersonNameId) | repeated | Definition: full name separated into primary and secondary identifier using local characters. |
+| phonetic_name_identifiers | [LocalNaturalPersonNameId](#ivms101-LocalNaturalPersonNameId) | repeated | Definition: Alternate representation of a name that corresponds to the manner the name is pronounced. |
 
 
 
@@ -178,46 +231,17 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse"></a>
+<a name="ivms101-NaturalPersonNameId"></a>
 
-### GetQuoteResponse
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| quote | [GetQuoteResponse.Quote](#tzero-v1-payment_intent-recipient-GetQuoteResponse-Quote) |  |  |
-| not_found | [GetQuoteResponse.NotFound](#tzero-v1-payment_intent-recipient-GetQuoteResponse-NotFound) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse-NotFound"></a>
-
-### GetQuoteResponse.NotFound
-
-
-
-This message has no fields defined.
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-GetQuoteResponse-Quote"></a>
-
-### GetQuoteResponse.Quote
+### NaturalPersonNameId
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Rate of pay-in currency to pay-out |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Time until when quote is valid. Used only for reference. Actual quote is determined at the moment of payment. |
+| primary_identifier | [string](#string) |  | Definition: This may be the family name, the maiden name or the married name, the main name, the surname, and in some cases, the entire name where the natural person’s name cannot be divided into two parts, or where the sender is unable to divide the natural person’s name into two parts. |
+| secondary_identifier | [string](#string) |  | Definition: These may be the forenames, familiar names, given names, initials, prefixes, suffixes or Roman numerals (where considered to be legally part of the name) or any other secondary names. |
+| name_identifier_type | [NaturalPersonNameTypeCode](#ivms101-NaturalPersonNameTypeCode) |  | Definition: The nature of the name specified. |
 
 
 
@@ -225,31 +249,17 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-payment_intent-recipient-RejectPaymentIntentRequest"></a>
+<a name="ivms101-Person"></a>
 
-### RejectPaymentIntentRequest
+### Person
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](#uint64) |  | payment_intent_id from the CreatePaymentIntentResponse |
-| payment_reference | [string](#string) |  | payment_reference from the CreatePaymentIntentRequest |
-| reason | [string](#string) |  |  |
+| natural_person | [NaturalPerson](#ivms101-NaturalPerson) |  | Definition: a uniquely distinguishable individual; one single person. |
+| legal_person | [LegalPerson](#ivms101-LegalPerson) |  | Definition: any entity other than a natural person that can establish a permanent customer relationship with an affected entity or otherwise own property. This can include companies, bodies corporate, foundations, anstalt, partnerships, or associations and other relevantly similar entities. |
 
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-recipient-RejectPaymentIntentResponse"></a>
-
-### RejectPaymentIntentResponse
-
-
-
-This message has no fields defined.
 
 
 
