@@ -74,7 +74,7 @@ This message has no fields defined.
 | amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  |  |
 | pay_in | [CreatePaymentRequest.PayIn](#tzero-v1-payment-CreatePaymentRequest-PayIn) |  |  |
 | pay_out | [CreatePaymentRequest.PayOut](#tzero-v1-payment-CreatePaymentRequest-PayOut) |  |  |
-| reference | [string](#string) | optional | **Deprecated.** optional reference for the payment, up to 140 characters |
+| travel_rule_data | [CreatePaymentRequest.TravelRuleData](#tzero-v1-payment-CreatePaymentRequest-TravelRuleData) | optional |  |
 
 
 
@@ -110,6 +110,23 @@ Provider must submit quotes to the network for the specified pay-in currency and
 | currency | [string](#string) |  |  |
 | payment_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  |  |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) | optional | if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method otherwise last available quote will be used |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-CreatePaymentRequest-TravelRuleData"></a>
+
+### CreatePaymentRequest.TravelRuleData
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| originator | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
+| beneficiary | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
 
 
 
@@ -175,7 +192,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | pay_in_currency | [string](#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
-| pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in pay-in currency |
+| amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  | amount |
 | pay_in_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |
 | pay_out_currency | [string](#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
 | pay_out_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |

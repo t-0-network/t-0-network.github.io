@@ -216,8 +216,25 @@ This message has no fields defined.
 
 * payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
 | payout_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) | optional |  |
-| reference | [string](#string) | optional | optional reference for the payment, up to 140 characters |
 | pay_in_provider_id | [uint32](#uint32) |  | Pay-in provider id which initiated the pay out. |
+| travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-PayoutRequest-TravelRuleData"></a>
+
+### PayoutRequest.TravelRuleData
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| originator | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
+| beneficiary | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
 
 
 
