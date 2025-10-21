@@ -57,10 +57,8 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | ----- | ---- | ----- | ----------- |
 | account_owner_id | [uint32](#uint32) |  | 1 is network account, others are ids of participants |
 | account_type | [AppendLedgerEntriesRequest.AccountType](#tzero-v1-payment-AppendLedgerEntriesRequest-AccountType) |  | account_type is the type of the account that the entry belongs to. It is used to categorize the entries and understand the nature of the financial event. |
-| currency | [string](#string) |  | It is the currency of the entry. If the transaction contains entries with multiple currencies, the exchange_rate field should be provided to be used to convert the amounts to USD. |
 | debit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | debit is the amount that was debited from the account. If the entry is a credit, this field should be 0. |
 | credit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | credit is the amount that was credited to the account. If the entry is a debit, this field should be 0. |
-| exchange_rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | exchange_rate is the exchange rate of the currency to USD if the currency is not USD and the transaction contains entries with multiple currencies. Exchange rate for the base currency USD and the quote currency provided in the entry. |
 
 
 
@@ -78,12 +76,9 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | ----- | ---- | ----- | ----------- |
 | transaction_id | [uint64](#uint64) |  | transaction_id is an incrementally growing identifier for the transaction. It could have gaps and could be out of order, but it is unique for each transaction. |
 | entries | [AppendLedgerEntriesRequest.LedgerEntry](#tzero-v1-payment-AppendLedgerEntriesRequest-LedgerEntry) | repeated | entries is a list of ledger entries that were appended to the ledger of the provider. Each entry represents a financial event that occurred in the provider's accounts. |
-| pay_in | [AppendLedgerEntriesRequest.Transaction.PayIn](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PayIn) |  |  |
-| payout_reservation | [AppendLedgerEntriesRequest.Transaction.PayoutReservation](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PayoutReservation) |  |  |
 | payout | [AppendLedgerEntriesRequest.Transaction.Payout](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-Payout) |  |  |
 | provider_settlement | [AppendLedgerEntriesRequest.Transaction.ProviderSettlement](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-ProviderSettlement) |  |  |
 | fee_settlement | [AppendLedgerEntriesRequest.Transaction.FeeSettlement](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-FeeSettlement) |  |  |
-| payout_reservation_release | [AppendLedgerEntriesRequest.Transaction.PayoutReservationRelease](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PayoutReservationRelease) |  |  |
 
 
 
@@ -107,57 +102,9 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 
 
-<a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PayIn"></a>
-
-### AppendLedgerEntriesRequest.Transaction.PayIn
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-
 <a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-Payout"></a>
 
 ### AppendLedgerEntriesRequest.Transaction.Payout
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PayoutReservation"></a>
-
-### AppendLedgerEntriesRequest.Transaction.PayoutReservation
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PayoutReservationRelease"></a>
-
-### AppendLedgerEntriesRequest.Transaction.PayoutReservationRelease
 
 
 
@@ -212,10 +159,12 @@ This message has no fields defined.
 | payout_id | [uint64](#uint64) |  | payout id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
 | currency | [string](#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
 | client_quote_id | [string](#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
-| payout_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) | optional | payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
+| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient.
+
+* payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
+| payout_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) | optional |  |
 | pay_in_provider_id | [uint32](#uint32) |  | Pay-in provider id which initiated the pay out. |
-| travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional | travel rule data for the payout |
+| travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional |  |
 
 
 
@@ -233,6 +182,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | originator | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
 | beneficiary | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
+| originator_provider | [ivms101.Person](#ivms101-Person) | optional |  |
 
 
 
@@ -364,6 +314,23 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payout_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout |
+| travel_rule_data | [UpdatePaymentRequest.Accepted.TravelRuleData](#tzero-v1-payment-UpdatePaymentRequest-Accepted-TravelRuleData) | optional |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-UpdatePaymentRequest-Accepted-TravelRuleData"></a>
+
+### UpdatePaymentRequest.Accepted.TravelRuleData
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| beneficiary_provider | [ivms101.Person](#ivms101-Person) | optional |  |
 
 
 
@@ -427,17 +394,12 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
-| ACCOUNT_TYPE_USER_PAYABLE | 10 | Reflects the user's payable balance, the amount that the provider owes to the user. |
-| ACCOUNT_TYPE_CASH | 20 | Reflects the cash balance of the provider. |
-| ACCOUNT_TYPE_RESERVE | 30 | This is the reserve account of the provider, which reflects the reserve of balance to reduce the limit available from one provider to another. |
-| ACCOUNT_TYPE_RESERVE_USAGE | 40 | This is the mirror account for the reserve. To keep the double entry accounting principle. |
-| ACCOUNT_TYPE_PROVIDER_PAYABLE | 50 | Reflects how much the provider owes to the network or other participants. |
-| ACCOUNT_TYPE_PROVIDER_RECEIVABLE | 60 | Reflects how much the provider is owed by the network or other participants. |
-| ACCOUNT_TYPE_PROVIDER_SETTLEMENT | 70 | Reflects the settlement balance of the provider with the network or other participants. |
-| ACCOUNT_TYPE_FEE_PAYABLE | 80 | Reflects the fees that the provider owes to the network. |
-| ACCOUNT_TYPE_FEE_RECEIVABLE | 90 | Reflects the fees that the network is owed by the provider. |
-| ACCOUNT_TYPE_FEE_EXPENSE | 100 | Reflects the fees that the provider has to pay for the services provided by the network. |
-| ACCOUNT_TYPE_FEE_SETTLEMENT | 110 |  |
+| ACCOUNT_TYPE_BALANCE | 20 |  |
+| ACCOUNT_TYPE_PAY_IN | 40 |  |
+| ACCOUNT_TYPE_PAY_OUT | 50 |  |
+| ACCOUNT_TYPE_FEE_EXPENSE | 60 | Reflects the fees that the provider has to pay for the services provided by the network. |
+| ACCOUNT_TYPE_SETTLEMENT_IN | 80 |  |
+| ACCOUNT_TYPE_SETTLEMENT_OUT | 90 |  |
 
 
 
