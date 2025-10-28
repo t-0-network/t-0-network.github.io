@@ -21,7 +21,7 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Used by the provider to publish pay-in and pay-out quotes (FX rates) into the network. These quotes include tiered pricing bands and an expiration timestamp. |
-| GetQuote | [GetQuoteRequest](#tzero-v1-payment-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment-GetQuoteResponse) | Request the best available quote for a payout in a specific currency, for a given amount. If the payout quote exists, but the credit limit is exceeded, this quote will not be considered. |
+| GetQuote | [GetQuoteRequest](#tzero-v1-payment-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment-GetQuoteResponse) | Request the best available quote for a payout in a specific currency, for a given amount. If the payout quote exists, but the credit limit is exceeded, this quote will not be considered. Before calling this endpoint UpdateQuote should be periodically triggered in order to put pay-in quotes into the network. |
 | CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Submit a request to create a new payment. PayIn currency and QuoteId are the optional parameters. If the payIn currency is not specified, the network will use USD as the default payIn currency, and considering the amount in USD. If specified, it must be a valid currency code - in this case the network will try to find the payIn quote for the specified currency and considering the band from the provider initiated this request. So this is only possible, if this provider already submitted the payIn quote for the specified currency using UpdateQuote rpc. If the quoteID is specified, it must be a valid quoteId that was previously returned by the GetPayoutQuote method. If the quoteId is not specified, the network will try to find a suitable quote for the payout currency and amount, same way as GetPayoutQuote rpc. |
 | ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Inform the network that a payout has been completed. This endpoint is called by the payout provider, specifying the payment ID and payout ID, which was provided when the payout request was made to this provider. |
 
@@ -71,10 +71,10 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_client_id | [string](#string) |  | unique client generated id for this payment |
-| amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  |  |
-| pay_in | [CreatePaymentRequest.PayIn](#tzero-v1-payment-CreatePaymentRequest-PayIn) |  |  |
-| pay_out | [CreatePaymentRequest.PayOut](#tzero-v1-payment-CreatePaymentRequest-PayOut) |  |  |
-| travel_rule_data | [CreatePaymentRequest.TravelRuleData](#tzero-v1-payment-CreatePaymentRequest-TravelRuleData) | optional |  |
+| amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  | payment amount |
+| pay_in | [CreatePaymentRequest.PayIn](#tzero-v1-payment-CreatePaymentRequest-PayIn) |  | pay-in details |
+| pay_out | [CreatePaymentRequest.PayOut](#tzero-v1-payment-CreatePaymentRequest-PayOut) |  | payout details |
+| travel_rule_data | [CreatePaymentRequest.TravelRuleData](#tzero-v1-payment-CreatePaymentRequest-TravelRuleData) | optional | travel rule data |
 
 
 
@@ -90,8 +90,8 @@ Provider must submit quotes to the network for the specified pay-in currency and
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| currency | [string](#string) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  |  |
+| currency | [string](#string) |  | pay-in currency |
+| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | pay-in payment method |
 
 
 
@@ -107,8 +107,8 @@ Provider must submit quotes to the network for the specified pay-in currency and
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| currency | [string](#string) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  |  |
+| currency | [string](#string) |  | pay-out currency |
+| payment_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | pay-in payment details |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) | optional | if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method otherwise last available quote will be used |
 
 
@@ -158,7 +158,10 @@ Provider must submit quotes to the network for the specified pay-in currency and
 
 
 
-This message has no fields defined.
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [CreatePaymentResponse.Failure.Reason](#tzero-v1-payment-CreatePaymentResponse-Failure-Reason) |  |  |
+
 
 
 
@@ -173,7 +176,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | payment id assigned by the network |
+| payment_id | [uint64](#uint64) |  | payment ID assigned by the network |
 | pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
 | settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
 
@@ -212,9 +215,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | rate in USD/currency, e.g. 1.2345 for 1 USD = 1.2345 EUR |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | expiration time of the quote |
-| quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  |  |
+| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | exchange rate as pay_out_currency_rate/pay_in_currency_rate, e.g. BRL/EUR |
+| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | expiration time of the payout quote |
+| quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | id of the payout quote |
 
 
 
@@ -336,6 +339,7 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
+| REASON_QUOTE_NOT_FOUND | 10 | No matching quote par for the specified pay-in and payout currencies found or provider limits would exceed by processing this payment |
 
 
 
