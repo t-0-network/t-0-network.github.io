@@ -11,14 +11,14 @@ toc: true
 
 ## Overview
 
-The Provider SDK is a Go library that enables payment processing services to integrate with the T-ZERO Network. The SDK provides comprehensive functionality for implementing provider services, handling cryptographic authentication, and managing network communications.
+The Provider SDK is a Go library that enables payment processing services to integrate with the t-0 Network. The SDK provides comprehensive functionality for implementing provider services, handling cryptographic authentication, and managing network communications.
 
 ## Architecture
 
 The SDK consists of two main components:
 
-- **Provider Service Handler**: Enables you to create services that respond to T-ZERO Network requests
-- **Network Client**: Allows direct interaction with T-ZERO Network services
+- **Provider Service Handler**: Enables you to create services that respond to t-0 Network requests
+- **Network Client**: Allows direct interaction with t-0 Network services
 
 ## Prerequisites
 
@@ -47,14 +47,14 @@ type ProviderServiceHandler interface {
 
 ### Provider Handler Setup
 
-Initialize the provider handler with the T-ZERO Network public key and your service implementation:
+Initialize the provider handler with the t-0 Network public key and your service implementation:
 
 ```go
-// T-ZERO Network hex formatted public key
+// t-0 Network hex formatted public key
 networkPublicKey := "0x049bb924680bfba3f64d924bf9040c45dcc215b124b5b9ee73ca8e32c050d042c0bbd8dbb98e3929ed5bc2967f28c3a3b72dd5e24312404598bbf6c6cc47708dc7"
 
 providerServiceHandler, err := provider.NewProviderHandler(
-    provider.NetworkPublicKeyHexed(networkPublicKey), // T-ZERO Network public key
+    provider.NetworkPublicKeyHexed(networkPublicKey), // t-0 Network public key
     &ProviderServiceImplementation{}, // This is your service implementation - replace with your actual implementation
     // optional configuration
     provider.WithVerifySignatureFn(verifySignatureFn) // Custom signature verification function
@@ -98,9 +98,9 @@ server := provider.NewServer(
 )
 ```
 
-## T-ZERO Network Client
+## t-0 Network Client
 
-The network client provides direct interaction capabilities with T-ZERO Network services, handling authentication and request signing automatically.
+The network client provides direct interaction capabilities with t-0 Network services, handling authentication and request signing automatically.
 
 ### Client Initialization
 
