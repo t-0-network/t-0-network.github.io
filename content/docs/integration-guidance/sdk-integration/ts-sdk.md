@@ -10,14 +10,14 @@ toc: true
 ---
 
 ## Overview
-The Provider SDK is a [Node.js library](https://www.npmjs.com/package/@t-0/provider-sdk) that enables payment processing services to integrate with the T-ZERO Network. The SDK provides comprehensive functionality for implementing provider services, handling cryptographic authentication, and managing network communications.
+The Provider SDK is a [Node.js library](https://www.npmjs.com/package/@t-0/provider-sdk) that enables payment processing services to integrate with the t-0 Network. The SDK provides comprehensive functionality for implementing provider services, handling cryptographic authentication, and managing network communications.
 
 ## Architecture
 
 The SDK consists of two main elements:
 
-- **Provider Service Handler**: Enables you to create services that respond to T-ZERO Network requests
-- **Network Client**: Allows direct interaction with T-ZERO Network services
+- **Provider Service Handler**: Enables you to create services that respond to t-0 Network requests
+- **Network Client**: Allows direct interaction with t-0 Network services
 
 ## Prerequisites
 
@@ -94,9 +94,9 @@ const server = http.createServer(
 console.log("server is listening at", server.address());
 ```
 
-## T-ZERO Network Client
+## t-0 Network Client
 
-The network client provides direct interaction capabilities with T-ZERO Network services, handling authentication and request signing automatically.
+The network client provides direct interaction capabilities with t-0 Network services, handling authentication and request signing automatically.
 
 ### Client Initialization
 

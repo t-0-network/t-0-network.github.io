@@ -10,14 +10,14 @@ toc: true
 ---
 ## Key Management
 
-The T-ZERO Network uses secp256k1 key pairs for request authentication and verification:
+The t-0 Network uses secp256k1 key pairs for request authentication and verification:
 
 ### Key Types and Usage
 
-- **Provider Private Key**: Signs outgoing requests to the T-ZERO Network
-- **Provider Public Key**: Shared with T-ZERO Network for request verification
-- **T-ZERO Network Public Key**: Verifies incoming requests from T-ZERO Network
-- **T-ZERO Network Private Key**: Used by T-ZERO Network to sign requests to your service
+- **Provider Private Key**: Signs outgoing requests to the t-0 Network
+- **Provider Public Key**: Shared with t-0 Network for request verification
+- **t-0 Network Public Key**: Verifies incoming requests from t-0 Network
+- **t-0 Network Private Key**: Used by t-0 Network to sign requests to your service
 
 ## Prerequisites
 
@@ -55,7 +55,7 @@ openssl ec -in private_key.pem -text -noout 2>/dev/null | grep -A 5 'pub:' | tai
 1. Never commit private keys to version control
 2. Store private keys securely using environment variables or secure vaults
 3. Use different keys for development and production environments
-4. Share only public keys with T-ZERO Network for registration
+4. Share only public keys with t-0 Network for registration
 
 
 ## Publicly available SDKs:
