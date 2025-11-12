@@ -215,6 +215,39 @@ Provider must submit quotes to the network for the specified pay-in currency and
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| success | [GetQuoteResponse.Success](#tzero-v1-payment-GetQuoteResponse-Success) |  | Success response - the network found a suitable quote for the provided parameters and with available credit or pre-settlement option. The returned quoteId can be used later to call the create payment endpoint. |
+| failure | [GetQuoteResponse.Failure](#tzero-v1-payment-GetQuoteResponse-Failure) |  | Failure response - means the quote was not found for the specified parameters, or provider limits would exceed by processing the payment amount with the specified amount. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-GetQuoteResponse-Failure"></a>
+
+### GetQuoteResponse.Failure
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [GetQuoteResponse.Failure.Reason](#tzero-v1-payment-GetQuoteResponse-Failure-Reason) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-GetQuoteResponse-Success"></a>
+
+### GetQuoteResponse.Success
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
 | rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | exchange rate as pay_out_currency_rate/pay_in_currency_rate, e.g. BRL/EUR |
 | expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | expiration time of the payout quote |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | id of the payout quote |
@@ -334,6 +367,19 @@ This message has no fields defined.
 <a name="tzero-v1-payment-CreatePaymentResponse-Failure-Reason"></a>
 
 ### CreatePaymentResponse.Failure.Reason
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| REASON_UNSPECIFIED | 0 |  |
+| REASON_QUOTE_NOT_FOUND | 10 | No matching quote par for the specified pay-in and payout currencies found or provider limits would exceed by processing this payment |
+| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | Payments with amount in pay out currency require available credit or pre-deposit |
+
+
+
+<a name="tzero-v1-payment-GetQuoteResponse-Failure-Reason"></a>
+
+### GetQuoteResponse.Failure.Reason
 
 
 | Name | Number | Description |
