@@ -66,9 +66,29 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-AchPaymentDetails"></a>
+<a name="tzero-v1-common-PaymentDetails"></a>
 
-### AchPaymentDetails
+### PaymentDetails
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sepa | [PaymentDetails.Sepa](#tzero-v1-common-PaymentDetails-Sepa) |  |  |
+| swift | [PaymentDetails.Swift](#tzero-v1-common-PaymentDetails-Swift) |  |  |
+| stablecoin | [PaymentDetails.Stablecoin](#tzero-v1-common-PaymentDetails-Stablecoin) |  |  |
+| ach | [PaymentDetails.Ach](#tzero-v1-common-PaymentDetails-Ach) |  |  |
+| wire | [PaymentDetails.Wire](#tzero-v1-common-PaymentDetails-Wire) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Ach"></a>
+
+### PaymentDetails.Ach
 
 
 
@@ -77,7 +97,7 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | routing_number | [string](#string) |  |  |
 | account_number | [string](#string) |  |  |
 | account_holder_name | [string](#string) |  |  |
-| account_type | [AchPaymentDetails.AchAccountType](#tzero-v1-common-AchPaymentDetails-AchAccountType) |  |  |
+| account_type | [PaymentDetails.Ach.AchAccountType](#tzero-v1-common-PaymentDetails-Ach-AchAccountType) |  |  |
 
 
 
@@ -85,29 +105,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-PaymentMethod"></a>
+<a name="tzero-v1-common-PaymentDetails-Sepa"></a>
 
-### PaymentMethod
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sepa | [SepaPaymentDetails](#tzero-v1-common-SepaPaymentDetails) |  |  |
-| swift | [SwiftPaymentDetails](#tzero-v1-common-SwiftPaymentDetails) |  |  |
-| stablecoin | [StablecoinPaymentDetails](#tzero-v1-common-StablecoinPaymentDetails) |  |  |
-| ach | [AchPaymentDetails](#tzero-v1-common-AchPaymentDetails) |  |  |
-| wire | [WirePaymentDetails](#tzero-v1-common-WirePaymentDetails) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-common-SepaPaymentDetails"></a>
-
-### SepaPaymentDetails
+### PaymentDetails.Sepa
 
 
 
@@ -123,9 +123,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-StablecoinPaymentDetails"></a>
+<a name="tzero-v1-common-PaymentDetails-Stablecoin"></a>
 
-### StablecoinPaymentDetails
+### PaymentDetails.Stablecoin
 
 
 
@@ -141,9 +141,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-SwiftPaymentDetails"></a>
+<a name="tzero-v1-common-PaymentDetails-Swift"></a>
 
-### SwiftPaymentDetails
+### PaymentDetails.Swift
 
 
 
@@ -154,9 +154,9 @@ This message has no fields defined.
 
 
 
-<a name="tzero-v1-common-WirePaymentDetails"></a>
+<a name="tzero-v1-common-PaymentDetails-Wire"></a>
 
-### WirePaymentDetails
+### PaymentDetails.Wire
 
 
 
@@ -178,9 +178,9 @@ This message has no fields defined.
  <!-- end messages -->
 
 
-<a name="tzero-v1-common-AchPaymentDetails-AchAccountType"></a>
+<a name="tzero-v1-common-PaymentDetails-Ach-AchAccountType"></a>
 
-### AchPaymentDetails.AchAccountType
+### PaymentDetails.Ach.AchAccountType
 
 
 | Name | Number | Description |
