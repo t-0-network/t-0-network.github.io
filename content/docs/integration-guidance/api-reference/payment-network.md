@@ -108,7 +108,7 @@ Provider must submit quotes to the network for the specified pay-in currency and
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | currency | [string](#string) |  | pay-out currency |
-| payment_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | pay-in payment details |
+| payment_details | [tzero.v1.common.PaymentDetails](#tzero-v1-common-PaymentDetails) |  | pay-in payment details |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) | optional | if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method otherwise last available quote will be used |
 
 
