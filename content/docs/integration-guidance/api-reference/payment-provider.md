@@ -24,6 +24,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | UpdatePayment | [UpdatePaymentRequest](#tzero-v1-payment-UpdatePaymentRequest) | [UpdatePaymentResponse](#tzero-v1-payment-UpdatePaymentResponse) | Network provides an update on the status of a payment. This can be either a success or a failure. This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
 | UpdateLimit | [UpdateLimitRequest](#tzero-v1-payment-UpdateLimitRequest) | [UpdateLimitResponse](#tzero-v1-payment-UpdateLimitResponse) | This rpc is used to notify the provider about the changes in credit limit and/or credit usage. |
 | AppendLedgerEntries | [AppendLedgerEntriesRequest](#tzero-v1-payment-AppendLedgerEntriesRequest) | [AppendLedgerEntriesResponse](#tzero-v1-payment-AppendLedgerEntriesResponse) | Network can send all the updates about ledger entries of the provider's accounts. It can be used to keep track of the provider's exposure to other participants and other important financial events. (see the list in the message below) |
+| ApprovePaymentQuotes | [ApprovePaymentQuoteRequest](#tzero-v1-payment-ApprovePaymentQuoteRequest) | [ApprovePaymentQuoteResponse](#tzero-v1-payment-ApprovePaymentQuoteResponse) | Pay-in provider approves the final pay-out quotes. This is the "Last Look" endpoint - it must be called after manual AML check completes (if one was required). It allows pay-in provider to verify and approve final rates before payment is executed. |
 
  <!-- end services -->
 
@@ -147,6 +148,69 @@ This message has no fields defined.
 
 
 
+<a name="tzero-v1-payment-ApprovePaymentQuoteRequest"></a>
+
+### ApprovePaymentQuoteRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_id | [uint64](#uint64) |  |  |
+| pay_out_quote_id | [int64](#int64) |  |  |
+| pay_out_rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
+| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
+| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-ApprovePaymentQuoteResponse"></a>
+
+### ApprovePaymentQuoteResponse
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| accepted | [ApprovePaymentQuoteResponse.Accepted](#tzero-v1-payment-ApprovePaymentQuoteResponse-Accepted) |  |  |
+| rejected | [ApprovePaymentQuoteResponse.Rejected](#tzero-v1-payment-ApprovePaymentQuoteResponse-Rejected) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-ApprovePaymentQuoteResponse-Accepted"></a>
+
+### ApprovePaymentQuoteResponse.Accepted
+
+
+
+This message has no fields defined.
+
+
+
+
+
+
+<a name="tzero-v1-payment-ApprovePaymentQuoteResponse-Rejected"></a>
+
+### ApprovePaymentQuoteResponse.Rejected
+
+
+
+This message has no fields defined.
+
+
+
+
+
+
 <a name="tzero-v1-payment-PayoutRequest"></a>
 
 ### PayoutRequest
@@ -159,10 +223,8 @@ This message has no fields defined.
 | payout_id | [uint64](#uint64) |  | payout id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
 | currency | [string](#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
 | client_quote_id | [string](#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient.
-
-* payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
-| payout_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) | optional |  |
+| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
+| payout_details | [tzero.v1.common.PaymentDetails](#tzero-v1-common-PaymentDetails) | optional | payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
 | pay_in_provider_id | [uint32](#uint32) |  | Pay-in provider id which initiated the pay out. |
 | travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional |  |
 
@@ -198,8 +260,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| accepted | [PayoutResponse.Accepted](#tzero-v1-payment-PayoutResponse-Accepted) |  | Success response - means the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
+| accepted | [PayoutResponse.Accepted](#tzero-v1-payment-PayoutResponse-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
 | failed | [PayoutResponse.Failed](#tzero-v1-payment-PayoutResponse-Failed) |  | Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout. |
+| manual_aml_check | [PayoutResponse.ManualAmlCheck](#tzero-v1-payment-PayoutResponse-ManualAmlCheck) |  | Manual AML check required - means the payout provider requires additional Anti-Money Laundering (AML) verification before the payment can proceed. The pay-out provider will need to perform the manual AML check and then call CompleteManualAmlCheck rpc with the result of the check. |
 
 
 
@@ -236,6 +299,19 @@ This message has no fields defined.
 
 
 
+<a name="tzero-v1-payment-PayoutResponse-ManualAmlCheck"></a>
+
+### PayoutResponse.ManualAmlCheck
+
+
+
+This message has no fields defined.
+
+
+
+
+
+
 <a name="tzero-v1-payment-UpdateLimitRequest"></a>
 
 ### UpdateLimitRequest
@@ -261,7 +337,7 @@ All the amounts are in USD
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | version | [int64](#int64) |  | Incrementally growing for the provider - same as in Ledger. |
-| creditor_id | [int32](#int32) |  | the Id of the counterparty (creditor) provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
+| counterpart_id | [int32](#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
 | payout_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
 | credit_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
 | credit_usage | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than made payouts (pre-settlement). |
@@ -298,6 +374,7 @@ This message has no fields defined.
 | accepted | [UpdatePaymentRequest.Accepted](#tzero-v1-payment-UpdatePaymentRequest-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
 | failed | [UpdatePaymentRequest.Failed](#tzero-v1-payment-UpdatePaymentRequest-Failed) |  | Payment failed and would not be retried. |
 | confirmed | [UpdatePaymentRequest.Confirmed](#tzero-v1-payment-UpdatePaymentRequest-Confirmed) |  | Confirmed response - final state meaning the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
+| manual_aml_check | [UpdatePaymentRequest.ManualAmlCheck](#tzero-v1-payment-UpdatePaymentRequest-ManualAmlCheck) |  | In case of manual AML check, pay-out provider needs to perform additional checks and then call CompleteManualAmlCheck rpc with the result of the check. |
 
 
 
@@ -365,6 +442,19 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | reason | [UpdatePaymentRequest.Failed.Reason](#tzero-v1-payment-UpdatePaymentRequest-Failed-Reason) |  |  |
 
+
+
+
+
+
+
+<a name="tzero-v1-payment-UpdatePaymentRequest-ManualAmlCheck"></a>
+
+### UpdatePaymentRequest.ManualAmlCheck
+
+
+
+This message has no fields defined.
 
 
 
