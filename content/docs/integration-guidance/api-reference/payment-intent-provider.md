@@ -66,25 +66,6 @@ ProviderService is implemented by provider to provide pay-in details fpr payment
 | ----- | ---- | ----- | ----------- |
 | settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | settlement amount denominated in settlement currency |
 | payout_provider_id | [uint32](#uint32) |  |  |
-| settlement_addresses | [ConfirmPaymentResponse.SettlementAddress](#tzero-v1-payment_intent-provider-ConfirmPaymentResponse-SettlementAddress) | repeated | payout provider could support multiple chains for settlement. Any of these could be used for settlement. |
-
-
-
-
-
-
-
-<a name="tzero-v1-payment_intent-provider-ConfirmPaymentResponse-SettlementAddress"></a>
-
-### ConfirmPaymentResponse.SettlementAddress
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| chain | [tzero.v1.common.Blockchain](#tzero-v1-common-Blockchain) |  |  |
-| stablecoin | [tzero.v1.common.Stablecoin](#tzero-v1-common-Stablecoin) |  |  |
-| address | [string](#string) |  |  |
 
 
 

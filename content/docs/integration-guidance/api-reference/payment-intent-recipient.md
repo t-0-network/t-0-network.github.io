@@ -115,7 +115,7 @@ This message has no fields defined.
 | pay_in_currency | [string](#string) |  | Pay-in currency |
 | pay_in_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount denominated in the pay-in currency |
 | pay_out_currency | [string](#string) |  | Payout currency |
-| pay_out_method | [tzero.v1.common.PaymentMethod](#tzero-v1-common-PaymentMethod) |  | Payout payment method |
+| pay_out_details | [tzero.v1.common.PaymentDetails](#tzero-v1-common-PaymentDetails) |  | Payout payment details |
 
 
 
@@ -161,7 +161,7 @@ This message has no fields defined.
 <a name="tzero-v1-payment_intent-recipient-GetQuoteRequest"></a>
 
 ### GetQuoteRequest
-
+TODO: enrich with more fields
 
 
 | Field | Type | Label | Description |
