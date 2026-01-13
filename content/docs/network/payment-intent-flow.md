@@ -24,7 +24,7 @@ The T-0 Network orchestrates cross-border payments by connecting pay-in provider
 sequenceDiagram
     autonumber
     
-    actor R as Recipient
+    actor R as Merchant
     participant TP as Payout<br/>Provider
     participant N as T-0<br/>Network
     participant PIP as Pay-in<br/>Provider
