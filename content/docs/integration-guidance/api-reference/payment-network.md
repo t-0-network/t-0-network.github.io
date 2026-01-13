@@ -24,6 +24,7 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 | GetQuote | [GetQuoteRequest](#tzero-v1-payment-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment-GetQuoteResponse) | Request the best available quote for a payout in a specific currency, for a given amount. If the payout quote exists, but the credit limit is exceeded, this quote will not be considered. |
 | CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Submit a request to create a new payment for the specified pay-out currency. QuoteId is the optional parameter. If the quoteID is specified, it must be a valid quoteId that was previously returned by the GetPayoutQuote method. If the quoteId is not specified, the network will try to find a suitable quote for the payout currency and amount, same way as GetPayoutQuote rpc. |
 | ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Inform the network that a payout has been completed. This endpoint is called by the payout provider, specifying the payment ID and payout ID, which was provided when the payout request was made to this provider. |
+| FinalizePayout | [FinalizePayoutRequest](#tzero-v1-payment-FinalizePayoutRequest) | [FinalizePayoutResponse](#tzero-v1-payment-FinalizePayoutResponse) |  |
 | CompleteManualAmlCheck | [CompleteManualAmlCheckRequest](#tzero-v1-payment-CompleteManualAmlCheckRequest) | [CompleteManualAmlCheckResponse](#tzero-v1-payment-CompleteManualAmlCheckResponse) | Pay-out provider reports the result of manual AML check. This endpoint is called after the manual AML check is completed. The network will find the new best quotes for the payment and will return the updated settlement/payout amount along with the updated quotes in the response. |
 
  <!-- end services -->
@@ -104,9 +105,10 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the updated amount that should be paid out to the recipient. |
-| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
-| pay_out_quote_id | [int64](#int64) |  | unique identifier of the pay-out quote |
+| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | updated amount based on updated quote approved by the pay-in provider |
+| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | updated settlement amount based on updated quote approved by the pay-in provider |
+| pay_out_quote_id | [int64](#int64) |  | unique identifier of the updated pay-out quote |
+| pay_out_client_quote_id | [string](#string) |  | client_quote_id of the updated pay-out quote assigned by pay-out provider |
 
 
 
@@ -137,7 +139,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_id | [uint64](#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
-| payout_id | [uint64](#uint64) |  | payout id assigned by the payout provider, this is the same payout id that was provided in the PayoutRequest |
+| payout_id | [uint64](#uint64) |  | **Deprecated.** deprecated, this is 1->1 mapping between payment and payout ids |
 | receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
@@ -263,6 +265,69 @@ This message has no fields defined.
 | settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
 | payout_provider_id | [uint32](#uint32) |  | payout provider id with the best quote selected for this payment |
 
+
+
+
+
+
+
+<a name="tzero-v1-payment-FinalizePayoutRequest"></a>
+
+### FinalizePayoutRequest
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_id | [uint64](#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
+| success | [FinalizePayoutRequest.Success](#tzero-v1-payment-FinalizePayoutRequest-Success) |  |  |
+| failure | [FinalizePayoutRequest.Failure](#tzero-v1-payment-FinalizePayoutRequest-Failure) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-FinalizePayoutRequest-Failure"></a>
+
+### FinalizePayoutRequest.Failure
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [string](#string) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-FinalizePayoutRequest-Success"></a>
+
+### FinalizePayoutRequest.Success
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-FinalizePayoutResponse"></a>
+
+### FinalizePayoutResponse
+
+
+
+This message has no fields defined.
 
 
 

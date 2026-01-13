@@ -220,7 +220,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_id | [uint64](#uint64) |  | payment id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
-| payout_id | [uint64](#uint64) |  | payout id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
+| payout_id | [uint64](#uint64) |  | **Deprecated.** payout_id is deprecated now, since it's 1->1 mapping between payout_id and payment_id |
 | currency | [string](#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
 | client_quote_id | [string](#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
 | amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
@@ -338,9 +338,10 @@ All the amounts are in USD
 | ----- | ---- | ----- | ----------- |
 | version | [int64](#int64) |  | Incrementally growing for the provider - same as in Ledger. |
 | counterpart_id | [int32](#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
-| payout_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
+| payout_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage - reserve, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
 | credit_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
 | credit_usage | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than made payouts (pre-settlement). |
+| reserve | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This indicates how much is reserved for the pending payments (not yet finalized) |
 
 
 
