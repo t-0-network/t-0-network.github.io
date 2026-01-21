@@ -292,6 +292,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | reason | [PayoutResponse.Failed.Reason](#tzero-v1-payment-PayoutResponse-Failed-Reason) |  |  |
+| details | [string](#string) | optional |  |
 
 
 
@@ -425,7 +426,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | paid_out_at | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | time of the payout |
-| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) |  | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
 
@@ -442,6 +443,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | reason | [UpdatePaymentRequest.Failed.Reason](#tzero-v1-payment-UpdatePaymentRequest-Failed-Reason) |  |  |
+| details | [string](#string) | optional |  |
 
 
 
@@ -513,6 +515,9 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
+| REASON_NO_QUOTE_AFTER_AML_APPROVAL | 1 | AML review completed, but the pay-out provider no longer has a valid quote available. |
+| REASON_QUOTE_REJECTED_AFTER_AML_APPROVAL | 2 | AML review completed and a new quote was required, but the pay-in provider rejected the updated quote (e.g. due to rate change after AML delay). |
+| REASON_AML_RISK_CHECK_FAILED | 3 | Payment was rejected by the pay-out provider because the AML / risk checks failed. |
 
 
  <!-- end enums -->
