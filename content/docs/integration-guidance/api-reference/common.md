@@ -47,6 +47,7 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | ---- | ------ | ----------- |
 | BLOCKCHAIN_UNSPECIFIED | 0 |  |
 | BLOCKCHAIN_BSC | 10 |  |
+| BLOCKCHAIN_ETH | 20 |  |
 | BLOCKCHAIN_TRON | 100 |  |
 
 
@@ -76,7 +77,6 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | ----- | ---- | ----- | ----------- |
 | sepa | [PaymentDetails.Sepa](#tzero-v1-common-PaymentDetails-Sepa) |  | SEPA (Single Euro Payments Area) - Euro bank transfers across European countries |
 | swift | [PaymentDetails.Swift](#tzero-v1-common-PaymentDetails-Swift) |  | SWIFT (Society for Worldwide Interbank Financial Telecommunication) - International wire transfers Global (200+ countries) |
-| stablecoin | [PaymentDetails.Stablecoin](#tzero-v1-common-PaymentDetails-Stablecoin) |  | Stablecoin - Cryptocurrency transfers pegged to fiat currencies Global |
 | ach | [PaymentDetails.Ach](#tzero-v1-common-PaymentDetails-Ach) |  | ACH (Automated Clearing House) - Electronic bank-to-bank transfers United States |
 | wire | [PaymentDetails.Wire](#tzero-v1-common-PaymentDetails-Wire) |  | Wire - Domestic electronic funds transfer United States |
 | fps | [PaymentDetails.Fps](#tzero-v1-common-PaymentDetails-Fps) |  | FPS (Faster Payments Service) United Kingdom |
@@ -88,6 +88,8 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | pakistan_bank_transfer | [PaymentDetails.PakistanBankTransfer](#tzero-v1-common-PaymentDetails-PakistanBankTransfer) |  | Pakistan Bank Transfer - Domestic bank transfers using Pakistani IBAN Pakistan |
 | pakistan_mobile_wallet | [PaymentDetails.PakistanMobileWallet](#tzero-v1-common-PaymentDetails-PakistanMobileWallet) |  | Pakistan Mobile Wallet - JazzCash, Easypaisa, SadaPay, NayaPay and other wallets Pakistan |
 | pix | [PaymentDetails.Pix](#tzero-v1-common-PaymentDetails-Pix) |  | PIX - Brazilian instant payment system Brazil |
+| airtel_money | [PaymentDetails.AirtelMoney](#tzero-v1-common-PaymentDetails-AirtelMoney) |  | Airtel Money - Kenya payment method |
+| naps | [PaymentDetails.Cnaps](#tzero-v1-common-PaymentDetails-Cnaps) |  | The China National Advanced Payment System |
 
 
 
@@ -107,6 +109,77 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | account_number | [string](#string) |  |  |
 | account_holder_name | [string](#string) |  |  |
 | account_type | [PaymentDetails.Ach.AchAccountType](#tzero-v1-common-PaymentDetails-Ach-AchAccountType) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-AirtelMoney"></a>
+
+### PaymentDetails.AirtelMoney
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| beneficiary_phone | [string](#string) |  | Phone number in international format without + sign Required: Yes |
+| account_reference | [string](#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
+| beneficiary_name | [string](#string) |  | Beneficiary name |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Cnaps"></a>
+
+### PaymentDetails.Cnaps
+The China National Advanced Payment System
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account_number | [string](#string) |  | 6-25 digits |
+| cnaps_code | [string](#string) |  | 12 digits (encodes the bank + branch) |
+| beneficiary_name_local | [string](#string) |  | Beneficiary name in Chinese characters |
+| beneficiary_name | [string](#string) |  | Beneficiary name in Latin characters |
+| business | [PaymentDetails.Cnaps.Business](#tzero-v1-common-PaymentDetails-Cnaps-Business) |  |  |
+| person | [PaymentDetails.Cnaps.Person](#tzero-v1-common-PaymentDetails-Cnaps-Person) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Cnaps-Business"></a>
+
+### PaymentDetails.Cnaps.Business
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| license_number | [string](#string) |  | Business license number - 18 digits |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Cnaps-Person"></a>
+
+### PaymentDetails.Cnaps.Person
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| id_number | [string](#string) |  | ID number - 18 digits |
 
 
 
@@ -234,6 +307,7 @@ Method 2: IMPS P2P (Mobile + MMID)
 | ----- | ---- | ----- | ----------- |
 | beneficiary_phone | [string](#string) |  | Phone number in international format without + sign Examples: 254708374149 (Kenya), 255712345678 (Tanzania), 256712345678 (Uganda) Required: Yes |
 | account_reference | [string](#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
+| beneficiary_name | [string](#string) |  | Beneficiary name |
 
 
 
@@ -342,24 +416,6 @@ or traditional bank account details (bank code, branch, account number)
 
 
 
-<a name="tzero-v1-common-PaymentDetails-Stablecoin"></a>
-
-### PaymentDetails.Stablecoin
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| blockchain | [Blockchain](#tzero-v1-common-Blockchain) |  |  |
-| stablecoin | [Stablecoin](#tzero-v1-common-Stablecoin) |  |  |
-| address | [string](#string) |  |  |
-
-
-
-
-
-
-
 <a name="tzero-v1-common-PaymentDetails-Swift"></a>
 
 ### PaymentDetails.Swift
@@ -459,8 +515,6 @@ or traditional bank account details (bank code, branch, account number)
 | PAYMENT_METHOD_TYPE_UNSPECIFIED | 0 |  |
 | PAYMENT_METHOD_TYPE_SEPA | 10 |  |
 | PAYMENT_METHOD_TYPE_SWIFT | 20 |  |
-| PAYMENT_METHOD_TYPE_CARD | 30 | only pay in |
-| PAYMENT_METHOD_TYPE_STABLECOIN | 40 | only pay out |
 | PAYMENT_METHOD_TYPE_ACH | 50 |  |
 | PAYMENT_METHOD_TYPE_WIRE | 60 |  |
 | PAYMENT_METHOD_TYPE_FPS | 70 |  |
@@ -472,6 +526,8 @@ or traditional bank account details (bank code, branch, account number)
 | PAYMENT_METHOD_TYPE_PAKISTAN_BANK_TRANSFER | 130 | Pakistan domestic bank transfer via IBAN |
 | PAYMENT_METHOD_TYPE_PAKISTAN_MOBILE_WALLET | 140 | Pakistan mobile wallet (JazzCash, Easypaisa, etc.) - sometimes also called ID Wallet |
 | PAYMENT_METHOD_TYPE_PIX | 150 | PIX - Brazilian instant payment system |
+| PAYMENT_METHOD_TYPE_AIRTEL_MONEY | 160 | Airtel Money - Kenya payment method |
+| PAYMENT_METHOD_TYPE_CNAPS | 170 | The China National Advanced Payment System |
 
 
  <!-- end enums -->

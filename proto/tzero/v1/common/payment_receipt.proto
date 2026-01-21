@@ -9,7 +9,8 @@ message PaymentReceipt {
     option (buf.validate.oneof).required = true;
     Sepa sepa = 10;
     Swift swift = 30;
-    Stablecoin stablecoin = 40;
+    Pix pix = 50;
+    Fps fps = 60;
   };
 
   message Sepa {
@@ -22,11 +23,17 @@ message PaymentReceipt {
   message Swift {
   }
 
-  message Stablecoin {
-    string transaction_hash = 10 [(buf.validate.field).string = {
-      min_len: 64,
-      max_len: 66,
-      pattern: "^(0x)?[a-fA-F0-9]{64}$"
-    }]; // on-chain hex encoded transaction hash
+  message Pix {
+    optional string e2e_id = 10 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 35,
+    }];
+  }
+  
+  message Fps {
+    optional string transaction_reference_id = 10 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 35,
+    }];
   }
 }
