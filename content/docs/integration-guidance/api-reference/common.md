@@ -80,7 +80,9 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | ach | [PaymentDetails.Ach](#tzero-v1-common-PaymentDetails-Ach) |  | ACH (Automated Clearing House) - Electronic bank-to-bank transfers United States |
 | wire | [PaymentDetails.Wire](#tzero-v1-common-PaymentDetails-Wire) |  | Wire - Domestic electronic funds transfer United States |
 | fps | [PaymentDetails.Fps](#tzero-v1-common-PaymentDetails-Fps) |  | FPS (Faster Payments Service) United Kingdom |
-| mpesa | [PaymentDetails.MPesa](#tzero-v1-common-PaymentDetails-MPesa) |  | M-Pesa - Mobile money transfer and payment service Kenya, Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa |
+| mpesa | [PaymentDetails.MPesa](#tzero-v1-common-PaymentDetails-MPesa) |  | **Deprecated.** M-Pesa - Mobile money transfer and payment service Kenya, Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa
+
+deprecated in favor of AfricanMobileMoney |
 | gcash | [PaymentDetails.GCash](#tzero-v1-common-PaymentDetails-GCash) |  | GCash - Mobile wallet and payment platform Philippines |
 | indian_bank_transfer | [PaymentDetails.IndianBankTransfer](#tzero-v1-common-PaymentDetails-IndianBankTransfer) |  | Indian Bank Transfer - Domestic electronic funds transfer (IMPS/NEFT/RTGS) India |
 | pesonet | [PaymentDetails.Pesonet](#tzero-v1-common-PaymentDetails-Pesonet) |  | PESONet - Real-time domestic payments system Philippines |
@@ -88,7 +90,7 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | pakistan_bank_transfer | [PaymentDetails.PakistanBankTransfer](#tzero-v1-common-PaymentDetails-PakistanBankTransfer) |  | Pakistan Bank Transfer - Domestic bank transfers using Pakistani IBAN Pakistan |
 | pakistan_mobile_wallet | [PaymentDetails.PakistanMobileWallet](#tzero-v1-common-PaymentDetails-PakistanMobileWallet) |  | Pakistan Mobile Wallet - JazzCash, Easypaisa, SadaPay, NayaPay and other wallets Pakistan |
 | pix | [PaymentDetails.Pix](#tzero-v1-common-PaymentDetails-Pix) |  | PIX - Brazilian instant payment system Brazil |
-| airtel_money | [PaymentDetails.AirtelMoney](#tzero-v1-common-PaymentDetails-AirtelMoney) |  | Airtel Money - Kenya payment method |
+| african_mobile_money | [PaymentDetails.AfricanMobileMoney](#tzero-v1-common-PaymentDetails-AfricanMobileMoney) |  | African Money - Kenya payment method |
 | naps | [PaymentDetails.Cnaps](#tzero-v1-common-PaymentDetails-Cnaps) |  | The China National Advanced Payment System |
 
 
@@ -116,14 +118,15 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 
 
-<a name="tzero-v1-common-PaymentDetails-AirtelMoney"></a>
+<a name="tzero-v1-common-PaymentDetails-AfricanMobileMoney"></a>
 
-### PaymentDetails.AirtelMoney
+### PaymentDetails.AfricanMobileMoney
 
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| network | [PaymentDetails.AfricanMobileMoney.Network](#tzero-v1-common-PaymentDetails-AfricanMobileMoney-Network) |  | The phone network |
 | beneficiary_phone | [string](#string) |  | Phone number in international format without + sign Required: Yes |
 | account_reference | [string](#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
 | beneficiary_name | [string](#string) |  | Beneficiary name |
@@ -473,6 +476,25 @@ or traditional bank account details (bank code, branch, account number)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-AfricanMobileMoney-Network"></a>
+
+### PaymentDetails.AfricanMobileMoney.Network
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| NETWORK_UNDEFINED | 0 |  |
+| NETWORK_M_PESA | 10 |  |
+| NETWORK_AIRTEL | 20 |  |
+| NETWORK_MTN | 30 |  |
+| NETWORK_VODACOM | 40 |  |
+| NETWORK_ORANGE | 50 |  |
+| NETWORK_VODAFONE | 60 |  |
+| NETWORK_FREE | 70 |  |
+| NETWORK_ZAMTEL | 80 |  |
+
+
+
 <a name="tzero-v1-common-PaymentDetails-PakistanMobileWallet-PakistanWalletProvider"></a>
 
 ### PaymentDetails.PakistanMobileWallet.PakistanWalletProvider
@@ -518,7 +540,7 @@ or traditional bank account details (bank code, branch, account number)
 | PAYMENT_METHOD_TYPE_ACH | 50 |  |
 | PAYMENT_METHOD_TYPE_WIRE | 60 |  |
 | PAYMENT_METHOD_TYPE_FPS | 70 |  |
-| PAYMENT_METHOD_TYPE_M_PESA | 80 |  |
+| PAYMENT_METHOD_TYPE_M_PESA | 80 | deprecated in favor of PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY |
 | PAYMENT_METHOD_TYPE_G_CASH | 90 |  |
 | PAYMENT_METHOD_TYPE_INDIAN_BANK_TRANSFER | 100 |  |
 | PAYMENT_METHOD_TYPE_PESONET | 110 |  |
@@ -526,7 +548,7 @@ or traditional bank account details (bank code, branch, account number)
 | PAYMENT_METHOD_TYPE_PAKISTAN_BANK_TRANSFER | 130 | Pakistan domestic bank transfer via IBAN |
 | PAYMENT_METHOD_TYPE_PAKISTAN_MOBILE_WALLET | 140 | Pakistan mobile wallet (JazzCash, Easypaisa, etc.) - sometimes also called ID Wallet |
 | PAYMENT_METHOD_TYPE_PIX | 150 | PIX - Brazilian instant payment system |
-| PAYMENT_METHOD_TYPE_AIRTEL_MONEY | 160 | Airtel Money - Kenya payment method |
+| PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY | 160 | African Mobile Money - Mobile money system across multiple countries: Kenya (Mpesa, Airtel), Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa etc. |
 | PAYMENT_METHOD_TYPE_CNAPS | 170 | The China National Advanced Payment System |
 
 
