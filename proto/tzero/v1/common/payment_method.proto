@@ -331,6 +331,44 @@ message PaymentDetails {
     string payment_reference = 50 [(buf.validate.field).string = {
       max_len: 140
     }];
+
+    // Beneficiary's bank name
+    string bank_name = 60 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Beneficiary's bank country (ISO 3166-1 alpha-2)
+    string bank_country = 70 [(buf.validate.field).string = {
+      len: 2,
+      pattern: "^[A-Z]{2}$"
+    }];
+
+    // Account currency (ISO 4217)
+    optional string account_currency = 80 [(buf.validate.field).string = {
+      len: 3,
+      pattern: "^[A-Z]{3}$"
+    }];
+
+    IntermediaryBank intermediary_bank = 90;
+
+    // Intermediary bank details (optional)
+    message IntermediaryBank {
+      string swift_code = 1 [(buf.validate.field).string = {
+        min_len: 8,
+        max_len: 11,
+        pattern: "^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$"
+      }];
+
+      string bank_name = 2 [(buf.validate.field).string = {
+        min_len: 1,
+        max_len: 140
+      }];
+
+      string account_number = 3 [(buf.validate.field).string = {
+        max_len: 34
+      }];
+    }
   }
 
   message Ach {
