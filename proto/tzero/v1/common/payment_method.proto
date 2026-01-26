@@ -13,7 +13,8 @@ enum PaymentMethodType {
   PAYMENT_METHOD_TYPE_ACH = 50;
   PAYMENT_METHOD_TYPE_WIRE = 60;
   PAYMENT_METHOD_TYPE_FPS = 70;
-  PAYMENT_METHOD_TYPE_M_PESA = 80;
+
+  PAYMENT_METHOD_TYPE_M_PESA = 80 [deprecated = true]; // deprecated in favor of PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY
   PAYMENT_METHOD_TYPE_G_CASH = 90;
   PAYMENT_METHOD_TYPE_INDIAN_BANK_TRANSFER = 100;
   PAYMENT_METHOD_TYPE_PESONET = 110;
@@ -24,8 +25,8 @@ enum PaymentMethodType {
   PAYMENT_METHOD_TYPE_PAKISTAN_MOBILE_WALLET = 140;
   // PIX - Brazilian instant payment system
   PAYMENT_METHOD_TYPE_PIX = 150;
-  // Airtel Money - Kenya payment method
-  PAYMENT_METHOD_TYPE_AIRTEL_MONEY = 160;
+  // African Mobile Money  - Mobile money system across multiple countries: Kenya (Mpesa, Airtel), Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa etc.
+  PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY = 160;
   // The China National Advanced Payment System
   PAYMENT_METHOD_TYPE_CNAPS = 170;
 }
@@ -55,7 +56,7 @@ message PaymentDetails {
 
     // M-Pesa - Mobile money transfer and payment service
     // Kenya, Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa
-    MPesa mpesa = 80;
+    MPesa mpesa = 80 [deprecated = true]; // deprecated in favor of AfricanMobileMoney
 
     // GCash - Mobile wallet and payment platform
     // Philippines
@@ -85,8 +86,8 @@ message PaymentDetails {
     // Brazil
     Pix pix = 150;
 
-    // Airtel Money - Kenya payment method
-    AirtelMoney airtel_money = 160;
+    // African Money - Kenya payment method
+    AfricanMobileMoney african_mobile_money = 160;
 
     // The China National Advanced Payment System
     Cnaps naps = 170;
@@ -158,8 +159,11 @@ message PaymentDetails {
     }];
   }
 
-  message AirtelMoney {
-    option (payment_method_type) = PAYMENT_METHOD_TYPE_AIRTEL_MONEY;
+  message AfricanMobileMoney {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY;
+
+    // The phone network
+    Network network = 5 [(buf.validate.field).required = true];
 
     // Phone number in international format without + sign
     // Required: Yes
@@ -182,6 +186,33 @@ message PaymentDetails {
       min_len: 1,
       max_len: 100
     }];
+
+    enum Network {
+      NETWORK_UNDEFINED = 0;
+      NETWORK_M_PESA = 10;
+      NETWORK_AIRTEL = 20;
+      NETWORK_MTN = 30;
+      NETWORK_VODACOM = 40;
+      NETWORK_ORANGE = 50;
+      NETWORK_VODAFONE = 60;
+      NETWORK_FREE = 70;
+      NETWORK_ZAMTEL = 80;
+    }
+    /*
+    Countries and Available Networks
+     • CD (DRC): VODACOM, AIRTEL, ORANGE
+     • CI (Côte d'Ivoire): ORANGE, MTN
+     • CM (Cameroon): MTN, ORANGE
+     • GH (Ghana): MTN, VODAFONE, AIRTEL
+     • KE (Kenya): MPESA, AIRTEL
+     • MW (Malawi): AIRTEL
+     • RW (Rwanda): MTN, AIRTEL
+     • SN (Senegal): ORANGE, FREE
+     • TZ (Tanzania): VODACOM, AIRTEL
+     • UG (Uganda): MTN, AIRTEL,ORANGE
+     • ZA (South Africa): VODACOM, MTN
+     • ZM (Zambia): MTN, AIRTEL, ZAMTEL
+     */
   }
 
   message GCash {

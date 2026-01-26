@@ -45,6 +45,8 @@ sequenceDiagram
     N->>POP: Credit Usage Notification
 ```
 
+&nbsp;
+
 ## Payment Flow Description
 
 ### 1. UpdateQuote
