@@ -74,7 +74,7 @@ Network sends payout instruction to the Payout Provider including: amount in loc
 Instead of immediately accepting or rejecting the payout, the Payout Provider responds indicating that a manual AML check is required. This signals that the transaction requires additional Anti-Money Laundering review by the Payout Provider's compliance team before the payout can proceed. The payment enters a pending state while the review is conducted.
 
 ### 10. CompleteManualAmlCheck (Approved)
-After completing the manual AML review, the Payout Provider calls the Network to report the result. When approved, the Network finds the best available quotes for the payment, since the original quote may have expired during the AML review period. The Network then initiates the quote confirmation process with the Pay-in Provider. The updated settlement/payout amounts and new quote details are only returned to the Payout Provider after the Pay-in Provider approves the new rates.
+After completing the manual AML review, the Payout Provider calls the Network to report the result. When approved, finds the latest quote from the Payout Provider for the payment, since the original quote may have expired during the AML review period. The Network then initiates the quote confirmation process with the Pay-in Provider. The updated settlement/payout amounts and new quote details are only returned to the Payout Provider after the Pay-in Provider approves the new rates.
 
 ### 11. ApprovePaymentQuotes (Quote Confirmation Request)
 Network sends the updated quote details to the Pay-in Provider for approval. This "Last Look" mechanism allows the Pay-in Provider to verify and approve the final rates before the payment is executed. This is important because the exchange rate may have changed during the time the manual AML check was being performed.
@@ -95,7 +95,7 @@ Network notifies Pay-in Provider that the payout has been successfully completed
 
 1. **Manual AML Review**: The Payout Provider can signal that additional compliance review is needed before proceeding, rather than immediately accepting or rejecting.
 
-2. **Quote Refresh**: Since the manual AML check may take time (potentially longer than the 30-second quote validity window), the Network automatically finds new quotes after AML approval.
+2. **Quote Refresh**: Since the manual AML check may take time (potentially longer than the 30-second quote validity window), the Network finds the latest quote from the Payout Provider after AML approval.
 
 3. **Last Look Mechanism**: The Pay-in Provider gets a final opportunity to approve or reject the updated rates before the payout proceeds, protecting them from adverse rate movements during the AML review period.
 
