@@ -432,6 +432,28 @@ or traditional bank account details (bank code, branch, account number)
 | beneficiary_name | [string](#string) |  | Beneficiary's full name |
 | beneficiary_address | [string](#string) |  | Beneficiary's address |
 | payment_reference | [string](#string) |  |  |
+| bank_name | [string](#string) |  | Beneficiary's bank name |
+| bank_country | [string](#string) |  | Beneficiary's bank country (ISO 3166-1 alpha-2) |
+| account_currency | [string](#string) | optional | Account currency (ISO 4217) |
+| intermediary_bank | [PaymentDetails.Swift.IntermediaryBank](#tzero-v1-common-PaymentDetails-Swift-IntermediaryBank) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Swift-IntermediaryBank"></a>
+
+### PaymentDetails.Swift.IntermediaryBank
+Intermediary bank details (optional)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| swift_code | [string](#string) |  |  |
+| bank_name | [string](#string) |  |  |
+| account_number | [string](#string) |  |  |
 
 
 
