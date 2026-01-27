@@ -50,7 +50,7 @@ sequenceDiagram
 ## Payment Flow Description
 
 ### 1. UpdateQuote
-Payout Provider streams exchange rate quotes to the Network every 5 seconds, indicating rates at which they are willing to convert USDT to local currency for payouts. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). Quotes are valid for 30 seconds. This continuous streaming serves both as a rate dissemination method and a liveness check.
+Payout Provider streams exchange rate quotes to the Network at a regular interval of their choosing (up to every 20 seconds), indicating rates at which they are willing to convert USDT to local currency for payouts. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). Each quote is valid for the publishing interval plus 30 seconds (e.g., 35 seconds for a 5-second interval), ensuring that a payment originator always has at least 30 seconds to use any quote regardless of when it was fetched. This continuous streaming serves both as a rate dissemination method and a liveness check.
 
 ### 2. Get Quote
 Pay-in Provider requests a quote for a specific payment, specifying the amount (either in settlement currency USD or payout currency) and target currency. The request initiates the payment flow.
@@ -59,7 +59,7 @@ Pay-in Provider requests a quote for a specific payment, specifying the amount (
 Network searches the order book for the best available quote that satisfies the required volume. Selection considers both rate competitiveness and available credit limit capacity between counterparties. Response includes the local currency amount, USDT settlement amount, and quote ID. Average latency: 20-50 milliseconds.
 
 ### 4. Create Payment
-Pay-in Provider creates a payment using the quoted rate within the 30-second validity window. The request includes recipient details, bank account information, and comprehensive travel rule data (sender/recipient KYC information) following the OpenVASP standard with additional custom fields.
+Pay-in Provider creates a payment using the quoted rate within the guaranteed 30-second availability window. The request includes recipient details, bank account information, and comprehensive travel rule data (sender/recipient KYC information) following the OpenVASP standard with additional custom fields.
 
 ### 5. Select and Validate Quote
 Network validates the quote is still valid, converts the payout amount to USD equivalent, and verifies sufficient credit limit exists between the counterparties for this transaction. If the best rate provider has insufficient credit capacity, the system automatically routes to the next best available quote.
