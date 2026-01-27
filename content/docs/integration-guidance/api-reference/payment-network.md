@@ -209,7 +209,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | payment_client_id | [string](#string) |  | client generated id supplied in the request |
 | accepted | [CreatePaymentResponse.Accepted](#tzero-v1-payment-CreatePaymentResponse-Accepted) |  | Accepted response - the payment was accepted by the network and it's going to be passed to payout provider. Means the network found a suitable quote for the payout currency and amount. |
-| settlement_required | [CreatePaymentResponse.SettlementRequired](#tzero-v1-payment-CreatePaymentResponse-SettlementRequired) |  | Settlement required response - indicates that the payment requires settlement before payout completion. |
+| settlement_required | [CreatePaymentResponse.SettlementRequired](#tzero-v1-payment-CreatePaymentResponse-SettlementRequired) |  | **Deprecated.** Deprecated: Settlement required response - presettlement flow is being removed. This response type will no longer be returned. |
 | failure | [CreatePaymentResponse.Failure](#tzero-v1-payment-CreatePaymentResponse-Failure) |  | Failure response - means the payment was not accepted, e.g. the network could not find a suitable quote for the payout currency and amount, or the credit limit is exceeded for the available quotes. |
 
 
@@ -256,7 +256,7 @@ This message has no fields defined.
 <a name="tzero-v1-payment-CreatePaymentResponse-SettlementRequired"></a>
 
 ### CreatePaymentResponse.SettlementRequired
-
+Deprecated: presettlement flow is being removed. This message will no longer be used.
 
 
 | Field | Type | Label | Description |
