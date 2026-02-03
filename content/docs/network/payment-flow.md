@@ -25,7 +25,7 @@ sequenceDiagram
     PIP->>+N: Get Quote
     N-->>-PIP: Quote
     PIP->>+N: Create Payment
-    N-->>N: Select and validate quote
+    N-->>N: Payment Request Processed
     N-->>-PIP: Payment Accepted
 
     N->>+POP: Payout Request
@@ -50,7 +50,7 @@ sequenceDiagram
 ## Payment Flow Description
 
 ### 1. UpdateQuote
-Payout Provider streams exchange rate quotes to the Network at a regular interval of their choosing (up to every 20 seconds), indicating rates at which they are willing to convert USDT to local currency for payouts. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). Each quote is valid for the publishing interval plus 30 seconds (e.g., 35 seconds for a 5-second interval), ensuring that a payment originator always has at least 30 seconds to use any quote regardless of when it was fetched. This continuous streaming serves both as a rate dissemination method and a liveness check.
+Payout Provider streams exchange rate quotes to the Network at a regular interval of their choosing (every 1 to 20 seconds), indicating rates at which they are willing to convert USDT to local currency for payouts. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). Each quote is valid for the publishing interval plus 30 seconds (e.g., 50 seconds for a 20-second interval), ensuring that a payment originator always has at least 30 seconds to use any quote regardless of when it was fetched. This continuous streaming serves both as a rate dissemination method and a liveness check.
 
 ### 2. Get Quote
 Pay-in Provider requests a quote for a specific payment, specifying the amount (either in settlement currency USD or payout currency) and target currency. The request initiates the payment flow.
@@ -59,10 +59,11 @@ Pay-in Provider requests a quote for a specific payment, specifying the amount (
 Network searches the order book for the best available quote that satisfies the required volume. Selection considers both rate competitiveness and available credit limit capacity between counterparties. Response includes the local currency amount, USDT settlement amount, and quote ID. Average latency: 20-50 milliseconds.
 
 ### 4. Create Payment
-Pay-in Provider creates a payment using the quoted rate within the guaranteed 30-second availability window. The request includes recipient details, bank account information, and comprehensive travel rule data (sender/recipient KYC information) following the OpenVASP standard with additional custom fields.
+Pay-in Provider creates a payment, specifying the payout currency, amount, recipient details, and travel rule data (sender/recipient KYC information) following the OpenVASP standard with additional custom fields. The provider may include a quote ID from a previous GetQuote call to lock in a specific rate, or omit it to let the Network select the best available quote automatically.
 
-### 5. Select and Validate Quote
-Network validates the quote is still valid, converts the payout amount to USD equivalent, and verifies sufficient credit limit exists between the counterparties for this transaction. If the best rate provider has insufficient credit capacity, the system automatically routes to the next best available quote.
+### 5. Payment Request Processed
+If a quote ID was provided, the Network validates that the quote is still within its validity window and that the specified counterparty has sufficient credit capacity. If either condition fails, the payment is rejected.
+If no quote ID was provided, the Network selects the best available quote based on rate competitiveness and credit capacity. 
 
 ### 6. Payment Accepted
 Network confirms the payment request is accepted and will be routed to the selected Payout Provider.
@@ -80,22 +81,22 @@ Network increases credit usage of Pay-in Provider at Payout Provider by the USD 
 Network notifies Payout Provider of the increased credit usage, showing how much credit remains available for additional payments from this counterparty before settlement is required.
 
 ### 11. Payout Success
-Payout Provider completes the local currency disbursement through domestic payment rails (bank transfer, IBAN, ACH, SEPA, mobile wallet, or other local payment methods) and reports completion to the Network, including payment receipt details and transaction IDs where available by local rails. Timing varies by jurisdiction: seconds for instant payment systems, up to days for traditional clearing systems.
+Payout Provider completes the local currency disbursement through domestic payment rails and reports completion to the Network, including payment receipt details and transaction IDs where available by local rails. Timing varies by jurisdiction: seconds for instant payment systems, up to days for traditional clearing systems.
 
 ### 12. Payment Confirmed
-Network notifies Pay-in Provider that the payout has been successfully completed. Network charges both providers a fee of 5 basis points (0.05%) from the USD equivalent of the transaction amount, recorded in the accounting ledger. Total network fee is 10 basis points (0.10%) per complete transaction.
+Network notifies Pay-in Provider that the payout has been successfully completed. Network charges both providers a fee based on the USD equivalent of the transaction amount, recorded in the accounting ledger. This fee is paid separately on a periodic basis.
 
 ### 13. USDT Settlement Transfer
-When credit usage approaches the credit limit, Pay-in Provider initiates a USDT transfer from their whitelisted wallet to the Payout Provider's whitelisted wallet on Binance Smart Chain (BSC). Settlement is not required per-payment; providers can batch multiple payments into a single settlement transaction to reduce blockchain transaction costs. Transaction is cryptographically signed by the provider's private key and submitted to public BSC nodes.
+At the end of the day, or when credit usage approaches the credit limit, the Pay-in Provider initiates a USDT transfer from their whitelisted wallet to the Payout Provider's whitelisted wallet on a supported blockchain. Settlement is not required per-payment; providers can batch multiple payments into a single settlement transaction to reduce blockchain transaction costs. 
 
 ### 14. USDT Transaction Notification
-Network continuously monitors BSC for transactions between whitelisted provider wallets. Any USDT transfer detected between two whitelisted addresses is automatically classified as a settlement transaction. Network waits for sufficient confirmations (typically 1-2 minutes) before considering the transaction final and irreversible.
+Network continuously monitors supported blockchains for transactions between whitelisted provider wallets. Any USDT transfer detected between two whitelisted addresses is automatically classified as a settlement transaction. Network waits for sufficient confirmations (typically 1-2 minutes) before considering the transaction complete.
 
 ### 15. Credit Usage Notification (to Pay-in Provider)
 Network decreases the credit usage of Pay-in Provider at Payout Provider by the USDT amount of the settlement transaction. Updates internal ledger with settlement entry, allowing the Pay-in Provider to initiate additional payments.
 
 ### 16. Credit Usage Notification (to Payout Provider)
-Network notifies Payout Provider that a settlement has been received, increasing available credit for future payments from this counterparty. Provider can view complete ledger history showing all payment obligations and settlements for full transparency and reconciliation.
+Network notifies Payout Provider that a settlement has been received, increasing available credit for future payments from this counterparty. Through these notifications, providers can maintain a complete ledger history, all payment obligations and settlements, for full transparency and reconciliation.
 
 ## Payment flow notes
 
