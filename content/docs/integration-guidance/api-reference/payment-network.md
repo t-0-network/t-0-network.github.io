@@ -363,6 +363,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | success | [GetQuoteResponse.Success](#tzero-v1-payment-GetQuoteResponse-Success) |  | Success response - the network found a suitable quote for the provided parameters and with available credit or pre-settlement option. The returned quoteId can be used later to call the create payment endpoint. |
 | failure | [GetQuoteResponse.Failure](#tzero-v1-payment-GetQuoteResponse-Failure) |  | Failure response - means the quote was not found for the specified parameters, or provider limits would exceed by processing the payment amount with the specified amount. |
+| all_quotes | [GetQuoteResponse.ProviderQuote](#tzero-v1-payment-GetQuoteResponse-ProviderQuote) | repeated | All best quotes from providers with credit lines. Each quote is the best rate for that provider for the requested amount. Includes has_sufficient_credit flag to indicate if quote can be executed immediately. Always returned alongside success/failure - providers can compare alternatives or see options when no executable quote exists. |
 
 
 
@@ -379,6 +380,48 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | reason | [GetQuoteResponse.Failure.Reason](#tzero-v1-payment-GetQuoteResponse-Failure-Reason) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-GetQuoteResponse-ProviderQuote"></a>
+
+### GetQuoteResponse.ProviderQuote
+Best quote from a provider with credit line configured.
+Contains settlement status and calculated amounts for the payment request.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | Quote identification - can be used to initiate payment |
+| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Exchange rate: USD/pay_out_currency |
+| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Quote validity period |
+| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Payout amount in payout currency |
+| settlement | [GetQuoteResponse.ProviderQuote.Settlement](#tzero-v1-payment-GetQuoteResponse-ProviderQuote-Settlement) |  | Settlement details for this quote |
+| executable | [bool](#bool) |  | Indicates payment can be initiated with this quote immediately and no pre-funding is required |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-GetQuoteResponse-ProviderQuote-Settlement"></a>
+
+### GetQuoteResponse.ProviderQuote.Settlement
+Settlement details between pay-in and pay-out providers.
+All amounts are in USD (settlement currency).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Settlement amount required for this payment |
+| credit_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Total credit limit from payout provider |
+| total_used | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Total amount used from credit line (completed + reserved) |
+| prefunding_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Additional funding needed before payment can proceed (amount - max_executable) |
 
 
 
