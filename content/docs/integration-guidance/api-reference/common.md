@@ -92,6 +92,7 @@ deprecated in favor of AfricanMobileMoney |
 | pix | [PaymentDetails.Pix](#tzero-v1-common-PaymentDetails-Pix) |  | PIX - Brazilian instant payment system Brazil |
 | african_mobile_money | [PaymentDetails.AfricanMobileMoney](#tzero-v1-common-PaymentDetails-AfricanMobileMoney) |  | African Money - Kenya payment method |
 | naps | [PaymentDetails.Cnaps](#tzero-v1-common-PaymentDetails-Cnaps) |  | The China National Advanced Payment System |
+| nip | [PaymentDetails.Nip](#tzero-v1-common-PaymentDetails-Nip) |  | NIP - Nigeria Instant Payment system Nigeria |
 
 
 
@@ -311,6 +312,26 @@ Method 2: IMPS P2P (Mobile + MMID)
 | beneficiary_phone | [string](#string) |  | Phone number in international format without + sign Examples: 254708374149 (Kenya), 255712345678 (Tanzania), 256712345678 (Uganda) Required: Yes |
 | account_reference | [string](#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
 | beneficiary_name | [string](#string) |  | Beneficiary name |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Nip"></a>
+
+### PaymentDetails.Nip
+NIP - Nigeria Instant Payment system
+Transfers are made using bank code and account number (NUBAN)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bank_code | [string](#string) |  | Bank code (e.g., "00001") |
+| account_number | [string](#string) |  | Account number (NUBAN format) |
+| beneficiary_name | [string](#string) |  | Beneficiary's full name |
+| payment_reference | [string](#string) |  | Payment reference/description (optional) |
 
 
 
@@ -572,6 +593,7 @@ Intermediary bank details (optional)
 | PAYMENT_METHOD_TYPE_PIX | 150 | PIX - Brazilian instant payment system |
 | PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY | 160 | African Mobile Money - Mobile money system across multiple countries: Kenya (Mpesa, Airtel), Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa etc. |
 | PAYMENT_METHOD_TYPE_CNAPS | 170 | The China National Advanced Payment System |
+| PAYMENT_METHOD_TYPE_NIP | 180 | NIP - Nigeria Instant Payment system |
 
 
  <!-- end enums -->
