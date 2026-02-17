@@ -25,7 +25,7 @@ service PaymentIntentService {
    * The returned quotes show which providers can accept pay-ins and their current rates.
    *
    * Note: Quotes are indicative only. The actual rate used for settlement is determined
-   * at the time of ConfirmFundsReceived, using the best available quote from the last 30 minutes.
+   * at the time of ConfirmFundsReceived.
    */
   rpc GetQuote(GetQuoteRequest) returns (GetQuoteResponse) {
     option idempotency_level = IDEMPOTENT;
