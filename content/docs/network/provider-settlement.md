@@ -77,8 +77,8 @@ The Network tracks balances between network members, and sends messages to membe
 1. **Payout request created:** When a [payment is created](/content/docs/integration-guidance/api-reference/payment-network#createpaymentrequest), the *requester's* available balance at the chosen provider is temporarily reduced. This amount is reserved.
 2. **Confirmed payout request:** When a *payout provider* confirms a payout, the *requester's* balance at that provider is reduced. This amount is now used.
 3. **Confirmed collection request:** When a *collection provider* confirms that fiat funds were received, the *collection requester's* liability to that provider increases.
-4. **Blockchain transfer:** The Network detects a USDT transfer to or from your wallet to another member’s wallet. The message includes the blockchain transaction hash.
-5. **Credit limit update:** When you and one of your counterparties inform t-0 via a communication channel that you have decided on a change to your credit limits.
+4. **Blockchain transfer:** The Network detects a USDT transfer between your wallet and another network member’s wallet.
+5. **Credit limit update:** When you and one of your counterparties inform t-0 via a formal channel that you have decided on a change to your credit limits.
 
 To deliver your latest balances, availability and credit limits, when any of the above events occur, the Network calls your [UpdateLimit RPC endpoint](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-UpdateLimitRequest).
 
