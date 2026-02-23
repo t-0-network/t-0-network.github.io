@@ -68,21 +68,21 @@ Both members may discuss and decide on a change to their chosen settlement model
 
 Members tell t-0 about these changes. 
 
-t-0 then updates settlement model parameters in the Network to ensure new limits can’t be exceeded. And the Network issues an update ([via the UpdateLimitRequest RPC](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-UpdateLimitRequest)) to the endpoints of both of the network members, confirming the update.
+t-0 then updates settlement model parameters in the Network to ensure new limits can’t be exceeded. And the Network issues an update (via the UpdateLimitRequest RPC) to the endpoints of both of the network members, confirming the update.
  
 ## Monitoring Balances and Availability
 
 The Network tracks balances between network members, and sends messages to member's endpoints whenever there is a change. There are 5 events which can affect your balances, their availability and your credit limits:
 
-1. **Payout request created:** When a [payment is created](/content/docs/integration-guidance/api-reference/payment-network#createpaymentrequest), the *requester's* available balance at the chosen provider is temporarily reduced. This amount is reserved.
+1. **Payout request created:** When a payment is created, the *requester's* available balance at the chosen provider is temporarily reduced. This amount is reserved.
 2. **Confirmed payout request:** When a *payout provider* confirms a payout, the *requester's* balance at that provider is reduced. This amount is now used.
 3. **Confirmed collection request:** When a *collection provider* confirms that fiat funds were received, the *collection requester's* liability to that provider increases.
 4. **Blockchain transfer:** The Network detects a USDT transfer between your wallet and another network member’s wallet.
 5. **Credit limit update:** When you and one of your counterparties inform t-0 via a formal channel that you have decided on a change to your credit limits.
 
-To deliver your latest balances, availability and credit limits, when any of the above events occur, the Network calls your [UpdateLimit RPC endpoint](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-UpdateLimitRequest).
+To deliver your latest balances, availability and credit limits, when any of the above events occur, the Network calls your UpdateLimit RPC endpoint.
 
-To deliver detailed updates about important accounting events (specifically events 2, 3 & 4 in the list above), the Network also calls your [AppendLedgerEntries RPC endpoint](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-AppendLedgerEntriesRequest), in addition to UpdateLimit.
+To deliver detailed updates about important accounting events (specifically events 2, 3 & 4 in the list above), the Network also calls your AppendLedgerEntries RPC endpoint, in addition to UpdateLimit.
 
 ### Example Payout Walkthrough
 
@@ -125,7 +125,7 @@ credit_usage: 1,000 *(1,000 is reserved but not yet confirmed)*<br>
 
 Member A is seeing: "The reserve has been converted to credit usage. I've used $1,000 of my $10,000 credit line with B. $9,000 remaining."
 
-Member A also receives an [AppendLedgerEntries RPC](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-AppendLedgerEntriesRequest), with 2 entries, showing changes to their *balance* and *pay-in* accounts with B.
+Member A also receives an AppendLedgerEntries request, with 2 entries, showing changes to their *balance* and *pay-in* accounts with B.
 
 **UpdateLimit sent to Provider B:**
 
@@ -137,7 +137,7 @@ credit_usage: -1,000 <br>
 
 Member B is seeing: "My payout capacity through A has increased from $5,000 to $6,000. My credit usage is -1,000 (negative, meaning I'm owed money, not using credit)."
 
-Member B also receives an [AppendLedgerEntries RPC](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-AppendLedgerEntriesRequest), with 2 entries, showing changes to their *balance* and *pay-out* accounts with A.
+Member B also receives an AppendLedgerEntries request, with 2 entries, showing changes to their *balance* and *pay-out* accounts with A.
 
 This step demonstrates a key feature of the bidirectional system: when Member A pays out through Member B, it simultaneously increases B's capacity to pay out through A. A owes B $1,000, which offsets against B's credit line with A, effectively giving B an extra $1,000 of headroom.
 
@@ -153,7 +153,7 @@ reserve: 0<br>
 payout_limit: 10,000 *(9,000 + 1,000 sent)*<br>
 credit_usage: 0 *(1,000 - 1,000 sent)*<br>
 
-Member A also receives an [AppendLedgerEntries RPC](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-AppendLedgerEntriesRequest), with 2 entries, showing changes to their *balance* and *settlement-out* accounts with B.
+Member A also receives an AppendLedgerEntries request, with 2 entries, showing changes to their *balance* and *settlement-out* accounts with B.
 
 **UpdateLimit sent to Member B:**
 
@@ -163,4 +163,4 @@ reserve: 0<br>
 payout_limit: 5,000 *(6,000 - 1,000 received)*<br>
 credit_usage: 0 *(-1,000 + 1,000 received)*<br>
 
-Member B also receives an [AppendLedgerEntries RPC](/docs/integration-guidance/api-reference/payment-provider#tzero-v1-payment-AppendLedgerEntriesRequest), with 2 entries, showing changes to their *balance* and *settlement-in* accounts with A.
+Member B also receives an AppendLedgerEntries request with 2 entries, showing changes to their *balance* and *settlement-in* accounts with A.
