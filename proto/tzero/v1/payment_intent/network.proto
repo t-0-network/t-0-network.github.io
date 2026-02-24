@@ -59,12 +59,12 @@ service PaymentIntentService {
    * The provider is responsible for validating the received amount matches expectations.
    *
    * On success:
-   * 1. Network finds the best quote from the last 30 minutes
+   * 1. Network finds the best quote from the pay-in provider
    * 2. Settlement amount is calculated using that quote's rate
    * 3. Ledger entries are created (settlement + fees)
    * 4. Beneficiary provider receives PaymentIntentUpdate notification
    *
-   * Important: This endpoint assumes full payment. Partial payments are not supported in V1.
+   * Important: This endpoint assumes full payment.
    */
   rpc ConfirmFundsReceived(ConfirmFundsReceivedRequest) returns (ConfirmFundsReceivedResponse) {
     option idempotency_level = IDEMPOTENT;
