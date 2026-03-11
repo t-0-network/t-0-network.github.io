@@ -24,7 +24,7 @@ toc: true
 ### Address
 Constraint: ValidAddress
 There must be at least one occurrence of the element addressLine or (streetName and
-buildingName and/or buildingNumber).
+buildingName and/or buildingNumber)
 
 
 | Field | Type | Label | Description |
