@@ -87,6 +87,19 @@ message NaturalPerson {
   string country_of_residence = 6 [(buf.validate.field).string = {
     pattern: "^$|^[A-Z]{2}$"  // allow empty, or ISO 3166-1 alpha-2, or "XX"
   }];
+
+  // Definition: phone number of the natural person.
+  string phone = 7 [(buf.validate.field).string = {
+    max_len: 20,
+    pattern: "^$|^\\+?[0-9\\s\\-()]+$"  // allow empty, or phone number format
+  }];
+
+  // Definition: email address of the natural person.
+  string email = 8 [(buf.validate.field).cel = {
+    id: "valid_email"
+    message: "email must be a valid email"
+    expression: "this == '' || this.isEmail()"
+  }];
 }
 
 message NaturalPersonName {
