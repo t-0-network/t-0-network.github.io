@@ -41,7 +41,16 @@ jobs:
         with:
           go-version: 'stable'
 
+      - name: Cache Hugo modules
+        uses: actions/cache@v4
+        with:
+          path: /tmp/hugo_cache
+          key: hugo-modules-${{ hashFiles('go.sum') }}
+          restore-keys: hugo-modules-
+
       - name: Build with Hugo
+        env:
+          HUGO_CACHEDIR: /tmp/hugo_cache
         run: |
           hugo \
             --gc \
