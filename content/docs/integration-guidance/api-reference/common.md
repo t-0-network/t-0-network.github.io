@@ -78,7 +78,7 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | sepa | [PaymentDetails.Sepa](#tzero-v1-common-PaymentDetails-Sepa) |  | SEPA (Single Euro Payments Area) - Euro bank transfers across European countries |
 | swift | [PaymentDetails.Swift](#tzero-v1-common-PaymentDetails-Swift) |  | SWIFT (Society for Worldwide Interbank Financial Telecommunication) - International wire transfers Global (200+ countries) |
 | ach | [PaymentDetails.Ach](#tzero-v1-common-PaymentDetails-Ach) |  | ACH (Automated Clearing House) - Electronic bank-to-bank transfers United States |
-| wire | [PaymentDetails.Wire](#tzero-v1-common-PaymentDetails-Wire) |  | Wire - Domestic electronic funds transfer United States |
+| domestic_wire | [PaymentDetails.DomesticWire](#tzero-v1-common-PaymentDetails-DomesticWire) |  | DomesticWire - US domestic wire transfer United States |
 | fps | [PaymentDetails.Fps](#tzero-v1-common-PaymentDetails-Fps) |  | FPS (Faster Payments Service) United Kingdom |
 | mpesa | [PaymentDetails.MPesa](#tzero-v1-common-PaymentDetails-MPesa) |  | **Deprecated.** M-Pesa - Mobile money transfer and payment service Kenya, Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa
 
@@ -184,6 +184,28 @@ The China National Advanced Payment System
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | id_number | [string](#string) |  | ID number - 18 digits |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-DomesticWire"></a>
+
+### PaymentDetails.DomesticWire
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bank_name | [string](#string) |  |  |
+| bank_address | [string](#string) |  |  |
+| routing_number | [string](#string) |  | ABA routing number (9 digits) |
+| account_number | [string](#string) |  |  |
+| beneficiary_name | [string](#string) |  |  |
+| beneficiary_address | [string](#string) |  |  |
+| wire_reference | [string](#string) |  |  |
 
 
 
@@ -481,28 +503,6 @@ Intermediary bank details (optional)
 
 
 
-
-<a name="tzero-v1-common-PaymentDetails-Wire"></a>
-
-### PaymentDetails.Wire
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bank_name | [string](#string) |  |  |
-| bank_address | [string](#string) |  |  |
-| swift_code | [string](#string) |  |  |
-| account_number | [string](#string) |  |  |
-| beneficiary_name | [string](#string) |  |  |
-| beneficiary_address | [string](#string) |  |  |
-| wire_reference | [string](#string) |  |  |
-
-
-
-
-
-
  <!-- end messages -->
 
 
@@ -581,7 +581,7 @@ Intermediary bank details (optional)
 | PAYMENT_METHOD_TYPE_SEPA | 10 |  |
 | PAYMENT_METHOD_TYPE_SWIFT | 20 |  |
 | PAYMENT_METHOD_TYPE_ACH | 50 |  |
-| PAYMENT_METHOD_TYPE_WIRE | 60 |  |
+| PAYMENT_METHOD_TYPE_DOMESTIC_WIRE | 60 |  |
 | PAYMENT_METHOD_TYPE_FPS | 70 |  |
 | PAYMENT_METHOD_TYPE_M_PESA | 80 | deprecated in favor of PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY |
 | PAYMENT_METHOD_TYPE_G_CASH | 90 |  |
