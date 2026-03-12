@@ -25,7 +25,7 @@ The network calls this service to notify the beneficiary when:
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| PaymentIntentUpdate | [PaymentIntentUpdateRequest](#tzero-v1-payment_intent-PaymentIntentUpdateRequest) | [PaymentIntentUpdateResponse](#tzero-v1-payment_intent-PaymentIntentUpdateResponse) | PaymentIntentUpdate notifies the beneficiary provider of status changes.  Currently supports: - FundsReceived: The pay-in provider confirmed receipt  This notification is sent after ledger entries are created and the balance has been updated. The beneficiary provider can use this to: - Update their internal records - Notify their end-user of successful payment - Trigger downstream processing (e.g., release goods/services)  Idempotency: This endpoint must be idempotent. The network may retry delivery in case of failures or timeouts. |
+| PaymentIntentUpdate | [PaymentIntentUpdateRequest](#tzero-v1-payment_intent-PaymentIntentUpdateRequest) | [PaymentIntentUpdateResponse](#tzero-v1-payment_intent-PaymentIntentUpdateResponse) | PaymentIntentUpdate notifies the beneficiary provider of status changes.  Idempotency: This endpoint must be idempotent. The network may retry delivery in case of failures or timeouts. |
 
  <!-- end services -->
 
@@ -55,17 +55,14 @@ Notification of a payment intent status change.
 ### PaymentIntentUpdateRequest.FundsReceived
 Notification that funds were received from the payer by pay-in provider.
 
-After receiving this notification:
-- Your balance with the pay-in provider has been credited
-- Fees have been recorded (settled separately)
-- You can safely deliver goods/services to your end-user
-
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The settlement amount credited to your balance. This is calculated as: source_amount / rate  Note: Fees are NOT deducted from this amount. Fees are tracked separately and settled in periodic fee settlements. |
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The exchange rate used for settlement. |
-| source_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The fiat amount received from the end-user. Matches the amount originally requested in CreatePaymentIntent. |
+| payment_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The fiat amount received from the end-user. Matches the amount originally requested in CreatePaymentIntent. |
+| payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used for the pay-in |
+| transaction_reference | [string](../scalar/#string) |  | Unique transaction reference identifying the pay-in transaction |
 
 
 

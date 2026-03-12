@@ -144,13 +144,13 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| bank_name | [string](#string) |  |  |
-| bank_address | [string](#string) |  |  |
-| routing_number | [string](#string) |  | ABA routing number (9 digits) |
-| account_number | [string](#string) |  |  |
-| beneficiary_name | [string](#string) |  |  |
-| beneficiary_address | [string](#string) |  |  |
-| wire_reference | [string](#string) |  |  |
+| bank_name | [string](../scalar/#string) |  |  |
+| bank_address | [string](../scalar/#string) |  |  |
+| routing_number | [string](../scalar/#string) |  | ABA routing number (9 digits) |
+| account_number | [string](../scalar/#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  |  |
+| beneficiary_address | [string](../scalar/#string) |  |  |
+| wire_reference | [string](../scalar/#string) |  |  |
 
 
 
@@ -442,28 +442,6 @@ Intermediary bank details (optional)
 | swift_code | [string](../scalar/#string) |  |  |
 | bank_name | [string](../scalar/#string) |  |  |
 | account_number | [string](../scalar/#string) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-common-PaymentDetails-Wire"></a>
-
-### PaymentDetails.Wire
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| bank_name | [string](../scalar/#string) |  |  |
-| bank_address | [string](../scalar/#string) |  |  |
-| swift_code | [string](../scalar/#string) |  |  |
-| account_number | [string](../scalar/#string) |  |  |
-| beneficiary_name | [string](../scalar/#string) |  |  |
-| beneficiary_address | [string](../scalar/#string) |  |  |
-| wire_reference | [string](../scalar/#string) |  |  |
 
 
 

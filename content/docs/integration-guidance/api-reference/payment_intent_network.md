@@ -14,18 +14,20 @@ toc: true
 ## PaymentIntentService
 PaymentIntentService provides Payment Intent APIs for providers.
 
-Payment Intent is a pay-in initiated flow where:
+Payment Intent is a flow where:
 1. Beneficiary provider creates a payment intent specifying amount/currency
 2. End-user pays via one of the returned payment options
-3. Pay-in provider confirms receipt, triggering settlement
+3. Pay-in provider confirms funds received
+4. Settlement will happen periodically between providers
 
 This service is hosted by the T-0 Network and called by providers.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
+| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment_intent-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment_intent-UpdateQuoteResponse) | Used by the provider to publish payment intent (pay-in) quotes into the network. These quotes include tiered pricing bands and an expiration timestamp. |
 | GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-GetQuoteResponse) | GetQuote returns available quotes for a given currency and amount.  Use this to check indicative rates before creating a payment intent. The returned quotes show which providers can accept pay-ins and their current rates.  Note: Quotes are indicative only. The actual rate used for settlement is determined at the time of ConfirmFundsReceived. |
-| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-CreatePaymentIntentResponse) | CreatePaymentIntent initiates a new payment intent.  Called by the beneficiary provider (the one who will receive the settlement). The network finds suitable pay-in providers, retrieves their payment details, and returns available payment options to present to the end-user.  Flow: 1. Network finds providers with quotes for the requested currency/amount 2. Network calls GetPaymentInstructions on each pay-in provider 3. Network stores the payment intent and returns available options  The returned payment_intent_id must be stored by the beneficiary provider to correlate with the PaymentIntentUpdate notification received later.  Idempotency: Multiple calls with the same external_reference return the same payment_intent_id. |
-| ConfirmFundsReceived | [ConfirmFundsReceivedRequest](#tzero-v1-payment_intent-ConfirmFundsReceivedRequest) | [ConfirmFundsReceivedResponse](#tzero-v1-payment_intent-ConfirmFundsReceivedResponse) | ConfirmFundsReceived confirms that the pay-in provider has received funds from the end-user.  Called by the pay-in provider after verifying payment receipt. The provider is responsible for validating the received amount matches expectations.  On success: 1. Network finds the best quote from the last 30 minutes 2. Settlement amount is calculated using that quote's rate 3. Ledger entries are created (settlement + fees) 4. Beneficiary provider receives PaymentIntentUpdate notification  Important: This endpoint assumes full payment. Partial payments are not supported in V1. |
+| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-CreatePaymentIntentResponse) | CreatePaymentIntent initiates a new payment intent.  Called by the beneficiary provider (the one who will receive the settlement). The network finds suitable pay-in providers, retrieves their payment details, and returns available payment options to present to the end-user.  The returned payment_intent_id must be stored by the beneficiary provider to correlate with the PaymentIntentUpdate notification received later.  Idempotency: Multiple calls with the same external_reference return the same payment_intent_id. |
+| ConfirmFundsReceived | [ConfirmFundsReceivedRequest](#tzero-v1-payment_intent-ConfirmFundsReceivedRequest) | [ConfirmFundsReceivedResponse](#tzero-v1-payment_intent-ConfirmFundsReceivedResponse) | ConfirmFundsReceived confirms that the pay-in provider has received funds from the end-user. |
 
  <!-- end services -->
 
@@ -42,7 +44,9 @@ Request to confirm that funds have been received from the end-user.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_intent_id | [uint64](../scalar/#uint64) |  | The payment intent ID being confirmed. Must be a valid, pending payment intent. |
+| confirmation_code | [string](../scalar/#string) |  | Confirmation code received in the get payment details along with the payment_intent_id. This is to prevent the accidental confirmation of the wrong payment intent. |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used by the end-user. Must match one of the payment methods returned in CreatePaymentIntentResponse. |
+| transaction_reference | [string](../scalar/#string) |  | Transaction reference |
 
 
 
@@ -86,11 +90,12 @@ This message has no fields defined.
 
 ### ConfirmFundsReceivedResponse.Reject
 Funds rejected.
-Reserved for future use when credit limit checks or other validations
-may cause rejection.
 
 
-This message has no fields defined.
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| reason | [ConfirmFundsReceivedResponse.Reject.Reason](#tzero-v1-payment_intent-ConfirmFundsReceivedResponse-Reject-Reason) |  |  |
+
 
 
 
@@ -105,8 +110,8 @@ Request to create a new payment intent.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| external_reference | [string](../scalar/#string) |  | Provider-supplied unique identifier for this payment intent. Used for idempotency - subsequent requests with the same external_reference return the existing payment_intent_id instead of creating a new one.  Should be unique per beneficiary provider. Recommended format: UUID or combination of your internal transaction ID with a timestamp. |
-| currency | [string](../scalar/#string) |  | Pay-in currency code in ISO 4217 format. The currency that the end-user will pay in. Examples: "EUR", "GBP", "USD", "KES" |
+| external_reference | [string](../scalar/#string) |  | Provider-supplied unique identifier for this payment intent. Used for idempotency - subsequent requests with the same external_reference return the existing payment_intent_id instead of creating a new one. Should be unique per beneficiary provider. |
+| currency | [string](../scalar/#string) |  | Pay-in currency code in ISO 4217 format. The currency that the end-user will pay in. |
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Pay-in amount in the specified currency. The exact fiat amount the end-user should pay. |
 | travel_rule_data | [CreatePaymentIntentRequest.TravelRuleData](#tzero-v1-payment_intent-CreatePaymentIntentRequest-TravelRuleData) |  | Travel rule compliance data. Required for regulatory compliance under FATF guidelines. |
 
@@ -174,7 +179,7 @@ Payment intent created successfully.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](../scalar/#uint64) |  | Unique identifier for this payment intent. Store this ID to correlate with: - PaymentIntentUpdate notifications you'll receive - Any support inquiries or reconciliation needs |
+| payment_intent_id | [uint64](../scalar/#uint64) |  | Unique identifier for this payment intent. Store this ID to correlate with: - PaymentIntentUpdate notifications you'll receive |
 | pay_in_details | [PaymentIntentPayInDetails](#tzero-v1-payment_intent-PaymentIntentPayInDetails) | repeated | Available payment options for the end-user. Present these options to your user so they can choose how to pay. Each entry contains the payment details needed to complete the payment. |
 
 
@@ -221,10 +226,6 @@ Request to get indicative quotes for a currency/amount pair.
 
 ### GetQuoteResponse.QuoteNotFound
 No providers have active quotes for the requested currency/amount.
-This may occur if:
-- No providers support the currency
-- The amount is outside all providers' supported ranges
-- All relevant quotes have expired
 
 
 This message has no fields defined.
@@ -242,7 +243,8 @@ Quotes were found for the requested currency/amount.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| quotes | [GetQuoteResponse.Success.IndicativeQuote](#tzero-v1-payment_intent-GetQuoteResponse-Success-IndicativeQuote) | repeated | Available indicative quotes. Each entry represents a different pay-in provider and payment method combination. Use CreatePaymentIntent to get the actual payment details for making a payment. |
+| best_quotes | [GetQuoteResponse.Success.IndicativeQuote](#tzero-v1-payment_intent-GetQuoteResponse-Success-IndicativeQuote) | repeated | Best quotes per payment method available for the specified currency and amount. |
+| all_quotes | [GetQuoteResponse.Success.IndicativeQuote](#tzero-v1-payment_intent-GetQuoteResponse-Success-IndicativeQuote) | repeated | Available indicative quotes. Each entry represents a different pay-in provider and payment method combination. Use CreatePaymentIntent to get the actual payment details for making a payment. |
 
 
 
@@ -255,14 +257,13 @@ Quotes were found for the requested currency/amount.
 ### GetQuoteResponse.Success.IndicativeQuote
 Represents an indicative quote from a pay-in provider.
 Contains the payment method, provider info, and indicative exchange rate.
-Does not include payment details - use CreatePaymentIntent to get those.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method type (e.g., SEPA, SWIFT, mobile money). |
-| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Used internally for routing; providers can use this to identify counterparties. |
-| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (quote currency is always USD).  Note: This is indicative only. The actual rate is determined at ConfirmFundsReceived using the best quote available at that time from the pay-in provider. |
+| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Providers can use this to identify counterparties. |
+| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived |
 
 
 
@@ -280,16 +281,96 @@ Contains the payment method, provider info, payment details, and indicative exch
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method type (e.g., SEPA, SWIFT, mobile money). Determines which payment details format is provided. |
-| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Used internally for routing; providers can use this to identify counterparties. |
+| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Providers can use this to identify counterparties. |
 | payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | Payment details for the end-user to make the payment. Contains bank account info, mobile money details, etc. based on payment_method. This should be displayed to the end-user to complete their payment. |
-| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (quote currency is always USD).  Note: This is indicative only. The actual rate is determined at ConfirmFundsReceived using the best quote available at that time from the pay-in provider. |
+| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived |
 
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-UpdateQuoteRequest"></a>
+
+### UpdateQuoteRequest
+Base currency is always USD, so the quotes are always in USD/currency format.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_intent_quotes | [UpdateQuoteRequest.Quote](#tzero-v1-payment_intent-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-UpdateQuoteRequest-Quote"></a>
+
+### UpdateQuoteRequest.Quote
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| currency | [string](../scalar/#string) |  | BRL, EUR, GBP, etc. (ISO 4217 currency code) |
+| payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
+| bands | [UpdateQuoteRequest.Quote.Band](#tzero-v1-payment_intent-UpdateQuoteRequest-Quote-Band) | repeated | list of bands for this quote |
+| expiration | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | expiration time of the quote |
+| timestamp | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | timestamp quote was created |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-UpdateQuoteRequest-Quote-Band"></a>
+
+### UpdateQuoteRequest.Quote.Band
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| client_quote_id | [string](../scalar/#string) |  | unique client generated id for this band |
+| max_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
+| rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/currency rate |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-UpdateQuoteResponse"></a>
+
+### UpdateQuoteResponse
+
+
+
+This message has no fields defined.
 
 
 
 
 
  <!-- end messages -->
+
+
+<a name="tzero-v1-payment_intent-ConfirmFundsReceivedResponse-Reject-Reason"></a>
+
+### ConfirmFundsReceivedResponse.Reject.Reason
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| REJECT_REASON_UNSPECIFIED | 0 |  |
+| REJECT_REASON_CONFIRMATION_CODE_MISMATCH | 10 |  |
+| REJECT_REASON_NO_ACTIVE_QUOTE | 20 |  |
+
 
 
 <a name="tzero-v1-payment_intent-CreatePaymentIntentResponse-Failure-Reason"></a>
@@ -300,7 +381,8 @@ Contains the payment method, provider info, payment details, and indicative exch
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | FAILURE_REASON_UNSPECIFIED | 0 |  |
-| FAILURE_REASON_QUOTE_NOT_FOUND | 10 | No quotes found for the requested currency/amount. This may occur if: - No providers support the requested currency - The amount is outside all providers' supported ranges - All relevant quotes have expired |
+| FAILURE_REASON_QUOTE_NOT_FOUND | 10 | No quotes found for the requested currency/amount. |
+| FAILURE_REASON_REJECTED | 20 | Payment intent rejected. |
 
 
  <!-- end enums -->
