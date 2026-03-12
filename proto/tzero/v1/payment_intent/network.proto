@@ -6,18 +6,28 @@ import "buf/validate/validate.proto";
 import "tzero/v1/common/common.proto";
 import "tzero/v1/common/payment_method.proto";
 import "ivms101/v1/ivms/ivms101.proto";
+import "google/protobuf/timestamp.proto";
 
 /**
  * PaymentIntentService provides Payment Intent APIs for providers.
  *
- * Payment Intent is a pay-in initiated flow where:
+ * Payment Intent is a flow where:
  * 1. Beneficiary provider creates a payment intent specifying amount/currency
  * 2. End-user pays via one of the returned payment options
- * 3. Pay-in provider confirms receipt, triggering settlement
+ * 3. Pay-in provider confirms funds received
+ * 4. Settlement will happen periodically between providers
  *
  * This service is hosted by the T-0 Network and called by providers.
  */
 service PaymentIntentService {
+  /**
+  * Used by the provider to publish payment intent (pay-in) quotes into the network.
+  * These quotes include tiered pricing bands and an expiration timestamp.
+ */
+  rpc UpdateQuote(UpdateQuoteRequest) returns (UpdateQuoteResponse)  {
+    option idempotency_level = IDEMPOTENT;
+  };
+
   /**
    * GetQuote returns available quotes for a given currency and amount.
    *
@@ -38,11 +48,6 @@ service PaymentIntentService {
    * The network finds suitable pay-in providers, retrieves their payment details,
    * and returns available payment options to present to the end-user.
    *
-   * Flow:
-   * 1. Network finds providers with quotes for the requested currency/amount
-   * 2. Network calls GetPaymentInstructions on each pay-in provider
-   * 3. Network stores the payment intent and returns available options
-   *
    * The returned payment_intent_id must be stored by the beneficiary provider
    * to correlate with the PaymentIntentUpdate notification received later.
    *
@@ -54,22 +59,60 @@ service PaymentIntentService {
 
   /**
    * ConfirmFundsReceived confirms that the pay-in provider has received funds from the end-user.
-   *
-   * Called by the pay-in provider after verifying payment receipt.
-   * The provider is responsible for validating the received amount matches expectations.
-   *
-   * On success:
-   * 1. Network finds the best quote from the last 30 minutes
-   * 2. Settlement amount is calculated using that quote's rate
-   * 3. Ledger entries are created (settlement + fees)
-   * 4. Beneficiary provider receives PaymentIntentUpdate notification
-   *
-   * Important: This endpoint assumes full payment. Partial payments are not supported in V1.
    */
   rpc ConfirmFundsReceived(ConfirmFundsReceivedRequest) returns (ConfirmFundsReceivedResponse) {
     option idempotency_level = IDEMPOTENT;
   };
 }
+
+/*
+ * Base currency is always USD, so the quotes are always in USD/currency format.
+ */
+message UpdateQuoteRequest {
+  /**
+   * Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the
+   * unique client_quote_id for each band.
+   */
+  repeated Quote payment_intent_quotes = 10;
+
+  message Quote {
+    // BRL, EUR, GBP, etc. (ISO 4217 currency code)
+    string currency = 10 [(buf.validate.field).string = {
+      len: 3,
+      pattern: "^[A-Z]{3}$"
+    }];
+
+    // Payment method must be specified
+    tzero.v1.common.PaymentMethodType payment_method = 25 [(buf.validate.field).required = true];
+
+    // list of bands for this quote
+    repeated Band bands = 30 [(buf.validate.field).repeated = {
+      min_items: 1
+    }];
+
+    // expiration time of the quote
+    google.protobuf.Timestamp expiration = 60 [(buf.validate.field).timestamp.gt_now = true];
+
+    // timestamp quote was created
+    google.protobuf.Timestamp timestamp = 70 [(buf.validate.field).required = true];
+
+    message Band {
+      // unique client generated id for this band
+      string client_quote_id = 10 [(buf.validate.field).string = {
+        min_len: 1,
+        max_len: 64
+      }];
+
+      // max amount of USD this quote is applicable for. Please look into documentation for valid amounts.
+      tzero.v1.common.Decimal max_amount = 40 [(buf.validate.field).required = true];
+
+      // USD/currency rate
+      tzero.v1.common.Decimal rate = 50 [(buf.validate.field).required = true];
+    }
+  }
+}
+
+message UpdateQuoteResponse {}
 
 /**
  * Request to get indicative quotes for a currency/amount pair.
@@ -101,17 +144,20 @@ message GetQuoteResponse {
    * Quotes were found for the requested currency/amount.
    */
   message Success {
+    /*
+     * Best quotes per payment method available for the specified currency and amount.
+     */
+    repeated IndicativeQuote best_quotes = 10;
     /**
      * Available indicative quotes.
      * Each entry represents a different pay-in provider and payment method combination.
      * Use CreatePaymentIntent to get the actual payment details for making a payment.
      */
-    repeated IndicativeQuote quotes = 10;
+    repeated IndicativeQuote all_quotes = 20;
 
     /**
      * Represents an indicative quote from a pay-in provider.
      * Contains the payment method, provider info, and indicative exchange rate.
-     * Does not include payment details - use CreatePaymentIntent to get those.
      */
     message IndicativeQuote {
       /**
@@ -121,15 +167,14 @@ message GetQuoteResponse {
 
       /**
        * The T-0 provider ID of the pay-in provider offering this quote.
-       * Used internally for routing; providers can use this to identify counterparties.
+       * Providers can use this to identify counterparties.
        */
       uint32 provider_id = 20;
 
       /**
-       * Indicative exchange rate USD/XXX (quote currency is always USD).
+       * Indicative exchange rate USD/XXX (base currency is always USD).
        *
-       * Note: This is indicative only. The actual rate is determined at ConfirmFundsReceived
-       * using the best quote available at that time from the pay-in provider.
+       * Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived
        */
       tzero.v1.common.Decimal indicative_rate = 30;
     }
@@ -137,15 +182,9 @@ message GetQuoteResponse {
 
   /**
    * No providers have active quotes for the requested currency/amount.
-   * This may occur if:
-   * - No providers support the currency
-   * - The amount is outside all providers' supported ranges
-   * - All relevant quotes have expired
    */
   message QuoteNotFound {}
 }
-
-
 
 /**
  * Represents pay-in details for a payment intent option.
@@ -160,7 +199,7 @@ message PaymentIntentPayInDetails {
 
   /**
    * The T-0 provider ID of the pay-in provider offering this quote.
-   * Used internally for routing; providers can use this to identify counterparties.
+   * Providers can use this to identify counterparties.
    */
   uint32 provider_id = 20;
 
@@ -172,10 +211,9 @@ message PaymentIntentPayInDetails {
   tzero.v1.common.PaymentDetails payment_details = 30;
 
   /**
-   * Indicative exchange rate USD/XXX (quote currency is always USD).
+   * Indicative exchange rate USD/XXX (base currency is always USD).
    *
-   * Note: This is indicative only. The actual rate is determined at ConfirmFundsReceived
-   * using the best quote available at that time from the pay-in provider.
+   * Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived
    */
   tzero.v1.common.Decimal indicative_rate = 40;
 }
@@ -188,16 +226,13 @@ message CreatePaymentIntentRequest {
    * Provider-supplied unique identifier for this payment intent.
    * Used for idempotency - subsequent requests with the same external_reference
    * return the existing payment_intent_id instead of creating a new one.
-   *
-   * Should be unique per beneficiary provider. Recommended format: UUID or
-   * combination of your internal transaction ID with a timestamp.
+   * Should be unique per beneficiary provider.
    */
   string external_reference = 10;
 
   /**
    * Pay-in currency code in ISO 4217 format.
    * The currency that the end-user will pay in.
-   * Examples: "EUR", "GBP", "USD", "KES"
    */
   string currency = 20 [(buf.validate.field).string = {
     len: 3,
@@ -253,7 +288,6 @@ message CreatePaymentIntentResponse {
      * Unique identifier for this payment intent.
      * Store this ID to correlate with:
      * - PaymentIntentUpdate notifications you'll receive
-     * - Any support inquiries or reconciliation needs
      */
     uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
 
@@ -278,12 +312,12 @@ message CreatePaymentIntentResponse {
       FAILURE_REASON_UNSPECIFIED = 0;
       /**
        * No quotes found for the requested currency/amount.
-       * This may occur if:
-       * - No providers support the requested currency
-       * - The amount is outside all providers' supported ranges
-       * - All relevant quotes have expired
        */
       FAILURE_REASON_QUOTE_NOT_FOUND = 10;
+      /**
+       * Payment intent rejected.
+       */
+      FAILURE_REASON_REJECTED = 20;
     }
   }
 }
@@ -298,11 +332,26 @@ message ConfirmFundsReceivedRequest {
    */
   uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
 
+  /*
+   * Confirmation code received in the get payment details along with the payment_intent_id. This is to prevent
+   * the accidental confirmation of the wrong payment intent.
+   */
+  string confirmation_code = 20;
+
   /**
    * The payment method used by the end-user.
    * Must match one of the payment methods returned in CreatePaymentIntentResponse.
    */
-  tzero.v1.common.PaymentMethodType payment_method = 20;
+  tzero.v1.common.PaymentMethodType payment_method = 30;
+
+  /*
+   * Transaction reference
+   */
+  string transaction_reference = 40 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 256
+  }];
+
 }
 
 message ConfirmFundsReceivedResponse {
@@ -327,9 +376,14 @@ message ConfirmFundsReceivedResponse {
 
   /**
    * Funds rejected.
-   * Reserved for future use when credit limit checks or other validations
-   * may cause rejection.
    */
   message Reject {
+    Reason reason = 10;
+
+    enum Reason {
+      REJECT_REASON_UNSPECIFIED = 0;
+      REJECT_REASON_CONFIRMATION_CODE_MISMATCH = 10;
+      REJECT_REASON_NO_ACTIVE_QUOTE = 20;
+    }
   }
 }

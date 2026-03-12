@@ -3,6 +3,7 @@ syntax = "proto3";
 package tzero.v1.payment_intent;
 
 import "tzero/v1/common/common.proto";
+import "tzero/v1/common/payment_method.proto";
 import "buf/validate/validate.proto";
 
 /**
@@ -20,15 +21,6 @@ import "buf/validate/validate.proto";
 service BeneficiaryService {
   /**
    * PaymentIntentUpdate notifies the beneficiary provider of status changes.
-   *
-   * Currently supports:
-   * - FundsReceived: The pay-in provider confirmed receipt
-   *
-   * This notification is sent after ledger entries are created and the balance
-   * has been updated. The beneficiary provider can use this to:
-   * - Update their internal records
-   * - Notify their end-user of successful payment
-   * - Trigger downstream processing (e.g., release goods/services)
    *
    * Idempotency: This endpoint must be idempotent. The network may retry
    * delivery in case of failures or timeouts.
@@ -49,9 +41,9 @@ message PaymentIntentUpdateRequest {
   uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
 
   /**
-   * The type of update. Currently only PayInReceived is supported.
+   * The type of update.
    */
-  oneof Update {
+  oneof update {
     /**
      * Funds were received from the payer by pay-in provider.
      */
@@ -61,10 +53,6 @@ message PaymentIntentUpdateRequest {
   /**
    * Notification that funds were received from the payer by pay-in provider.
    *
-   * After receiving this notification:
-   * - Your balance with the pay-in provider has been credited
-   * - Fees have been recorded (settled separately)
-   * - You can safely deliver goods/services to your end-user
    */
   message FundsReceived {
     /**
@@ -85,7 +73,17 @@ message PaymentIntentUpdateRequest {
      * The fiat amount received from the end-user.
      * Matches the amount originally requested in CreatePaymentIntent.
      */
-    tzero.v1.common.Decimal source_amount = 30;
+    tzero.v1.common.Decimal payment_amount = 30;
+
+    /*
+     * The payment method used for the pay-in
+     */
+    tzero.v1.common.PaymentMethodType payment_method = 40;
+
+    /*
+     * Unique transaction reference identifying the pay-in transaction
+     */
+    string transaction_reference = 50;
   }
 }
 
