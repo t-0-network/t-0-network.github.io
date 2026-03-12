@@ -13,6 +13,71 @@ toc: true
 
 The Provider SDK is a Go library that enables payment processing services to integrate with the t-0 Network. The SDK provides comprehensive functionality for implementing provider services, handling cryptographic authentication, and managing network communications.
 
+## Quick Start with Starter Template
+
+Scaffold a complete provider project with a single command:
+
+```bash
+go run github.com/t-0-network/provider-sdk/go/starter@latest my-provider
+```
+
+This creates a ready-to-run project with a secp256k1 keypair, environment config, provider service stubs, and a Dockerfile.
+
+### Generated Project Structure
+
+```
+my-provider/
+├── cmd/
+│   └── main.go              # Entry point
+├── internal/
+│   ├── handler/
+│   │   ├── provider.go      # Provider service implementation
+│   │   └── payment.go       # Payment handler implementation
+│   ├── get_quote.go         # Quote retrieval logic
+│   ├── publish_quotes.go    # Quote publishing logic
+│   └── service.go           # Service utilities
+├── .env                     # Environment variables (with generated keys)
+├── .env.example             # Example environment file
+├── .gitignore               # Git ignore rules
+├── Dockerfile               # Docker configuration
+├── go.mod                   # Go module definition
+└── go.sum                   # Go dependencies checksums
+```
+
+### Key Files to Modify
+
+| File | Purpose |
+|------|---------|
+| `internal/handler/payment.go` | Implement your payment processing logic. Look for `TODO` comments. |
+| `internal/publish_quotes.go` | Replace sample quotes with your FX rate source. |
+
+### Getting Started
+
+#### Phase 1: Quoting
+
+1. Review the generated keys in `.env` — share your public key (shown as a comment) with the T-0 team to register your provider.
+2. Edit `internal/publish_quotes.go` to implement your quote publishing logic.
+3. Start the development server: `go run ./cmd/main.go`
+4. Verify quotes are received by the network.
+
+#### Phase 2: Payments
+
+1. Implement `UpdatePayment` handler in `internal/handler/payment.go`.
+2. Deploy your service and share the base URL with the T-0 team.
+3. Implement `PayOut` handler in `internal/handler/payment.go`.
+4. Coordinate with the T-0 team to test end-to-end payment flows.
+
+### Deployment
+
+```bash
+docker build -t my-provider:latest .
+docker run -p 8080:8080 --env-file .env my-provider:latest
+```
+
+Full starter template source: [GitHub](https://github.com/t-0-network/provider-sdk/tree/master/go/starter/template)
+
+---
+
 ## Architecture
 
 The SDK consists of two main components:
@@ -28,20 +93,26 @@ The SDK consists of two main components:
 
 ### Service Interface
 
-Implement the `networkconnect.ProviderServiceHandler` interface to create your provider service. You can check the 
+Implement the `paymentconnect.ProviderServiceHandler` interface to create your provider service. You can check the
 detailed description of each rpc in the [API Reference](https://t-0-network.github.io/docs/integration-guidance/api-reference/provider/)
 
 ```go
+package main
+
+import (
+    "context"
+
+    "connectrpc.com/connect"
+    "github.com/t-0-network/provider-sdk/go/api/tzero/v1/payment"
+    "github.com/t-0-network/provider-sdk/go/api/tzero/v1/payment/paymentconnect"
+)
+
 type ProviderServiceHandler interface {
-    PayOut(context.Context, *connect.Request[network.PayoutRequest]) (*connect.Response[network.PayoutResponse], error)
-	
-    UpdatePayment(context.Context, *connect.Request[network.UpdatePaymentRequest]) (*connect.Response[network.UpdatePaymentResponse], error)
-	
-    CreatePayInDetails(context.Context, *connect.Request[network.CreatePayInDetailsRequest]) (*connect.Response[network.CreatePayInDetailsResponse], error)
-	
-    UpdateLimit(context.Context, *connect.Request[network.UpdateLimitRequest]) (*connect.Response[network.UpdateLimitResponse], error)
-	
-    AppendLedgerEntries(context.Context, *connect.Request[network.AppendLedgerEntriesRequest]) (*connect.Response[network.AppendLedgerEntriesResponse], error)
+    PayOut(context.Context, *connect.Request[payment.PayoutRequest]) (*connect.Response[payment.PayoutResponse], error)
+    UpdatePayment(context.Context, *connect.Request[payment.UpdatePaymentRequest]) (*connect.Response[payment.UpdatePaymentResponse], error)
+    UpdateLimit(context.Context, *connect.Request[payment.UpdateLimitRequest]) (*connect.Response[payment.UpdateLimitResponse], error)
+    AppendLedgerEntries(context.Context, *connect.Request[payment.AppendLedgerEntriesRequest]) (*connect.Response[payment.AppendLedgerEntriesResponse], error)
+    ApprovePaymentQuotes(context.Context, *connect.Request[payment.ApprovePaymentQuoteRequest]) (*connect.Response[payment.ApprovePaymentQuoteResponse], error)
 }
 ```
 
@@ -50,15 +121,20 @@ type ProviderServiceHandler interface {
 Initialize the provider handler with the t-0 Network public key and your service implementation:
 
 ```go
-// t-0 Network hex formatted public key
-networkPublicKey := "0x049bb924680bfba3f64d924bf9040c45dcc215b124b5b9ee73ca8e32c050d042c0bbd8dbb98e3929ed5bc2967f28c3a3b72dd5e24312404598bbf6c6cc47708dc7"
+package main
 
-providerServiceHandler, err := provider.NewProviderHandler(
-    provider.NetworkPublicKeyHexed(networkPublicKey), // t-0 Network public key
-    &ProviderServiceImplementation{}, // This is your service implementation - replace with your actual implementation
-    // optional configuration
-    provider.WithVerifySignatureFn(verifySignatureFn) // Custom signature verification function
-    provider.WithConnectHandlerOptions(HandlerOptions) // Additional Connect handler options
+import (
+    "github.com/t-0-network/provider-sdk/go/api/tzero/v1/payment/paymentconnect"
+    "github.com/t-0-network/provider-sdk/go/provider"
+)
+
+// t-0 Network hex formatted public key
+networkPublicKey := "0x04..."
+
+providerServiceHandler, err := provider.NewHttpHandler(
+    provider.NetworkPublicKeyHexed(networkPublicKey),
+    provider.Handler(paymentconnect.NewProviderServiceHandler,
+        paymentconnect.ProviderServiceHandler(&ProviderServiceImplementation{})),
 )
 if err != nil {
     log.Fatalf("Failed to create provider service handler: %v", err)
@@ -71,31 +147,19 @@ This step is optional, you can register and serve the handler using your existin
 #### Launch an HTTP server with the provider handler:
 
 ```go
-shutdownFunc := provider.StartServer( // Start the HTTP server with the provider service handler, one-liner, you can also use your own HTTP server implementation 
+shutdownFunc, err := provider.StartServer(
     providerServiceHandler,
     // optional configuration
     provider.WithAddr(":8080"),
-    provider.WithReadTimeout(10 * time.Second)
-    provider.WithWriteTimeout(10 * time.Second)
-    provider.WithReadHeaderTimeout(10 * time.Second)
-    provider.WithTLSConfig(tlsConfig)
 )
+if err != nil {
+    log.Fatalf("Failed to start provider server: %v", err)
+}
 
 // Manual shutdown handling
 if err := shutdownFunc(context.Background()); err != nil {
     log.Printf("Failed to shutdown server: %v", err)
 }
-```
-
-#### Or return a ready to use HTTP Server
-
-Create an HTTP server instance without starting it:
-
-```go
-server := provider.NewServer(
-    providerServiceHandler,
-    provider.WithAddr(":8080"),
-)
 ```
 
 ## t-0 Network Client
@@ -105,19 +169,18 @@ The network client provides direct interaction capabilities with t-0 Network ser
 ### Client Initialization
 
 ```go
-import (
-    "context"
-    "log"
+package main
 
-    "connectrpc.com/connect"
-    networkproto "github.com/t-0-network/provider-sdk-go/api/gen/proto/network"
-    "github.com/t-0-network/provider-sdk-go/pkg/network"
+import (
+    "github.com/t-0-network/provider-sdk/go/api/tzero/v1/payment/paymentconnect"
+    "github.com/t-0-network/provider-sdk/go/network"
 )
 
-// Initialize with private key
-yourPrivateKey := network.PrivateKeyHexed("0x7795db2f4499c04d80062c1f1614ff1e427c148e47ed23e387d62829f437b5d8")
-
-networkClient, err := network.NewServiceClient(yourPrivateKey)
+networkClient, err := network.NewServiceClient(
+    network.PrivateKeyHexed("0x7795db2f4499c04d80062c1f1614ff1e427c148e47ed23e387d62829f437b5d8"),
+    paymentconnect.NewNetworkServiceClient,
+    network.WithBaseURL("https://api-sandbox.t-0.network"),
+)
 if err != nil {
     log.Fatalf("Failed to create network service client: %v", err)
 }
@@ -126,9 +189,33 @@ if err != nil {
 ### Network Service Operations
 
 ```go
+package main
+
+import (
+    "github.com/google/uuid"
+    "github.com/t-0-network/provider-sdk/go/api/tzero/v1/common"
+    "github.com/t-0-network/provider-sdk/go/api/tzero/v1/payment"
+    "google.golang.org/protobuf/types/known/timestamppb"
+)
+
 // Example: Update quote operation
-_, err = networkClient.UpdateQuote(context.Background(), connect.NewRequest(&networkproto.UpdateQuoteRequest{
-    // Request parameters
+_, err := networkClient.UpdateQuote(ctx, connect.NewRequest(&payment.UpdateQuoteRequest{
+    PayOut: []*payment.UpdateQuoteRequest_Quote{
+        {
+            Currency:      "EUR",
+            QuoteType:     payment.QuoteType_QUOTE_TYPE_REALTIME,
+            PaymentMethod: common.PaymentMethodType_PAYMENT_METHOD_TYPE_SEPA,
+            Expiration:    timestamppb.New(time.Now().Add(30 * time.Second)),
+            Timestamp:     timestamppb.New(time.Now()),
+            Bands: []*payment.UpdateQuoteRequest_Quote_Band{
+                {
+                    ClientQuoteId: uuid.NewString(),
+                    MaxAmount:     &common.Decimal{Unscaled: 1000, Exponent: 0},
+                    Rate:          &common.Decimal{Unscaled: 86, Exponent: -2}, // rate 0.86
+                },
+            },
+        },
+    },
 }))
 if err != nil {
     log.Printf("Failed to update quote: %v", err)
@@ -136,10 +223,3 @@ if err != nil {
 }
 ```
 
-## Examples
-
-Comprehensive examples are available in:
-- [Pay-In Provider flow Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/payin_provider_flow_test.go)
-- [Payout Provider flow Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/payout_provider_flow_test.go)
-- [Provider Service Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/network_client_test.go)
-- [Network Client Example](https://github.com/t-0-network/provider-sdk-go/blob/main/examples/provider_service_test.go)
