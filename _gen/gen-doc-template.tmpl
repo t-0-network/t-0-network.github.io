@@ -8,8 +8,7 @@ lastmod: "2025-06-16T12:09:09+02:00"
 draft: false
 toc: true
 ---
-{{range .Files}}
-{{$file_name := .Name}}
+{{- range .Files}}{{if eq .Name "%%ACTIVE_FILE%%"}}
 {{range .Services}}
 <a name="{{.FullName | anchor}}"></a>
 
@@ -19,13 +18,23 @@ toc: true
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 {{range .Methods -}}
-  | {{.Name}} | [{{.RequestLongType}}](#{{.RequestFullType | anchor}}){{if .RequestStreaming}} stream{{end}} | [{{.ResponseLongType}}](#{{.ResponseFullType | anchor}}){{if .ResponseStreaming}} stream{{end}} | {{nobr .Description}} |
+{{- $rqft := .RequestFullType -}}{{- $rqlt := .RequestLongType -}}{{- $rqLocal := false -}}{{- $rqSfa := "" -}}
+{{- range $.Files -}}{{- $fa := .Name | anchor -}}{{- $act := eq .Name "%%ACTIVE_FILE%%" -}}
+{{- range .Messages -}}{{- if eq .FullName $rqft -}}{{- if $act -}}{{- $rqLocal = true -}}{{- else -}}{{- $rqSfa = $fa -}}{{- end -}}{{- end -}}{{- end -}}
+{{- range .Enums -}}{{- if eq .FullName $rqft -}}{{- if $act -}}{{- $rqLocal = true -}}{{- else -}}{{- $rqSfa = $fa -}}{{- end -}}{{- end -}}{{- end -}}
+{{- end -}}
+{{- $rsft := .ResponseFullType -}}{{- $rslt := .ResponseLongType -}}{{- $rsLocal := false -}}{{- $rsSfa := "" -}}
+{{- range $.Files -}}{{- $fa := .Name | anchor -}}{{- $act := eq .Name "%%ACTIVE_FILE%%" -}}
+{{- range .Messages -}}{{- if eq .FullName $rsft -}}{{- if $act -}}{{- $rsLocal = true -}}{{- else -}}{{- $rsSfa = $fa -}}{{- end -}}{{- end -}}{{- end -}}
+{{- range .Enums -}}{{- if eq .FullName $rsft -}}{{- if $act -}}{{- $rsLocal = true -}}{{- else -}}{{- $rsSfa = $fa -}}{{- end -}}{{- end -}}{{- end -}}
+{{- end -}}
+  | {{.Name}} | {{if $rqLocal}}[{{$rqlt}}](#{{$rqft | anchor}}){{else if $rqSfa}}[{{$rqlt}}](%%FILEREF:{{$rqSfa}}%%#{{$rqft | anchor}}){{else}}[{{$rqlt}}](%%SCALAR%%#{{$rqft | anchor}}){{end}}{{if .RequestStreaming}} stream{{end}} | {{if $rsLocal}}[{{$rslt}}](#{{$rsft | anchor}}){{else if $rsSfa}}[{{$rslt}}](%%FILEREF:{{$rsSfa}}%%#{{$rsft | anchor}}){{else}}[{{$rslt}}](%%SCALAR%%#{{$rsft | anchor}}){{end}}{{if .ResponseStreaming}} stream{{end}} | {{.Description | replace "\n" " "}} |
 {{end}}
 {{end}} <!-- end services -->
-{{end}}
+{{end}}{{end}}
 
 ##  Requests And Response Types
-{{range .Files}}
+{{range .Files}}{{if eq .Name "%%ACTIVE_FILE%%"}}
 {{range .Messages}}
 <a name="{{.FullName | anchor}}"></a>
 
@@ -36,7 +45,12 @@ toc: true
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 {{range .Fields -}}
-  | {{.Name}} | [{{.LongType}}](#{{.FullType | anchor}}) | {{.Label}} | {{if (index .Options "deprecated"|default false)}}**Deprecated.** {{end}}{{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+{{- $ft := .FullType -}}{{- $lt := .LongType -}}{{- $isLocal := false -}}{{- $sfa := "" -}}
+{{- range $.Files -}}{{- $fa := .Name | anchor -}}{{- $act := eq .Name "%%ACTIVE_FILE%%" -}}
+{{- range .Messages -}}{{- if eq .FullName $ft -}}{{- if $act -}}{{- $isLocal = true -}}{{- else -}}{{- $sfa = $fa -}}{{- end -}}{{- end -}}{{- end -}}
+{{- range .Enums -}}{{- if eq .FullName $ft -}}{{- if $act -}}{{- $isLocal = true -}}{{- else -}}{{- $sfa = $fa -}}{{- end -}}{{- end -}}{{- end -}}
+{{- end -}}
+  | {{.Name}} | {{if $isLocal}}[{{$lt}}](#{{$ft | anchor}}){{else if $sfa}}[{{$lt}}](%%FILEREF:{{$sfa}}%%#{{$ft | anchor}}){{else}}[{{$lt}}](%%SCALAR%%#{{$ft | anchor}}){{end}} | {{.Label}} | {{if (index .Options "deprecated"|default false)}}**Deprecated.** {{end}}{{.Description | replace "\n" " "}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
 {{end}}
 
 {{else}}
@@ -48,7 +62,7 @@ This message has no fields defined.
 | Extension | Type | Base | Number | Description |
 | --------- | ---- | ---- | ------ | ----------- |
 {{range .Extensions -}}
-  | {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{nobr .Description}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
+  | {{.Name}} | {{.LongType}} | {{.ContainingLongType}} | {{.Number}} | {{.Description | replace "\n" " "}}{{if .DefaultValue}} Default: {{.DefaultValue}}{{end}} |
 {{end}}
 {{end}}
 
@@ -63,9 +77,9 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 {{range .Values -}}
-  | {{.Name}} | {{.Number}} | {{nobr .Description}} |
+  | {{.Name}} | {{.Number}} | {{.Description | replace "\n" " "}} |
 {{end}}
 
 {{end}} <!-- end enums -->
 
-{{end}}
+{{end}}{{end}}

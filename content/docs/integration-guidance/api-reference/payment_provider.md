@@ -9,8 +9,6 @@ draft: false
 toc: true
 ---
 
-
-
 <a name="tzero-v1-payment-ProviderService"></a>
 
 ## ProviderService
@@ -56,10 +54,10 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| account_owner_id | [uint32](#uint32) |  | 1 is network account, others are ids of participants |
+| account_owner_id | [uint32](../scalar/#uint32) |  | 1 is network account, others are ids of participants |
 | account_type | [AppendLedgerEntriesRequest.AccountType](#tzero-v1-payment-AppendLedgerEntriesRequest-AccountType) |  | account_type is the type of the account that the entry belongs to. It is used to categorize the entries and understand the nature of the financial event. |
-| debit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | debit is the amount that was debited from the account. If the entry is a credit, this field should be 0. |
-| credit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | credit is the amount that was credited to the account. If the entry is a debit, this field should be 0. |
+| debit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | debit is the amount that was debited from the account. If the entry is a credit, this field should be 0. |
+| credit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | credit is the amount that was credited to the account. If the entry is a debit, this field should be 0. |
 
 
 
@@ -75,7 +73,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| transaction_id | [uint64](#uint64) |  | transaction_id is an incrementally growing identifier for the transaction. It could have gaps and could be out of order, but it is unique for each transaction. |
+| transaction_id | [uint64](../scalar/#uint64) |  | transaction_id is an incrementally growing identifier for the transaction. It could have gaps and could be out of order, but it is unique for each transaction. |
 | entries | [AppendLedgerEntriesRequest.LedgerEntry](#tzero-v1-payment-AppendLedgerEntriesRequest-LedgerEntry) | repeated | entries is a list of ledger entries that were appended to the ledger of the provider. Each entry represents a financial event that occurred in the provider's accounts. |
 | payout | [AppendLedgerEntriesRequest.Transaction.Payout](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-Payout) |  |  |
 | provider_settlement | [AppendLedgerEntriesRequest.Transaction.ProviderSettlement](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-ProviderSettlement) |  |  |
@@ -95,7 +93,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| fee_settlement_id | [uint64](#uint64) |  |  |
+| fee_settlement_id | [uint64](../scalar/#uint64) |  |  |
 
 
 
@@ -111,7 +109,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  |  |
+| payment_id | [uint64](../scalar/#uint64) |  |  |
 
 
 
@@ -127,7 +125,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| settlement_id | [uint64](#uint64) |  |  |
+| settlement_id | [uint64](../scalar/#uint64) |  |  |
 
 
 
@@ -156,11 +154,11 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  |  |
-| pay_out_quote_id | [int64](#int64) |  |  |
-| pay_out_rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
-| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
+| payment_id | [uint64](../scalar/#uint64) |  |  |
+| pay_out_quote_id | [int64](../scalar/#int64) |  |  |
+| pay_out_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
 
 
 
@@ -219,13 +217,13 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | payment id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
-| payout_id | [uint64](#uint64) |  | **Deprecated.** payout_id is deprecated now, since it's 1->1 mapping between payout_id and payment_id |
-| currency | [string](#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
-| client_quote_id | [string](#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
-| payout_details | [tzero.v1.common.PaymentDetails](#tzero-v1-common-PaymentDetails) | optional | payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
-| pay_in_provider_id | [uint32](#uint32) |  | Pay-in provider id which initiated the pay out. |
+| payment_id | [uint64](../scalar/#uint64) |  | payment id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
+| payout_id | [uint64](../scalar/#uint64) |  | **Deprecated.** payout_id is deprecated now, since it's 1->1 mapping between payout_id and payment_id |
+| currency | [string](../scalar/#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
+| client_quote_id | [string](../scalar/#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
+| amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
+| payout_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) | optional | payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
+| pay_in_provider_id | [uint32](../scalar/#uint32) |  | Pay-in provider id which initiated the pay out. |
 | travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional |  |
 
 
@@ -242,9 +240,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| originator | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
-| beneficiary | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
-| originator_provider | [ivms101.Person](#ivms101-Person) | optional |  |
+| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
+| beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
+| originator_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional |  |
 
 
 
@@ -292,7 +290,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | reason | [PayoutResponse.Failed.Reason](#tzero-v1-payment-PayoutResponse-Failed-Reason) |  |  |
-| details | [string](#string) | optional |  |
+| details | [string](../scalar/#string) | optional |  |
 
 
 
@@ -337,12 +335,12 @@ All the amounts are in USD
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| version | [int64](#int64) |  | Incrementally growing for the provider - same as in Ledger. |
-| counterpart_id | [int32](#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
-| payout_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage - reserve, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
-| credit_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
-| credit_usage | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than made payouts. |
-| reserve | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | This indicates how much is reserved for the pending payments (not yet finalized) |
+| version | [int64](../scalar/#int64) |  | Incrementally growing for the provider - same as in Ledger. |
+| counterpart_id | [int32](../scalar/#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
+| payout_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage - reserve, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
+| credit_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
+| credit_usage | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than made payouts. |
+| reserve | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This indicates how much is reserved for the pending payments (not yet finalized) |
 
 
 
@@ -371,8 +369,8 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | payment_id is a payment id in the T-0 network. |
-| payment_client_id | [string](#string) |  | payment_client_id is a payment id assigned by the client, this is the same id that was provided in the CreatePaymentRequest. |
+| payment_id | [uint64](../scalar/#uint64) |  | payment_id is a payment id in the T-0 network. |
+| payment_client_id | [string](../scalar/#string) |  | payment_client_id is a payment id assigned by the client, this is the same id that was provided in the CreatePaymentRequest. |
 | accepted | [UpdatePaymentRequest.Accepted](#tzero-v1-payment-UpdatePaymentRequest-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
 | failed | [UpdatePaymentRequest.Failed](#tzero-v1-payment-UpdatePaymentRequest-Failed) |  | Payment failed and would not be retried. |
 | confirmed | [UpdatePaymentRequest.Confirmed](#tzero-v1-payment-UpdatePaymentRequest-Confirmed) |  | Confirmed response - final state meaning the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
@@ -392,7 +390,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payout_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | amount in currency of the payout |
+| payout_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout |
 | travel_rule_data | [UpdatePaymentRequest.Accepted.TravelRuleData](#tzero-v1-payment-UpdatePaymentRequest-Accepted-TravelRuleData) | optional |  |
 
 
@@ -409,7 +407,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| beneficiary_provider | [ivms101.Person](#ivms101-Person) | optional |  |
+| beneficiary_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional |  |
 
 
 
@@ -425,8 +423,8 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| paid_out_at | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | time of the payout |
-| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| paid_out_at | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | time of the payout |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
 
@@ -443,7 +441,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | reason | [UpdatePaymentRequest.Failed.Reason](#tzero-v1-payment-UpdatePaymentRequest-Failed-Reason) |  |  |
-| details | [string](#string) | optional |  |
+| details | [string](../scalar/#string) | optional |  |
 
 
 
@@ -521,4 +519,5 @@ This message has no fields defined.
 
 
  <!-- end enums -->
+
 
