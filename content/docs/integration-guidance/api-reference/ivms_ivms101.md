@@ -204,6 +204,8 @@ Definition: refers to a uniquely distinguishable individual; one single person
 | customer_identification | [string](../scalar/#string) |  | Definition: a distinct identifier that uniquely identifies the person to the institution in context. |
 | date_and_place_of_birth | [DateAndPlaceOfBirth](#ivms101-DateAndPlaceOfBirth) |  | Definition: date and place of birth of a person. |
 | country_of_residence | [string](../scalar/#string) |  | Definition: country in which a person resides (the place of a person's home). The value used for the field country must be present on the ISO-3166-1 alpha-2 codes or the value XX. |
+| phone | [string](../scalar/#string) |  | Definition: phone number of the natural person. |
+| email | [string](../scalar/#string) |  | Definition: email address of the natural person. |
 
 
 
