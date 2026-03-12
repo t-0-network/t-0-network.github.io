@@ -1,6 +1,6 @@
 ---
-weight: 338
-title: "Common"
+weight: 337
+title: "Payment Method"
 description: ""
 icon: "article"
 date: "2025-06-16T12:09:09+02:00"
@@ -8,63 +8,10 @@ lastmod: "2025-06-16T12:09:09+02:00"
 draft: false
 toc: true
 ---
-
-
- <!-- end services -->
-
-
  <!-- end services -->
 
 
 ##  Requests And Response Types
-
-
-<a name="tzero-v1-common-Decimal"></a>
-
-### Decimal
-Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^exponent, 123.45 = 12345 * 10^-2)
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| unscaled | [int64](#int64) |  |  |
-| exponent | [int32](#int32) |  |  |
-
-
-
-
-
-
- <!-- end messages -->
-
-
-<a name="tzero-v1-common-Blockchain"></a>
-
-### Blockchain
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| BLOCKCHAIN_UNSPECIFIED | 0 |  |
-| BLOCKCHAIN_BSC | 10 |  |
-| BLOCKCHAIN_ETH | 20 |  |
-| BLOCKCHAIN_TRON | 100 |  |
-
-
-
-<a name="tzero-v1-common-Stablecoin"></a>
-
-### Stablecoin
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| STABLECOIN_UNSPECIFIED | 0 |  |
-| STABLECOIN_USDT | 10 |  |
-
-
- <!-- end enums -->
-
 
 
 <a name="tzero-v1-common-PaymentDetails"></a>
@@ -80,9 +27,7 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | ach | [PaymentDetails.Ach](#tzero-v1-common-PaymentDetails-Ach) |  | ACH (Automated Clearing House) - Electronic bank-to-bank transfers United States |
 | domestic_wire | [PaymentDetails.DomesticWire](#tzero-v1-common-PaymentDetails-DomesticWire) |  | DomesticWire - US domestic wire transfer United States |
 | fps | [PaymentDetails.Fps](#tzero-v1-common-PaymentDetails-Fps) |  | FPS (Faster Payments Service) United Kingdom |
-| mpesa | [PaymentDetails.MPesa](#tzero-v1-common-PaymentDetails-MPesa) |  | **Deprecated.** M-Pesa - Mobile money transfer and payment service Kenya, Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa
-
-deprecated in favor of AfricanMobileMoney |
+| mpesa | [PaymentDetails.MPesa](#tzero-v1-common-PaymentDetails-MPesa) |  | **Deprecated.** M-Pesa - Mobile money transfer and payment service Kenya, Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa  deprecated in favor of AfricanMobileMoney |
 | gcash | [PaymentDetails.GCash](#tzero-v1-common-PaymentDetails-GCash) |  | GCash - Mobile wallet and payment platform Philippines |
 | indian_bank_transfer | [PaymentDetails.IndianBankTransfer](#tzero-v1-common-PaymentDetails-IndianBankTransfer) |  | Indian Bank Transfer - Domestic electronic funds transfer (IMPS/NEFT/RTGS) India |
 | pesonet | [PaymentDetails.Pesonet](#tzero-v1-common-PaymentDetails-Pesonet) |  | PESONet - Real-time domestic payments system Philippines |
@@ -108,9 +53,9 @@ deprecated in favor of AfricanMobileMoney |
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| routing_number | [string](#string) |  |  |
-| account_number | [string](#string) |  |  |
-| account_holder_name | [string](#string) |  |  |
+| routing_number | [string](../scalar/#string) |  |  |
+| account_number | [string](../scalar/#string) |  |  |
+| account_holder_name | [string](../scalar/#string) |  |  |
 | account_type | [PaymentDetails.Ach.AchAccountType](#tzero-v1-common-PaymentDetails-Ach-AchAccountType) |  |  |
 
 
@@ -128,9 +73,9 @@ deprecated in favor of AfricanMobileMoney |
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | network | [PaymentDetails.AfricanMobileMoney.Network](#tzero-v1-common-PaymentDetails-AfricanMobileMoney-Network) |  | The phone network |
-| beneficiary_phone | [string](#string) |  | Phone number in international format without + sign Required: Yes |
-| account_reference | [string](#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
-| beneficiary_name | [string](#string) |  | Beneficiary name |
+| beneficiary_phone | [string](../scalar/#string) |  | Phone number in international format without + sign Required: Yes |
+| account_reference | [string](../scalar/#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary name |
 
 
 
@@ -146,10 +91,10 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| account_number | [string](#string) |  | 6-25 digits |
-| cnaps_code | [string](#string) |  | 12 digits (encodes the bank + branch) |
-| beneficiary_name_local | [string](#string) |  | Beneficiary name in Chinese characters |
-| beneficiary_name | [string](#string) |  | Beneficiary name in Latin characters |
+| account_number | [string](../scalar/#string) |  | 6-25 digits |
+| cnaps_code | [string](../scalar/#string) |  | 12 digits (encodes the bank + branch) |
+| beneficiary_name_local | [string](../scalar/#string) |  | Beneficiary name in Chinese characters |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary name in Latin characters |
 | business | [PaymentDetails.Cnaps.Business](#tzero-v1-common-PaymentDetails-Cnaps-Business) |  |  |
 | person | [PaymentDetails.Cnaps.Person](#tzero-v1-common-PaymentDetails-Cnaps-Person) |  |  |
 
@@ -167,7 +112,7 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| license_number | [string](#string) |  | Business license number - 18 digits |
+| license_number | [string](../scalar/#string) |  | Business license number - 18 digits |
 
 
 
@@ -183,7 +128,7 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id_number | [string](#string) |  | ID number - 18 digits |
+| id_number | [string](../scalar/#string) |  | ID number - 18 digits |
 
 
 
@@ -199,13 +144,13 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| bank_name | [string](#string) |  |  |
-| bank_address | [string](#string) |  |  |
-| routing_number | [string](#string) |  | ABA routing number (9 digits) |
-| account_number | [string](#string) |  |  |
-| beneficiary_name | [string](#string) |  |  |
-| beneficiary_address | [string](#string) |  |  |
-| wire_reference | [string](#string) |  |  |
+| bank_name | [string](../scalar/#string) |  |  |
+| bank_address | [string](../scalar/#string) |  |  |
+| routing_number | [string](../scalar/#string) |  | ABA routing number (9 digits) |
+| account_number | [string](../scalar/#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  |  |
+| beneficiary_address | [string](../scalar/#string) |  |  |
+| wire_reference | [string](../scalar/#string) |  |  |
 
 
 
@@ -221,10 +166,10 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| sort_code | [string](#string) |  |  |
-| account_number | [string](#string) |  |  |
-| beneficiary_name | [string](#string) |  |  |
-| reference | [string](#string) |  |  |
+| sort_code | [string](../scalar/#string) |  |  |
+| account_number | [string](../scalar/#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  |  |
+| reference | [string](../scalar/#string) |  |  |
 
 
 
@@ -240,9 +185,9 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| beneficiary_name | [string](#string) |  |  |
-| beneficiary_phone | [string](#string) |  | Recipient phone |
-| payment_reference | [string](#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  |  |
+| beneficiary_phone | [string](../scalar/#string) |  | Recipient phone |
+| payment_reference | [string](../scalar/#string) |  |  |
 
 
 
@@ -260,9 +205,9 @@ The China National Advanced Payment System
 | ----- | ---- | ----- | ----------- |
 | account_ifsc | [PaymentDetails.IndianBankTransfer.AccountIFSC](#tzero-v1-common-PaymentDetails-IndianBankTransfer-AccountIFSC) |  | 1) ACCOUNT + IFSC (NEFT/RTGS/IMPS P2A) |
 | imps | [PaymentDetails.IndianBankTransfer.IMPS](#tzero-v1-common-PaymentDetails-IndianBankTransfer-IMPS) |  | 2) IMPS P2P (MOBILE + MMID) |
-| beneficiary_name | [string](#string) |  | Beneficiary name |
-| beneficiary_type | [string](#string) |  | Beneficiary type |
-| payment_reference | [string](#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary name |
+| beneficiary_type | [string](../scalar/#string) |  | Beneficiary type |
+| payment_reference | [string](../scalar/#string) |  |  |
 
 
 
@@ -278,8 +223,8 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| account_number | [string](#string) |  | Beneficiary bank account number |
-| ifsc | [string](#string) |  | IFSC code (11 characters: 4 letters + '0' + 6 alphanumeric). |
+| account_number | [string](../scalar/#string) |  | Beneficiary bank account number |
+| ifsc | [string](../scalar/#string) |  | IFSC code (11 characters: 4 letters + '0' + 6 alphanumeric). |
 
 
 
@@ -295,8 +240,8 @@ Method 2: IMPS P2P (Mobile + MMID)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| beneficiary_phone | [string](#string) |  | Indian mobile number (10 digits, starting from 6–9). |
-| mmid | [string](#string) |  | MMID: 7-digit Mobile Money Identifier. |
+| beneficiary_phone | [string](../scalar/#string) |  | Indian mobile number (10 digits, starting from 6–9). |
+| mmid | [string](../scalar/#string) |  | MMID: 7-digit Mobile Money Identifier. |
 
 
 
@@ -312,10 +257,10 @@ Method 2: IMPS P2P (Mobile + MMID)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| recipient_institution | [string](#string) |  | Recipient institution: receiving bank or e‑money issuer selected from an InstaPay list. |
-| recipient_identifier | [string](#string) |  | Recipient identifier (one of): Account number, or Mobile number, or Email address, or QR code (scanned/uploaded “InstaPay QR”). |
-| recipient_account_name | [string](#string) |  | Recipient account name: the name as registered on the account or wallet (may be auto-displayed but is logically required for correct routing/confirmation). |
-| purpose_of_transfer | [string](#string) | optional | Purpose of Transfer (Optional/Mandatory depending on bank) |
+| recipient_institution | [string](../scalar/#string) |  | Recipient institution: receiving bank or e‑money issuer selected from an InstaPay list. |
+| recipient_identifier | [string](../scalar/#string) |  | Recipient identifier (one of): Account number, or Mobile number, or Email address, or QR code (scanned/uploaded “InstaPay QR”). |
+| recipient_account_name | [string](../scalar/#string) |  | Recipient account name: the name as registered on the account or wallet (may be auto-displayed but is logically required for correct routing/confirmation). |
+| purpose_of_transfer | [string](../scalar/#string) | optional | Purpose of Transfer (Optional/Mandatory depending on bank) |
 
 
 
@@ -331,9 +276,9 @@ Method 2: IMPS P2P (Mobile + MMID)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| beneficiary_phone | [string](#string) |  | Phone number in international format without + sign Examples: 254708374149 (Kenya), 255712345678 (Tanzania), 256712345678 (Uganda) Required: Yes |
-| account_reference | [string](#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
-| beneficiary_name | [string](#string) |  | Beneficiary name |
+| beneficiary_phone | [string](../scalar/#string) |  | Phone number in international format without + sign Examples: 254708374149 (Kenya), 255712345678 (Tanzania), 256712345678 (Uganda) Required: Yes |
+| account_reference | [string](../scalar/#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary name |
 
 
 
@@ -350,10 +295,10 @@ Transfers are made using bank code and account number (NUBAN)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| bank_code | [string](#string) |  | Bank code (e.g., "00001") |
-| account_number | [string](#string) |  | Account number (NUBAN format) |
-| beneficiary_name | [string](#string) |  | Beneficiary's full name |
-| payment_reference | [string](#string) |  | Payment reference/description (optional) |
+| bank_code | [string](../scalar/#string) |  | Bank code (e.g., "00001") |
+| account_number | [string](../scalar/#string) |  | Account number (NUBAN format) |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name |
+| payment_reference | [string](../scalar/#string) |  | Payment reference/description (optional) |
 
 
 
@@ -370,10 +315,10 @@ Pakistan uses 24-character IBAN: PK + 2 check digits + 4-char bank code + 16-cha
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| iban | [string](#string) |  | Pakistani IBAN (24 characters: PK + 2 check digits + 4-char bank identifier + 16-char account) Example: PK36SCBL0000001123456702 |
-| beneficiary_name | [string](#string) |  | Beneficiary's full name |
-| beneficiary_cnic | [string](#string) | optional | (Optional) Beneficiary CNIC (13 digits, no dashes) — sometimes required by receiving banks |
-| payment_reference | [string](#string) |  | Payment reference/description |
+| iban | [string](../scalar/#string) |  | Pakistani IBAN (24 characters: PK + 2 check digits + 4-char bank identifier + 16-char account) Example: PK36SCBL0000001123456702 |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name |
+| beneficiary_cnic | [string](../scalar/#string) | optional | (Optional) Beneficiary CNIC (13 digits, no dashes) — sometimes required by receiving banks |
+| payment_reference | [string](../scalar/#string) |  | Payment reference/description |
 
 
 
@@ -391,10 +336,10 @@ Transfers are made using the mobile number linked to the wallet account; CNIC is
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | wallet_provider | [PaymentDetails.PakistanMobileWallet.PakistanWalletProvider](#tzero-v1-common-PaymentDetails-PakistanMobileWallet-PakistanWalletProvider) |  | Wallet provider |
-| mobile_number | [string](#string) |  | Mobile number linked to the wallet (Pak local 03XXXXXXXXX or international 923XXXXXXXXX) |
-| cnic | [string](#string) |  | CNIC (Computerized National Identity Card) - 13 digits without dashes |
-| beneficiary_name | [string](#string) |  | Beneficiary's full name as registered with the wallet |
-| payment_reference | [string](#string) | optional | Payment reference/description (optional) |
+| mobile_number | [string](../scalar/#string) |  | Mobile number linked to the wallet (Pak local 03XXXXXXXXX or international 923XXXXXXXXX) |
+| cnic | [string](../scalar/#string) |  | CNIC (Computerized National Identity Card) - 13 digits without dashes |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name as registered with the wallet |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional) |
 
 
 
@@ -410,11 +355,11 @@ Transfers are made using the mobile number linked to the wallet account; CNIC is
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| recipient_financial_institution | [string](#string) |  | Recipient institution: receiving bank or participating non‑bank chosen from a PESONet list. |
-| recipient_identifier | [string](#string) |  | Recipient identifier: Account number (some banks also allow email/mobile). |
-| recipient_account_name | [string](#string) |  |  |
-| purpose_of_transfer | [string](#string) | optional | Purpose of Transfer (Optional/Mandatory depending on bank) |
-| recipient_address_email | [string](#string) | optional | Recipient's Address/Email (Optional/Mandatory depending on bank) |
+| recipient_financial_institution | [string](../scalar/#string) |  | Recipient institution: receiving bank or participating non‑bank chosen from a PESONet list. |
+| recipient_identifier | [string](../scalar/#string) |  | Recipient identifier: Account number (some banks also allow email/mobile). |
+| recipient_account_name | [string](../scalar/#string) |  |  |
+| purpose_of_transfer | [string](../scalar/#string) | optional | Purpose of Transfer (Optional/Mandatory depending on bank) |
+| recipient_address_email | [string](../scalar/#string) | optional | Recipient's Address/Email (Optional/Mandatory depending on bank) |
 
 
 
@@ -433,10 +378,10 @@ or traditional bank account details (bank code, branch, account number)
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | key_type | [PaymentDetails.Pix.KeyType](#tzero-v1-common-PaymentDetails-Pix-KeyType) |  | Pix key type - determines the format of pix_key_value |
-| key_value | [string](#string) |  | Pix key value - format depends on pix_key_type: - CPF: 11 digits (e.g., "12345678901") - CNPJ: 14 digits (e.g., "12345678000195") - EMAIL: valid email address - PHONE: international format with country code (e.g., "+5511999999999") - EVP: 32-character UUID (e.g., "123e4567-e89b-12d3-a456-426614174000") |
-| beneficiary_name | [string](#string) |  | Beneficiary's full name |
-| beneficiary_tax_id | [string](#string) | optional | (Optional) Beneficiary's CPF (11 digits) or CNPJ (14 digits) for verification |
-| payment_reference | [string](#string) | optional | (Optional) Payment description/reference |
+| key_value | [string](../scalar/#string) |  | Pix key value - format depends on pix_key_type: - CPF: 11 digits (e.g., "12345678901") - CNPJ: 14 digits (e.g., "12345678000195") - EMAIL: valid email address - PHONE: international format with country code (e.g., "+5511999999999") - EVP: 32-character UUID (e.g., "123e4567-e89b-12d3-a456-426614174000") |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name |
+| beneficiary_tax_id | [string](../scalar/#string) | optional | (Optional) Beneficiary's CPF (11 digits) or CNPJ (14 digits) for verification |
+| payment_reference | [string](../scalar/#string) | optional | (Optional) Payment description/reference |
 
 
 
@@ -452,9 +397,9 @@ or traditional bank account details (bank code, branch, account number)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| iban | [string](#string) |  |  |
-| beneficiary_name | [string](#string) |  |  |
-| payment_reference | [string](#string) |  |  |
+| iban | [string](../scalar/#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  |  |
+| payment_reference | [string](../scalar/#string) |  |  |
 
 
 
@@ -470,14 +415,14 @@ or traditional bank account details (bank code, branch, account number)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| swift_code | [string](#string) |  | Beneficiary's bank SWIFT/BIC code (8 or 11 characters) |
-| account_number | [string](#string) |  | Beneficiary's account number (format varies by country) Could be IBAN, account number, or other format |
-| beneficiary_name | [string](#string) |  | Beneficiary's full name |
-| beneficiary_address | [string](#string) |  | Beneficiary's address |
-| payment_reference | [string](#string) |  |  |
-| bank_name | [string](#string) |  | Beneficiary's bank name |
-| bank_country | [string](#string) |  | Beneficiary's bank country (ISO 3166-1 alpha-2) |
-| account_currency | [string](#string) | optional | Account currency (ISO 4217) |
+| swift_code | [string](../scalar/#string) |  | Beneficiary's bank SWIFT/BIC code (8 or 11 characters) |
+| account_number | [string](../scalar/#string) |  | Beneficiary's account number (format varies by country) Could be IBAN, account number, or other format |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name |
+| beneficiary_address | [string](../scalar/#string) |  | Beneficiary's address |
+| payment_reference | [string](../scalar/#string) |  |  |
+| bank_name | [string](../scalar/#string) |  | Beneficiary's bank name |
+| bank_country | [string](../scalar/#string) |  | Beneficiary's bank country (ISO 3166-1 alpha-2) |
+| account_currency | [string](../scalar/#string) | optional | Account currency (ISO 4217) |
 | intermediary_bank | [PaymentDetails.Swift.IntermediaryBank](#tzero-v1-common-PaymentDetails-Swift-IntermediaryBank) |  |  |
 
 
@@ -494,9 +439,9 @@ Intermediary bank details (optional)
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| swift_code | [string](#string) |  |  |
-| bank_name | [string](#string) |  |  |
-| account_number | [string](#string) |  |  |
+| swift_code | [string](../scalar/#string) |  |  |
+| bank_name | [string](../scalar/#string) |  |  |
+| account_number | [string](../scalar/#string) |  |  |
 
 
 
@@ -591,10 +536,11 @@ Intermediary bank details (optional)
 | PAYMENT_METHOD_TYPE_PAKISTAN_BANK_TRANSFER | 130 | Pakistan domestic bank transfer via IBAN |
 | PAYMENT_METHOD_TYPE_PAKISTAN_MOBILE_WALLET | 140 | Pakistan mobile wallet (JazzCash, Easypaisa, etc.) - sometimes also called ID Wallet |
 | PAYMENT_METHOD_TYPE_PIX | 150 | PIX - Brazilian instant payment system |
-| PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY | 160 | African Mobile Money - Mobile money system across multiple countries: Kenya (Mpesa, Airtel), Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa etc. |
+| PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY | 160 | African Mobile Money  - Mobile money system across multiple countries: Kenya (Mpesa, Airtel), Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa etc. |
 | PAYMENT_METHOD_TYPE_CNAPS | 170 | The China National Advanced Payment System |
 | PAYMENT_METHOD_TYPE_NIP | 180 | NIP - Nigeria Instant Payment system |
 
 
  <!-- end enums -->
+
 

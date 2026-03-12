@@ -9,8 +9,6 @@ draft: false
 toc: true
 ---
 
-
-
 <a name="tzero-v1-payment-NetworkService"></a>
 
 ## NetworkService
@@ -41,7 +39,7 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  |  |
+| payment_id | [uint64](../scalar/#uint64) |  |  |
 | approved | [CompleteManualAmlCheckRequest.Approved](#tzero-v1-payment-CompleteManualAmlCheckRequest-Approved) |  |  |
 | rejected | [CompleteManualAmlCheckRequest.Rejected](#tzero-v1-payment-CompleteManualAmlCheckRequest-Rejected) |  |  |
 
@@ -72,7 +70,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| reason | [string](#string) |  |  |
+| reason | [string](../scalar/#string) |  |  |
 
 
 
@@ -105,10 +103,10 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | updated amount based on updated quote approved by the pay-in provider |
-| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | updated settlement amount based on updated quote approved by the pay-in provider |
-| pay_out_quote_id | [int64](#int64) |  | unique identifier of the updated pay-out quote |
-| pay_out_client_quote_id | [string](#string) |  | client_quote_id of the updated pay-out quote assigned by pay-out provider |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated amount based on updated quote approved by the  pay-in provider |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated settlement amount based on updated quote approved by the  pay-in provider |
+| pay_out_quote_id | [int64](../scalar/#int64) |  | unique identifier of the updated pay-out quote |
+| pay_out_client_quote_id | [string](../scalar/#string) |  | client_quote_id of the updated pay-out quote assigned by pay-out provider |
 
 
 
@@ -138,9 +136,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
-| payout_id | [uint64](#uint64) |  | **Deprecated.** deprecated, this is 1->1 mapping between payment and payout ids |
-| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| payment_id | [uint64](../scalar/#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
+| payout_id | [uint64](../scalar/#uint64) |  | **Deprecated.** deprecated, this is 1->1 mapping between payment and payout ids |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
 
@@ -169,10 +167,10 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_client_id | [string](#string) |  | unique client generated id for this payment |
+| payment_client_id | [string](../scalar/#string) |  | unique client generated id for this payment |
 | amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  | payment amount - should be either pay-out amount or settlement amount |
-| currency | [string](#string) |  | pay-out currency |
-| payment_details | [tzero.v1.common.PaymentDetails](#tzero-v1-common-PaymentDetails) |  | pay-out payment details |
+| currency | [string](../scalar/#string) |  | pay-out currency |
+| payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | pay-out payment details |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) | optional | if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method otherwise last available quote will be used |
 | travel_rule_data | [CreatePaymentRequest.TravelRuleData](#tzero-v1-payment-CreatePaymentRequest-TravelRuleData) | optional | travel rule data |
 
@@ -190,8 +188,8 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| originator | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
-| beneficiary | [ivms101.Person](#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
+| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
+| beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
 
 
 
@@ -207,7 +205,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_client_id | [string](#string) |  | client generated id supplied in the request |
+| payment_client_id | [string](../scalar/#string) |  | client generated id supplied in the request |
 | accepted | [CreatePaymentResponse.Accepted](#tzero-v1-payment-CreatePaymentResponse-Accepted) |  | Accepted response - the payment was accepted by the network and it's going to be passed to payout provider. Means the network found a suitable quote for the payout currency and amount. |
 | settlement_required | [CreatePaymentResponse.SettlementRequired](#tzero-v1-payment-CreatePaymentResponse-SettlementRequired) |  | **Deprecated.** Deprecated: Settlement required response - presettlement flow is being removed. This response type will no longer be returned. |
 | failure | [CreatePaymentResponse.Failure](#tzero-v1-payment-CreatePaymentResponse-Failure) |  | Failure response - means the payment was not accepted, e.g. the network could not find a suitable quote for the payout currency and amount, or the credit limit is exceeded for the available quotes. |
@@ -226,10 +224,10 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | payment ID assigned by the network |
-| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
-| payout_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
-| payout_provider_id | [uint32](#uint32) |  | payout provider id with the best quote selected for this payment |
+| payment_id | [uint64](../scalar/#uint64) |  | payment ID assigned by the network |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
+| payout_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
+| payout_provider_id | [uint32](../scalar/#uint32) |  | payout provider id with the best quote selected for this payment |
 
 
 
@@ -261,9 +259,9 @@ Deprecated: presettlement flow is being removed. This message will no longer be 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | payment ID assigned by the network |
-| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  |  |
-| payout_provider_id | [uint32](#uint32) |  | payout provider id with the best quote selected for this payment |
+| payment_id | [uint64](../scalar/#uint64) |  | payment ID assigned by the network |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
+| payout_provider_id | [uint32](../scalar/#uint32) |  | payout provider id with the best quote selected for this payment |
 
 
 
@@ -279,7 +277,7 @@ Deprecated: presettlement flow is being removed. This message will no longer be 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
+| payment_id | [uint64](../scalar/#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
 | success | [FinalizePayoutRequest.Success](#tzero-v1-payment-FinalizePayoutRequest-Success) |  |  |
 | failure | [FinalizePayoutRequest.Failure](#tzero-v1-payment-FinalizePayoutRequest-Failure) |  |  |
 
@@ -297,7 +295,7 @@ Deprecated: presettlement flow is being removed. This message will no longer be 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| reason | [string](#string) |  |  |
+| reason | [string](../scalar/#string) |  |  |
 
 
 
@@ -313,7 +311,7 @@ Deprecated: presettlement flow is being removed. This message will no longer be 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receipt | [tzero.v1.common.PaymentReceipt](#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
 
@@ -343,8 +341,8 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  | payment amount - must be either pay-out amount or settlement amount |
-| pay_out_currency | [string](#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
-| pay_out_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |
+| pay_out_currency | [string](../scalar/#string) |  | ISO 4217 currency code, e.g. EUR, GBP, etc. in which the payout should be made |
+| pay_out_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | payment method to use for the payout, e.g. bank transfer, card, etc. |
 | quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | type of the quote, e.g. real-time |
 
 
@@ -397,11 +395,11 @@ Contains settlement status and calculated amounts for the payment request.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | Quote identification - can be used to initiate payment |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Exchange rate: USD/pay_out_currency |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | Quote validity period |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Payout amount in payout currency |
+| rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Exchange rate: USD/pay_out_currency |
+| expiration | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | Quote validity period |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Payout amount in payout currency |
 | settlement | [GetQuoteResponse.ProviderQuote.Settlement](#tzero-v1-payment-GetQuoteResponse-ProviderQuote-Settlement) |  | Settlement details for this quote |
-| executable | [bool](#bool) |  | Indicates payment can be initiated with this quote immediately and no pre-funding is required |
+| executable | [bool](../scalar/#bool) |  | Indicates payment can be initiated with this quote immediately and no pre-funding is required |
 
 
 
@@ -418,10 +416,10 @@ All amounts are in USD (settlement currency).
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Settlement amount required for this payment |
-| credit_limit | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Total credit limit from payout provider |
-| total_used | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Total amount used from credit line (completed + reserved) |
-| prefunding_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Additional funding needed before payment can proceed (amount - max_executable) |
+| amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Settlement amount required for this payment |
+| credit_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Total credit limit from payout provider |
+| total_used | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Total amount used from credit line (completed + reserved) |
+| prefunding_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Additional funding needed before payment can proceed (amount - max_executable) |
 
 
 
@@ -437,11 +435,11 @@ All amounts are in USD (settlement currency).
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | pay-out quote rate in settlement_currency/pay_out_currency, i.e. USD/pay_out_currency |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | expiration time of the payout quote |
+| rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | pay-out quote rate in settlement_currency/pay_out_currency, i.e. USD/pay_out_currency |
+| expiration | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | expiration time of the payout quote |
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | id of the payout quote |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | pay-out amount in pay-out currency if the quote from response is used |
-| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | settlement amount in settlement currency if the quote from response is used |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | pay-out amount in pay-out currency if the quote from response is used |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | settlement amount in settlement currency if the quote from response is used |
 
 
 
@@ -458,8 +456,8 @@ or as pay-out amount, so that the settlement amount is calculated accordingly
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_out_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Amount in the pay-out currency |
-| settlement_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | Settlement amount in the settlement currency |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Amount in the pay-out currency |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Settlement amount in the settlement currency |
 
 
 
@@ -475,8 +473,8 @@ or as pay-out amount, so that the settlement amount is calculated accordingly
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| quote_id | [int64](#int64) |  | unique identifier of the quote within the specified provider |
-| provider_id | [int32](#int32) |  | provider id of the quote |
+| quote_id | [int64](../scalar/#int64) |  | unique identifier of the quote within the specified provider |
+| provider_id | [int32](../scalar/#int32) |  | provider id of the quote |
 
 
 
@@ -509,12 +507,12 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| currency | [string](#string) |  | BRL, EUR, GBP, etc. (ISO 4217 currency code) |
+| currency | [string](../scalar/#string) |  | BRL, EUR, GBP, etc. (ISO 4217 currency code) |
 | quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  |  |
-| payment_method | [tzero.v1.common.PaymentMethodType](#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
+| payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
 | bands | [UpdateQuoteRequest.Quote.Band](#tzero-v1-payment-UpdateQuoteRequest-Quote-Band) | repeated | list of bands for this quote |
-| expiration | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | expiration time of the quote |
-| timestamp | [google.protobuf.Timestamp](#google-protobuf-Timestamp) |  | timestamp quote was created |
+| expiration | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | expiration time of the quote |
+| timestamp | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | timestamp quote was created |
 
 
 
@@ -530,9 +528,9 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| client_quote_id | [string](#string) |  | unique client generated id for this band |
-| max_amount | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
-| rate | [tzero.v1.common.Decimal](#tzero-v1-common-Decimal) |  | USD/currency rate |
+| client_quote_id | [string](../scalar/#string) |  | unique client generated id for this band |
+| max_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
+| rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/currency rate |
 
 
 
@@ -592,4 +590,5 @@ This message has no fields defined.
 
 
  <!-- end enums -->
+
 

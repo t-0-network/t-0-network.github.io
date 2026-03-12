@@ -9,7 +9,7 @@ on:
 
 jobs:
   generate:
-    runs-on: ubuntu-latest
+    runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Generate GitHub APP Token
         uses: actions/create-github-app-token@v2
@@ -21,17 +21,32 @@ jobs:
           repositories: t-0-network.github.io
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           show-progress: false
           token: ${{ steps.app-token.outputs.token }}
           ref: ${{ github.head_ref }}
 
+      - name: Install protoc
+        run: |
+          PROTOC_TAG=$(curl -sS https://api.github.com/repos/protocolbuffers/protobuf/releases/latest | jq -r .tag_name)
+          PROTOC_VER=${PROTOC_TAG#v}
+          curl -sSL "https://github.com/protocolbuffers/protobuf/releases/download/${PROTOC_TAG}/protoc-${PROTOC_VER}-linux-x86_64.zip" -o /tmp/protoc.zip
+          sudo unzip -o /tmp/protoc.zip bin/protoc 'include/*' -d /usr/local
+
+      - name: Setup Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: 'stable'
+
+      - name: Install protoc-gen-doc
+        run: go install github.com/pseudomuto/protoc-gen-doc/cmd/protoc-gen-doc
+
       - name: Generate Docs
         run: ./_gen/gen.sh
 
       - name: Commit generated files
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "Auto-generate docs"
           file_pattern: "content/docs/**"

@@ -9,150 +9,19 @@ draft: false
 toc: true
 ---
 
+## Well-Known Types
 
- <!-- end services -->
+<a name="google-protobuf-Timestamp"></a>
 
+### google.protobuf.Timestamp
+A Timestamp represents a point in time independent of any time zone or local calendar, encoded as a count of seconds and fractions of seconds at nanosecond resolution.
 
- <!-- end services -->
-
-
-##  Requests And Response Types
-
-
-<a name="tzero-v1-common-Decimal"></a>
-
-### Decimal
-Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^exponent, 123.45 = 12345 * 10^-2)
-
+See [google.protobuf.Timestamp](https://protobuf.dev/reference/protobuf/google.protobuf/#timestamp) documentation.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| unscaled | [int64](#int64) |  |  |
-| exponent | [int32](#int32) |  |  |
-
-
-
-
-
-
- <!-- end messages -->
-
-
-<a name="tzero-v1-common-Blockchain"></a>
-
-### Blockchain
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| BLOCKCHAIN_UNSPECIFIED | 0 |  |
-| BLOCKCHAIN_BSC | 10 |  |
-| BLOCKCHAIN_TRON | 100 |  |
-
-
-
-<a name="tzero-v1-common-Stablecoin"></a>
-
-### Stablecoin
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| STABLECOIN_UNSPECIFIED | 0 |  |
-| STABLECOIN_USDT | 10 |  |
-
-
- <!-- end enums -->
-
-
-
-<a name="tzero-v1-common-PaymentMethod"></a>
-
-### PaymentMethod
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| sepa | [SepaPaymentMethod](#tzero-v1-common-SepaPaymentMethod) |  |  |
-| swift | [SwiftPaymentMethod](#tzero-v1-common-SwiftPaymentMethod) |  |  |
-| stablecoin | [StablecoinPaymentMethod](#tzero-v1-common-StablecoinPaymentMethod) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-common-SepaPaymentMethod"></a>
-
-### SepaPaymentMethod
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| iban | [string](#string) |  |  |
-| beneficiary_name | [string](#string) |  |  |
-| payment_reference | [string](#string) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-common-StablecoinPaymentMethod"></a>
-
-### StablecoinPaymentMethod
-
-
-
-| Field | Type | Label | Description |
-| ----- | ---- | ----- | ----------- |
-| blockchain | [Blockchain](#tzero-v1-common-Blockchain) |  |  |
-| stablecoin | [Stablecoin](#tzero-v1-common-Stablecoin) |  |  |
-| address | [string](#string) |  |  |
-
-
-
-
-
-
-
-<a name="tzero-v1-common-SwiftPaymentMethod"></a>
-
-### SwiftPaymentMethod
-
-
-
-This message has no fields defined.
-
-
-
-
-
- <!-- end messages -->
-
-
-<a name="tzero-v1-common-PaymentMethodType"></a>
-
-### PaymentMethodType
-
-
-| Name | Number | Description |
-| ---- | ------ | ----------- |
-| PAYMENT_METHOD_TYPE_UNSPECIFIED | 0 |  |
-| PAYMENT_METHOD_TYPE_SEPA | 10 |  |
-| PAYMENT_METHOD_TYPE_SWIFT | 20 |  |
-| PAYMENT_METHOD_TYPE_CARD | 30 | only pay in |
-| PAYMENT_METHOD_TYPE_STABLECOIN | 40 | only pay out |
-
-
- <!-- end enums -->
-
-
-
+| seconds | [int64](#int64) |  | Represents seconds of UTC time since Unix epoch 1970-01-01T00:00:00Z. |
+| nanos | [int32](#int32) |  | Non-negative fractions of a second at nanosecond resolution. |
 
 ## Scalar Value Types
 
