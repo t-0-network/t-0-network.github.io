@@ -27,7 +27,7 @@ anchor_filter() {
 }
 
 escape_sed() {
-    printf '%s' "$1" | sed 's/[&/\]/\\&/g'
+    printf '%s' "$1" | sed 's/[&|\\]/\\&/g'
 }
 
 # Pages to generate: "proto_file|title|weight"
