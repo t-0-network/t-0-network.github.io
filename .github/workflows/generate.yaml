@@ -12,7 +12,7 @@ jobs:
     runs-on: blacksmith-4vcpu-ubuntu-2404
     steps:
       - name: Generate GitHub APP Token
-        uses: actions/create-github-app-token@v2
+        uses: actions/create-github-app-token@v3
         id: app-token
         with:
           app-id: ${{ vars.CI_APP_ID }}
@@ -21,7 +21,7 @@ jobs:
           repositories: t-0-network.github.io
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           show-progress: false
           token: ${{ steps.app-token.outputs.token }}
@@ -35,7 +35,7 @@ jobs:
           sudo unzip -o /tmp/protoc.zip bin/protoc 'include/*' -d /usr/local
 
       - name: Setup Go
-        uses: actions/setup-go@v5
+        uses: actions/setup-go@v6
         with:
           go-version: 'stable'
 
@@ -46,7 +46,7 @@ jobs:
         run: ./_gen/gen.sh
 
       - name: Commit generated files
-        uses: stefanzweifel/git-auto-commit-action@v5
+        uses: stefanzweifel/git-auto-commit-action@v6
         with:
           commit_message: "Auto-generate docs"
           file_pattern: "content/docs/**"
