@@ -9,7 +9,7 @@ draft: false
 toc: true
 ---
 
-The payment processing workflow involves multiple steps and participants, requiring careful coordination between the originating payment institution (OFI) who requests the payout; the payout provider; and the network orchestration layer.
+The payment processing workflow involves multiple steps and participants, requiring careful coordination between the originating financial institution (OFI) who requests the payout; the payout provider; and the network orchestration layer.
 
 The diagram below demonstrates a payment flow using pre-settlement, the default settlement model, where USDT is sent to the payout provider before a request to pay out is made. You can [read more about settlement options here](provider-settlement).
 
