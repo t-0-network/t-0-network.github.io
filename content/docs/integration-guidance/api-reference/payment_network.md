@@ -491,7 +491,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | pay_out | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-out operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
-| pay_in | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
+| pay_in | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | **Deprecated.** Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band.  Deprecated: pay-in quotes are no longer used. |
 
 
 
