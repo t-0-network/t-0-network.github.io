@@ -78,8 +78,10 @@ message UpdateQuoteRequest {
   /**
    * Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the
    * unique client_quote_id for each band.
+   *
+   * Deprecated: pay-in quotes are no longer used.
    */
-  repeated Quote pay_in = 20;
+  repeated Quote pay_in = 20 [deprecated = true];
 
   message Quote {
     string currency = 10 [(buf.validate.field).string = {
