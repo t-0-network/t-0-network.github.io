@@ -5,6 +5,7 @@ package tzero.v1.payment_intent;
 import "tzero/v1/common/common.proto";
 import "tzero/v1/common/payment_method.proto";
 import "buf/validate/validate.proto";
+import "ivms101/v1/ivms/ivms101.proto";
 
 /**
  * BeneficiaryService must be implemented by beneficiary providers to receive
@@ -84,6 +85,19 @@ message PaymentIntentUpdateRequest {
      * Unique transaction reference identifying the pay-in transaction
      */
     string transaction_reference = 50;
+
+    /**
+     * Travel rule data of the pay-in provider's legal entity that received the funds.
+     * Present when the pay-in provider has registered travel rule data.
+     */
+    optional TravelRuleData travel_rule_data = 60;
+
+    message TravelRuleData {
+      /**
+       * IVMS101 legal person data of the originating provider's legal entity.
+       */
+      optional ivms101.LegalPerson originator_provider = 30;
+    }
   }
 }
 
