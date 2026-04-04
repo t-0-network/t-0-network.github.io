@@ -159,6 +159,7 @@ This message has no fields defined.
 | pay_out_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
 | pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
 | settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
+| pay_out_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed charge in USD included in the settlement amount for this payout. |
 
 
 
@@ -242,7 +243,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
-| originator_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional |  |
+| originator_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | IVMS101 travel rule data of the originating provider's legal entity. Resolved by the network from the entity specified in CreatePaymentRequest. |
 
 
 
@@ -258,6 +259,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
+| beneficiary_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the payout provider handling this transaction. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
 | accepted | [PayoutResponse.Accepted](#tzero-v1-payment-PayoutResponse-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
 | failed | [PayoutResponse.Failed](#tzero-v1-payment-PayoutResponse-Failed) |  | Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout. |
 | manual_aml_check | [PayoutResponse.ManualAmlCheck](#tzero-v1-payment-PayoutResponse-ManualAmlCheck) |  | Manual AML check required - means the payout provider requires additional Anti-Money Laundering (AML) verification before the payment can proceed. The pay-out provider will need to perform the manual AML check and then call CompleteManualAmlCheck rpc with the result of the check. |

@@ -63,6 +63,23 @@ Notification that funds were received from the payer by pay-in provider.
 | payment_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The fiat amount received from the end-user. Matches the amount originally requested in CreatePaymentIntent. |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used for the pay-in |
 | transaction_reference | [string](../scalar/#string) |  | Unique transaction reference identifying the pay-in transaction |
+| travel_rule_data | [PaymentIntentUpdateRequest.FundsReceived.TravelRuleData](#tzero-v1-payment_intent-PaymentIntentUpdateRequest-FundsReceived-TravelRuleData) | optional | Travel rule data of the pay-in provider's legal entity that received the funds. Present when the pay-in provider has registered travel rule data. |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment_intent-PaymentIntentUpdateRequest-FundsReceived-TravelRuleData"></a>
+
+### PaymentIntentUpdateRequest.FundsReceived.TravelRuleData
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| originator_provider | [ivms101.LegalPerson](../ivms_ivms101/#ivms101-LegalPerson) | optional | IVMS101 legal person data of the originating provider's legal entity. |
 
 
 

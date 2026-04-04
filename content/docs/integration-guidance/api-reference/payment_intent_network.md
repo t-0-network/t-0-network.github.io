@@ -47,6 +47,7 @@ Request to confirm that funds have been received from the end-user.
 | confirmation_code | [string](../scalar/#string) |  | Confirmation code received in the get payment details along with the payment_intent_id. This is to prevent the accidental confirmation of the wrong payment intent. |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used by the end-user. Must match one of the payment methods returned in CreatePaymentIntentResponse. |
 | transaction_reference | [string](../scalar/#string) |  | Transaction reference |
+| originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the pay-in provider that received the funds. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
 
 
 
@@ -114,6 +115,7 @@ Request to create a new payment intent.
 | currency | [string](../scalar/#string) |  | Pay-in currency code in ISO 4217 format. The currency that the end-user will pay in. |
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Pay-in amount in the specified currency. The exact fiat amount the end-user should pay. |
 | travel_rule_data | [CreatePaymentIntentRequest.TravelRuleData](#tzero-v1-payment_intent-CreatePaymentIntentRequest-TravelRuleData) |  | Travel rule compliance data. Required for regulatory compliance under FATF guidelines. |
+| pay_in_provider_ids | [uint32](../scalar/#uint32) | repeated | Optional list of pay-in provider IDs to consider. When specified, only quotes from these providers will be used. When empty, all available providers are considered. |
 
 
 
@@ -198,6 +200,7 @@ Request to get indicative quotes for a currency/amount pair.
 | ----- | ---- | ----- | ----------- |
 | currency | [string](../scalar/#string) |  | Pay-in currency code in ISO 4217 format. Examples: "EUR", "GBP", "USD", "KES" |
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Pay-in amount in the specified currency. This is the fiat amount the end-user will pay. |
+| pay_in_provider_ids | [uint32](../scalar/#uint32) | repeated | Optional list of pay-in provider IDs to filter by. When specified, only quotes from these providers are returned. When empty, quotes from all providers are returned. |
 
 
 
@@ -370,6 +373,7 @@ This message has no fields defined.
 | REJECT_REASON_UNSPECIFIED | 0 |  |
 | REJECT_REASON_CONFIRMATION_CODE_MISMATCH | 10 |  |
 | REJECT_REASON_NO_ACTIVE_QUOTE | 20 |  |
+| REJECT_REASON_PROVIDER_NOT_ALLOWED | 30 |  |
 
 
 
