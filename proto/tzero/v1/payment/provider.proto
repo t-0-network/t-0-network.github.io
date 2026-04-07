@@ -175,18 +175,33 @@ message PayoutRequest {
   optional TravelRuleData travel_rule_data = 200;
 
   message TravelRuleData {
-    // the natural or legal person that requests payment with originating provider
+    /*
+     * the natural or legal person that requests payment with originating provider
+     */
     repeated ivms101.Person originator = 10 [(buf.validate.field).repeated.min_items = 1];
 
-    // the natural or legal person or legal arrangement who is identified
-    // by the originator as the receiver of the requested payment.
+    /*
+     * the natural or legal person or legal arrangement who is identified
+     * by the originator as the receiver of the requested payment.
+     */
     repeated ivms101.Person beneficiary = 20 [(buf.validate.field).repeated.min_items = 1];
 
+    /**
+     * IVMS101 travel rule data of the originating provider's legal entity.
+     * Resolved by the network from the entity specified in CreatePaymentRequest.
+     */
     optional ivms101.Person originator_provider = 30;
   }
 }
 
 message PayoutResponse {
+  /**
+   * Legal entity ID of the payout provider handling this transaction.
+   * Required when the provider has multiple registered legal entities.
+   * If the provider has a single entity, this field may be omitted.
+   */
+  optional uint32 beneficiary_provider_legal_entity_id = 10 [(buf.validate.field).uint32.gt = 0];
+
   oneof result {
     /**
      * Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to
@@ -345,6 +360,8 @@ message ApprovePaymentQuoteRequest {
   tzero.v1.common.Decimal pay_out_rate = 30;
   tzero.v1.common.Decimal pay_out_amount = 40;
   tzero.v1.common.Decimal settlement_amount = 50;
+  /** Fixed charge in USD included in the settlement amount for this payout. */
+  tzero.v1.common.Decimal pay_out_fix = 60;
 }
 
 message ApprovePaymentQuoteResponse {

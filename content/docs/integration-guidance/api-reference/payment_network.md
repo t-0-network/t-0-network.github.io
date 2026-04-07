@@ -21,7 +21,7 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 | UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Used by the provider to publish pay-in and pay-out quotes (FX rates) into the network. These quotes include tiered pricing bands and an expiration timestamp. |
 | GetQuote | [GetQuoteRequest](#tzero-v1-payment-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment-GetQuoteResponse) | Request the best available quote for a payout in a specific currency, for a given amount. If the payout quote exists, but the credit limit is exceeded, this quote will not be considered. |
 | CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Submit a request to create a new payment for the specified pay-out currency. QuoteId is the optional parameter. If the quoteID is specified, it must be a valid quoteId that was previously returned by the GetPayoutQuote method. If the quoteId is not specified, the network will try to find a suitable quote for the payout currency and amount, same way as GetPayoutQuote rpc. |
-| ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Inform the network that a payout has been completed. This endpoint is called by the payout provider, specifying the payment ID and payout ID, which was provided when the payout request was made to this provider. |
+| ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Inform the network that a payout has been completed. This endpoint is called by the payout provider, specifying the payment ID and payout ID, which was provided when the payout request was made to this provider. deprecated, use the FinalizePayout rpc instead. |
 | FinalizePayout | [FinalizePayoutRequest](#tzero-v1-payment-FinalizePayoutRequest) | [FinalizePayoutResponse](#tzero-v1-payment-FinalizePayoutResponse) |  |
 | CompleteManualAmlCheck | [CompleteManualAmlCheckRequest](#tzero-v1-payment-CompleteManualAmlCheckRequest) | [CompleteManualAmlCheckResponse](#tzero-v1-payment-CompleteManualAmlCheckResponse) | Pay-out provider reports the result of manual AML check. This endpoint is called after the manual AML check is completed. The network will find the new best quotes for the payment and will return the updated settlement/payout amount along with the updated quotes in the response. |
 
@@ -190,6 +190,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
+| originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the originating provider. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
 
 
 
@@ -400,6 +401,7 @@ Contains settlement status and calculated amounts for the payment request.
 | pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Payout amount in payout currency |
 | settlement | [GetQuoteResponse.ProviderQuote.Settlement](#tzero-v1-payment-GetQuoteResponse-ProviderQuote-Settlement) |  | Settlement details for this quote |
 | executable | [bool](../scalar/#bool) |  | Indicates payment can be initiated with this quote immediately and no pre-funding is required |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed charge in USD per transfer for this provider's quote. |
 
 
 
@@ -440,6 +442,7 @@ All amounts are in USD (settlement currency).
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | id of the payout quote |
 | pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | pay-out amount in pay-out currency if the quote from response is used |
 | settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | settlement amount in settlement currency if the quote from response is used |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed charge in USD included in settlement_amount. settlement_amount = (pay_out_amount / rate) + fix. |
 
 
 
@@ -491,7 +494,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | pay_out | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-out operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
-| pay_in | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
+| pay_in | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | **Deprecated.** Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band.  Deprecated: pay-in quotes are no longer used. |
 
 
 
@@ -531,6 +534,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | client_quote_id | [string](../scalar/#string) |  | unique client generated id for this band |
 | max_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/currency rate |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) | optional | Fixed charge in USD applied per transfer on top of the exchange rate. This covers payment method costs (e.g. wire transfer fees). Added to the settlement amount: settlement = (amount / rate) + fix. Defaults to 0 when absent — no fixed charge applied. |
 
 
 

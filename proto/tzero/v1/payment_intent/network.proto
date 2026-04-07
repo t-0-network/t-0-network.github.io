@@ -132,6 +132,13 @@ message GetQuoteRequest {
    * This is the fiat amount the end-user will pay.
    */
   tzero.v1.common.Decimal amount = 30 [(buf.validate.field).required = true];
+
+  /**
+   * Optional list of pay-in provider IDs to filter by.
+   * When specified, only quotes from these providers are returned.
+   * When empty, quotes from all providers are returned.
+   */
+  repeated uint32 pay_in_provider_ids = 40;
 }
 
 message GetQuoteResponse {
@@ -252,6 +259,13 @@ message CreatePaymentIntentRequest {
   TravelRuleData travel_rule_data = 40;
 
   /**
+   * Optional list of pay-in provider IDs to consider.
+   * When specified, only quotes from these providers will be used.
+   * When empty, all available providers are considered.
+   */
+  repeated uint32 pay_in_provider_ids = 50;
+
+  /**
    * Travel rule data containing originator information.
    */
   message TravelRuleData {
@@ -352,6 +366,12 @@ message ConfirmFundsReceivedRequest {
     max_len: 256
   }];
 
+  /**
+   * Legal entity ID of the pay-in provider that received the funds.
+   * Required when the provider has multiple registered legal entities.
+   * If the provider has a single entity, this field may be omitted.
+   */
+  optional uint32 originator_provider_legal_entity_id = 50 [(buf.validate.field).uint32.gt = 0];
 }
 
 message ConfirmFundsReceivedResponse {
@@ -384,6 +404,7 @@ message ConfirmFundsReceivedResponse {
       REJECT_REASON_UNSPECIFIED = 0;
       REJECT_REASON_CONFIRMATION_CODE_MISMATCH = 10;
       REJECT_REASON_NO_ACTIVE_QUOTE = 20;
+      REJECT_REASON_PROVIDER_NOT_ALLOWED = 30;
     }
   }
 }
