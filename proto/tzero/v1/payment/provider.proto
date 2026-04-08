@@ -172,7 +172,7 @@ message PayoutRequest {
    */
   uint32 pay_in_provider_id = 80;
 
-  optional TravelRuleData travel_rule_data = 200;
+  TravelRuleData travel_rule_data = 200 [(buf.validate.field).required = true];
 
   message TravelRuleData {
     /*
@@ -273,10 +273,10 @@ message UpdatePaymentRequest {
   message Accepted {
     tzero.v1.common.Decimal payout_amount = 10; // amount in currency of the payout
 
-    optional TravelRuleData travel_rule_data = 20;
+    TravelRuleData travel_rule_data = 20 [(buf.validate.field).required = true];
 
     message TravelRuleData {
-      optional ivms101.Person beneficiary_provider = 10;
+      ivms101.Person beneficiary_provider = 10 [(buf.validate.field).required = true];
     }
   }
 

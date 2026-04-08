@@ -256,7 +256,7 @@ message CreatePaymentIntentRequest {
    * Travel rule compliance data.
    * Required for regulatory compliance under FATF guidelines.
    */
-  TravelRuleData travel_rule_data = 40;
+  TravelRuleData travel_rule_data = 40 [(buf.validate.field).required = true];
 
   /**
    * Optional list of pay-in provider IDs to consider.

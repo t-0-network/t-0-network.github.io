@@ -225,7 +225,7 @@ This message has no fields defined.
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
 | payout_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) | optional | payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
 | pay_in_provider_id | [uint32](../scalar/#uint32) |  | Pay-in provider id which initiated the pay out. |
-| travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) | optional |  |
+| travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) |  |  |
 
 
 
@@ -393,7 +393,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payout_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout |
-| travel_rule_data | [UpdatePaymentRequest.Accepted.TravelRuleData](#tzero-v1-payment-UpdatePaymentRequest-Accepted-TravelRuleData) | optional |  |
+| travel_rule_data | [UpdatePaymentRequest.Accepted.TravelRuleData](#tzero-v1-payment-UpdatePaymentRequest-Accepted-TravelRuleData) |  |  |
 
 
 
@@ -409,7 +409,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| beneficiary_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional |  |
+| beneficiary_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) |  |  |
 
 
 

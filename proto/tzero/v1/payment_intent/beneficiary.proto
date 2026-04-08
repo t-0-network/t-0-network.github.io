@@ -90,13 +90,13 @@ message PaymentIntentUpdateRequest {
      * Travel rule data of the pay-in provider's legal entity that received the funds.
      * Present when the pay-in provider has registered travel rule data.
      */
-    optional TravelRuleData travel_rule_data = 60;
+    TravelRuleData travel_rule_data = 60 [(buf.validate.field).required = true];
 
     message TravelRuleData {
       /**
        * IVMS101 legal person data of the originating provider's legal entity.
        */
-      optional ivms101.LegalPerson originator_provider = 30;
+      ivms101.LegalPerson originator_provider = 30 [(buf.validate.field).required = true];
     }
   }
 }
