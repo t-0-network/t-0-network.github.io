@@ -232,7 +232,7 @@ message CreatePaymentRequest{
   tzero.v1.common.PaymentDetails payment_details = 50 [(buf.validate.field).required = true]; // pay-out payment details
   optional QuoteId quote_id = 60; // if specified, must be a valid quoteId that was previously returned by the GetPayoutQuote method otherwise last available quote will be used
 
-  optional TravelRuleData travel_rule_data = 100; // travel rule data
+  TravelRuleData travel_rule_data = 100 [(buf.validate.field).required = true]; // travel rule data
 
   message TravelRuleData {
     /**
