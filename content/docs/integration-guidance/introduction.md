@@ -9,45 +9,37 @@ draft: false
 toc: true
 ---
 
-Payment providers can integrate with the T-0 Network through two primary approaches: using the provided Software Development Kit (SDK) for simplified integration, or implementing the underlying protocols directly for maximum flexibility and control. Both approaches utilize the Connect RPC framework, which provides native support for both gRPC and REST/JSON encoding, allowing providers to choose the communication protocol that best fits their existing infrastructure.
+Payment providers integrate with the T-0 Network in two ways: through the SDK, or by implementing the protocols directly. Both use the Connect RPC framework, which supports gRPC and REST/JSON encoding.
 
-The integration process requires implementing both client-side capabilities for calling network services and server-side endpoints for receiving network callbacks. All communications within the network utilize cryptographic signatures for authentication and integrity verification, ensuring secure and verifiable message exchange between all participants.
+You will implement client-side calls to network services and server-side endpoints that receive network callbacks. All communication uses cryptographic signatures for authentication and integrity verification.
 
 ## API Endpoints
 * Production: `https://api.t-0.network`
 * Sandbox: `https://api-sandbox.t-0.network`
 
 ## Idempotency and Request Safety
-All network RPC methods specify idempotency levels to ensure safe retry behavior and prevent duplicate processing. Methods marked as IDEMPOTENT can be safely retried multiple times with the same parameters without causing additional side effects.
-
-Methods marked as NO_SIDE_EFFECTS, such as GetPayoutQuote, can be called multiple times without any system state changes, making them safe for aggressive retry policies and caching strategies.
-
-This idempotency design enables robust error handling and retry mechanisms while preventing issues such as duplicate payments or incorrect credit usage accounting that could result from network interruptions or service restarts.
+All network methods specify idempotency levels for safe retry behavior and duplicate prevention. See [Idempotency](idempotency) for the full reliability contract and provider implementation requirements.
 
 ## SDK Integration Approach
-The T-0 Network SDK provides the most streamlined integration path for payment providers, abstracting the complexity of protocol implementation and cryptographic operations. The SDK is currently available for Go programming language, with additional language support available upon request for specific integration requirements.
+The SDK is the fastest integration path. It handles request signing, signature verification, and key management for you. The Go SDK is available now; additional languages are available on request.
 
-The SDK handles all cryptographic operations automatically, including request signing, signature verification, and key management. This approach significantly reduces the implementation complexity for providers while ensuring compliance with network security requirements. The SDK also provides built-in error handling, retry logic, and connection management to ensure robust operation in production environments.
-
-When using the SDK, providers implement callback handlers for network-initiated operations such as payout requests and payment status updates. The SDK framework manages the underlying HTTP server functionality, allowing providers to focus on business logic implementation rather than protocol details.
+With the SDK, you write callback handlers for network-initiated operations like payout requests and payment status updates. The SDK manages the HTTP server, retry logic, and connection lifecycle. You focus on business logic.
 
 ## Protocol Implementation Approach
-For providers requiring maximum control over their integration or operating in environments where SDK usage is not feasible, direct protocol implementation provides complete flexibility. This approach requires implementing both the client-side and server-side aspects of the Connect RPC protocol while managing cryptographic operations manually.
+If you need full control or cannot use the SDK, implement the Connect RPC protocol directly. You manage both client-side and server-side aspects, including cryptographic operations.
 
 ### gRPC Protocol Implementation
-The gRPC implementation provides high-performance, strongly-typed communication between providers and the network. gRPC's binary protocol encoding offers superior efficiency compared to JSON-based alternatives, making it particularly suitable for high-volume payment processing environments.
+gRPC uses binary encoding for high-throughput, strongly-typed communication. It is well suited for high-volume payment processing.
 
-When implementing gRPC integration, providers must generate client and server stubs from the provided protocol buffer definitions. The network.proto file defines the NetworkService interface that providers call to interact with the network, while the provider.proto file defines the ProviderService interface that providers must implement to receive network callbacks.
+Generate client and server stubs from the provided protocol buffer definitions. `network.proto` defines the NetworkService interface you call; `provider.proto` defines the ProviderService interface you implement to receive callbacks.
 
-gRPC implementation requires careful attention to connection management, particularly for long-lived connections used for streaming operations. Providers should implement appropriate retry logic and circuit breaker patterns to handle network interruptions and service unavailability scenarios.
+Pay attention to connection management for long-lived streaming connections. Implement retry logic and circuit breaker patterns for network interruptions.
 
-The gRPC approach provides excellent tooling support across multiple programming languages and integrates well with modern microservices architectures. The strongly-typed nature of gRPC interfaces helps prevent integration errors and provides clear API contracts between providers and the network.
+gRPC tooling covers most programming languages and fits well in microservices architectures. Strongly-typed interfaces enforce clear API contracts and catch integration errors at compile time.
 
 ### REST/JSON Protocol Implementation
-The REST/JSON implementation offers broader compatibility and easier debugging compared to gRPC, making it suitable for providers with existing REST-based architectures or those requiring human-readable message formats for monitoring and troubleshooting.
+REST/JSON offers broader compatibility and human-readable messages, making it easier to debug and monitor. It suits providers with existing REST-based architectures.
 
-REST/JSON implementation uses standard HTTP methods and JSON message encoding, following RESTful design principles. The Connect RPC framework automatically generates REST endpoints corresponding to each gRPC service method, maintaining consistent functionality across both protocol options.
+The Connect RPC framework generates REST endpoints for each gRPC service method. Both protocols share the same functionality. JSON message formats follow the protocol buffer JSON mapping specification, so gRPC and REST implementations stay consistent.
 
-When implementing REST/JSON integration, providers must carefully handle HTTP status codes, error responses, and content negotiation. The JSON message format follows the protocol buffer JSON mapping specification, ensuring consistency with gRPC implementations while providing human-readable message content.
-
-REST implementation provides excellent debugging capabilities through standard HTTP debugging tools and offers straightforward integration with web-based monitoring and analytics platforms. The stateless nature of REST also simplifies load balancing and horizontal scaling of provider services.
+Handle HTTP status codes, error responses, and content negotiation in your implementation. REST's stateless model simplifies load balancing and horizontal scaling.

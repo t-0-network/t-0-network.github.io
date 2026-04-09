@@ -27,6 +27,10 @@ The mechanism uses placeholder markers in the template that get resolved by `gen
 4. `gen.sh` post-processes with sed to replace markers with relative Hugo URLs (`../slug/`)
 5. The FILEREF sed script is built from the same `PAGES` array, mapping `anchor(proto_path)` -> `../slug/`
 
+## Writing Style
+
+All prose in this repo must follow the stop-slop skill (`.claude/skills/stop-slop/`). Key rules: no adverbs, no passive voice, no filler phrases, no false agency, no three-item lists. Run `/stop-slop` on any new or edited documentation before committing.
+
 ## Commands
 
 - Generate docs: `./_gen/gen.sh`
