@@ -33,11 +33,13 @@ When you receive a request with an identifier you have already processed, return
 
 **Right:** Same scenario. On the retry, you look up `payment_id=123`, find it in the AML review state, and return `ManualAmlCheck` again. The network knows the payment is pending review. The flow continues.
 
-### 2. Return Current Status for In-Flight Requests
+### 2. Wait for Completion on In-Flight Requests
 
-If the original request is still being processed when a duplicate arrives, return the current state. Do not block until completion and do not reject the request.
+If your system has not yet returned a response for the original request when a duplicate arrives, wait for it to complete and return the same response for both requests. Do not reject the duplicate and do not return an error. 
 
-For example, if a payout is waiting on a compliance check, return the pending compliance status. The network uses this to track progress and make routing decisions.
+**Wrong:** The network sends a payout request with `payment_id=456`. You begin processing it. The network retries before you finish. You return `{"failed":{"details": "Request is already being processed"}}`. The network treats this as a failure and aborts the payment.
+
+**Right:** Same scenario. On the retry, you look up `payment_id=456` and see that it has not yet produced a response. You wait for it to complete, then return the same result for both requests.
 
 ### 3. Never Treat a Duplicate as an Error
 
