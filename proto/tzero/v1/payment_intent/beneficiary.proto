@@ -45,6 +45,7 @@ message PaymentIntentUpdateRequest {
    * The type of update.
    */
   oneof update {
+    option (buf.validate.oneof).required = true;
     /**
      * Funds were received from the payer by pay-in provider.
      */

@@ -142,7 +142,8 @@ message GetQuoteRequest {
 }
 
 message GetQuoteResponse {
-  oneof Result {
+  oneof result {
+    option (buf.validate.oneof).required = true;
     Success success = 10;
     QuoteNotFound quote_not_found = 20;
   }
@@ -283,7 +284,8 @@ message CreatePaymentIntentRequest {
 }
 
 message CreatePaymentIntentResponse {
-  oneof Result {
+  oneof result {
+    option (buf.validate.oneof).required = true;
     /**
      * Payment intent created successfully with available payment options.
      */
@@ -375,7 +377,8 @@ message ConfirmFundsReceivedRequest {
 }
 
 message ConfirmFundsReceivedResponse {
-  oneof Result {
+  oneof result {
+    option (buf.validate.oneof).required = true;
     /**
      * Funds confirmed successfully. Settlement will proceed.
      */
