@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="{{ .Site.LanguageCode }}">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{{ .Site.Title }}</title>
+  <link rel="icon" href="/favicon.ico" sizes="any">
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png">
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #15803D;
+      color: #fff;
+      overflow-x: hidden;
+    }
+
+    /* Hero container */
+    .hero {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      overflow: hidden;
+      background: #15803D;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* Map containers */
+    .hero-inner {
+      position: relative;
+      width: 100%;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .map-side {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      height: 78vh;
+      aspect-ratio: 2;
+      pointer-events: none;
+      color: rgba(255,255,255,0.2);
+    }
+    .map-left { right: 70%; }
+    .map-right { left: 70%; }
+    .map-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      overflow: visible;
+    }
+
+    /* Center content */
+    .hero-content {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      padding: 10rem 2rem;
+      max-width: 48rem;
+    }
+    .hero-title {
+      font-family: 'Figtree', system-ui, sans-serif;
+      font-size: clamp(2.5rem, 6vw, 5rem);
+      font-weight: 400;
+      letter-spacing: -0.02em;
+      line-height: 1;
+      white-space: nowrap;
+      animation: fadeZoomIn 1.5s ease-out both;
+    }
+    .hero-subtitle {
+      margin-top: 0.75rem;
+      font-size: 1rem;
+      font-weight: 400;
+      line-height: 1.6;
+      max-width: 36rem;
+      text-wrap: balance;
+      opacity: 0;
+      animation: slideIn 2s ease-out 0.4s both;
+    }
+    .hero-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      padding: 0.5rem 1.25rem;
+      background: #fff;
+      color: #166543;
+      font-size: 0.875rem;
+      font-weight: 500;
+      border-radius: 9999px;
+      text-decoration: none;
+      box-shadow: 0 0 0 4px rgba(255,255,255,0.2), 0 4px 12px rgba(0,0,0,0.15);
+      transition: all 0.2s;
+      opacity: 0;
+      animation: slideUp 1.5s ease-out 0.5s both;
+    }
+    .hero-cta:hover {
+      background: #f0fdf4;
+      box-shadow: 0 0 0 6px rgba(255,255,255,0.3), 0 4px 16px rgba(0,0,0,0.2);
+    }
+    .hero-cta svg {
+      width: 1.2em;
+      height: 1.2em;
+    }
+
+    /* Backed by */
+    .backed-by {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-top: 2rem;
+      opacity: 0.75;
+      animation: slideUp 1.2s ease-out 0.7s both;
+    }
+    .backed-by p {
+      font-size: 0.875rem;
+    }
+    .backed-by svg {
+      width: 6rem;
+      fill: currentColor;
+    }
+
+    /* Animations */
+    @keyframes fadeZoomIn {
+      from { opacity: 0; transform: scale(1.05); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(-0.5rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(1.5rem); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    /* Tablet */
+    @media (max-width: 1200px) {
+      .map-left { right: 60%; }
+      .map-right { left: 60%; }
+      .map-side path[stroke],
+      .map-side use { opacity: 0.4; }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .hero-content { padding: 8rem 1.5rem 4rem; }
+      .hero-title { font-size: 2.5rem; white-space: normal; }
+      .map-left { right: 55%; }
+      .map-right { left: 55%; }
+      .map-side path[stroke],
+      .map-side use { opacity: 0.15; }
+    }
+
+    /* Pulse dot — CSS-driven so it honors prefers-reduced-motion.
+       Animates transform (compositor-accelerated) instead of the `r`
+       attribute, which would force SVG layout on every frame. */
+    @keyframes pulse {
+      from { transform: scale(1); opacity: 0.5; }
+      to   { transform: scale(4); opacity: 0;   }
+    }
+    .pulse-ring {
+      animation: pulse 1.5s linear infinite;
+      transform-origin: center;
+      transform-box: fill-box;
+      will-change: transform, opacity;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .pulse-ring { animation: none; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Shared SVG definitions -->
+  <svg xmlns="http://www.w3.org/2000/svg" style="display:none">
+    <symbol id="pulse-dot" viewBox="-1.8 -1.8 3.6 3.6">
+      <circle r="0.45" fill="#ffffff"/>
+      <circle class="pulse-ring" r="0.45" fill="#ffffff"/>
+    </symbol>
+    <g id="map-dots">{{ partial "map-dots.html" . }}</g>
+  </svg>
+
+  <div class="hero">
+    <div class="hero-inner">
+
+      <!-- Left Map -->
+      <div class="map-side map-left">
+        <svg class="map-svg" viewBox="0 0 152 75">
+          <use href="#map-dots"/>
+          <path d="M 124.616 25.729 S 131.368 37.244 138.121 63.759" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <path d="M 124.616 25.729 S 122.815 29.095 121.015 47.460" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <path d="M 136.320 27.540 S 130.468 19.134 124.616 25.729" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <path d="M 136.320 27.540 S 130.468 15.512 124.616 18.485" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <path d="M 78.701 20.296 S 99.858 26.378 121.015 47.460" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <use href="#pulse-dot" x="122.816" y="23.929" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="136.321" y="61.959" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="119.215" y="45.660" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="134.520" y="25.740" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="122.816" y="16.685" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="76.901" y="18.496" width="3.6" height="3.6"/>
+        </svg>
+      </div>
+
+      <!-- Center Content -->
+      <div class="hero-content">
+        <h1 class="hero-title">Money without borders</h1>
+        <p class="hero-subtitle">
+          Move money instantly, at low cost, in a peer-to-peer stablecoin
+          settlement network. Built for Institutions. Powered by USDT.
+        </p>
+        <a href="/docs/introduction/" class="hero-cta" title="Access the Docs">
+          See the Documentation
+          <svg viewBox="0 0 256 256"><path fill="currentColor" d="m181.66 133.66l-80 80a8 8 0 0 1-11.32-11.32L164.69 128L90.34 53.66a8 8 0 0 1 11.32-11.32l80 80a8 8 0 0 1 0 11.32"/></svg>
+        </a>
+        <div class="backed-by">
+          <p>Backed by</p>
+          <svg width="125" height="28" viewBox="0 0 125 28">
+            <path fill-rule="evenodd" d="M7.16 0h18.936c.452 0 .87.242 1.095.634l5.516 9.6a1.266 1.266 0 0 1-.207 1.53L17.315 26.788a1.262 1.262 0 0 1-1.775 0L.375 11.785a1.266 1.266 0 0 1-.188-1.561L6.084.603A1.26 1.26 0 0 1 7.16 0Zm16.49 4.286V6.98h-5.394v1.868c3.788.2 6.63 1.02 6.652 2.002v2.048c-.021.982-2.864 1.802-6.652 2.002v4.583h-3.582V14.9c-3.788-.2-6.63-1.02-6.652-2.002V10.85c.021-.983 2.864-1.803 6.652-2.002V6.98H9.281V4.286h14.37Zm-7.185 9.207c4.043 0 7.422-.694 8.25-1.62-.702-.784-3.239-1.402-6.46-1.572v1.956a34.11 34.11 0 0 1-3.58 0V10.3c-3.221.17-5.758.788-6.46 1.573.828.925 4.207 1.619 8.25 1.619Z" clip-rule="evenodd"/>
+            <path d="m40.1 5.21 4.377-.494v4.252h3.8v3.697h-3.83v5.731c0 1.356.567 2.034 1.702 2.034.73 0 1.337-.123 1.823-.37l1.004 3.697c-.993.39-2.047.617-3.162.678-1.763.082-3.161-.339-4.195-1.263-1.013-.945-1.52-2.537-1.52-4.776v-5.73h-2.675V8.967H40.1V5.21Zm24.56 12.724H53.626c.121.781.537 1.428 1.246 1.942.71.492 1.651.739 2.827.739 1.682 0 2.979-.4 3.89-1.202l2.463 2.773c-1.5 1.5-3.648 2.25-6.444 2.25-2.675 0-4.752-.73-6.232-2.188-1.459-1.458-2.189-3.43-2.189-5.916 0-2.341.72-4.231 2.159-5.669 1.439-1.458 3.374-2.187 5.806-2.187 2.654 0 4.68.821 6.08 2.464 1.418 1.644 1.894 3.975 1.428 6.995ZM53.626 14.7h7.113c-.04-.78-.406-1.376-1.095-1.787-.689-.431-1.52-.647-2.492-.647-.872 0-1.622.216-2.25.647-.628.432-1.054 1.027-1.276 1.787Zm14.683-9.49 4.377-.494v4.252h3.8v3.697h-3.83v5.731c0 1.356.567 2.034 1.702 2.034.73 0 1.337-.123 1.823-.37l1.004 3.697c-.993.39-2.047.617-3.162.678-1.762.082-3.161-.339-4.195-1.263-1.013-.945-1.52-2.537-1.52-4.776v-5.73h-2.674V8.967h2.675V5.21Zm10.518-2.68h4.407v8.226c1.075-1.418 2.594-2.126 4.56-2.126 3.992 0 5.988 2.434 5.988 7.302v8.165h-4.376v-8.134c0-1.048-.265-1.86-.791-2.434-.506-.575-1.196-.863-2.067-.863-.953 0-1.753.329-2.402.986-.628.657-.942 1.571-.942 2.742v7.703h-4.377V2.529Zm32.122 15.404H99.915c.122.781.537 1.428 1.246 1.942.709.492 1.652.739 2.828.739 1.681 0 2.978-.4 3.89-1.202l2.463 2.773c-1.5 1.5-3.648 2.25-6.445 2.25-2.675 0-4.752-.73-6.232-2.188-1.459-1.458-2.188-3.43-2.188-5.916 0-2.341.72-4.231 2.158-5.669 1.44-1.458 3.374-2.187 5.806-2.187 2.655 0 4.681.821 6.08 2.464 1.418 1.644 1.894 3.975 1.428 6.995ZM99.915 14.7h7.113c-.04-.78-.405-1.376-1.094-1.787-.689-.431-1.52-.647-2.493-.647-.872 0-1.621.216-2.249.647-.629.432-1.054 1.027-1.277 1.787Zm12.85-5.793h4.074l.334 1.664c.952-1.356 2.29-2.034 4.013-2.034 1.418 0 2.644.462 3.677 1.387l-1.823 3.512a3.994 3.994 0 0 0-2.401-.77c-.994 0-1.825.318-2.493.955-.669.616-1.003 1.469-1.003 2.557v7.919h-4.378V8.907Z"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Right Map -->
+      <div class="map-side map-right">
+        <svg class="map-svg" viewBox="0 0 152 75">
+          <use href="#map-dots"/>
+          <path d="M 34.586 36.595 S 43.139 39.055 51.692 56.515" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <path d="M 45.390 22.107 S 39.988 21.851 34.586 36.595" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <path d="M 25.583 29.351 S 30.085 25.473 34.586 36.595" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <path d="M 12.979 11.241 S 29.185 9.174 45.390 22.107" fill="none" stroke="#ffffff" stroke-width="0.225"/>
+          <use href="#pulse-dot" x="32.786" y="34.795" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="49.892" y="54.715" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="43.590" y="20.307" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="23.783" y="27.551" width="3.6" height="3.6"/>
+          <use href="#pulse-dot" x="11.179" y="9.441" width="3.6" height="3.6"/>
+        </svg>
+      </div>
+
+    </div>
+  </div>
+
+</body>
+</html>
