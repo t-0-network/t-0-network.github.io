@@ -203,6 +203,7 @@ message PayoutResponse {
   optional uint32 beneficiary_provider_legal_entity_id = 10 [(buf.validate.field).uint32.gt = 0];
 
   oneof result {
+    option (buf.validate.oneof).required = true;
     /**
      * Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to
      * make a pay-out.
@@ -246,6 +247,7 @@ message UpdatePaymentRequest {
   string payment_client_id = 10;
 
   oneof result {
+    option (buf.validate.oneof).required = true;
     /**
      * Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to
      * make a pay-out.
@@ -366,6 +368,7 @@ message ApprovePaymentQuoteRequest {
 
 message ApprovePaymentQuoteResponse {
   oneof result {
+    option (buf.validate.oneof).required = true;
     Accepted accepted = 10;
     Rejected rejected = 20;
   }

@@ -99,6 +99,7 @@ message GetPaymentDetailsRequest {
  */
 message GetPaymentDetailsResponse {
   oneof result {
+    option (buf.validate.oneof).required = true;
     Details details = 10;
     Rejection rejection = 20;
   }

@@ -38,6 +38,7 @@ toc: true
 | african_mobile_money | [PaymentDetails.AfricanMobileMoney](#tzero-v1-common-PaymentDetails-AfricanMobileMoney) |  | African Money - Kenya payment method |
 | naps | [PaymentDetails.Cnaps](#tzero-v1-common-PaymentDetails-Cnaps) |  | The China National Advanced Payment System |
 | nip | [PaymentDetails.Nip](#tzero-v1-common-PaymentDetails-Nip) |  | NIP - Nigeria Instant Payment system Nigeria |
+| rtp | [PaymentDetails.Rtp](#tzero-v1-common-PaymentDetails-Rtp) |  | RTP - Real-Time Payments United States |
 
 
 
@@ -57,6 +58,7 @@ toc: true
 | account_number | [string](../scalar/#string) |  |  |
 | account_holder_name | [string](../scalar/#string) |  |  |
 | account_type | [PaymentDetails.Ach.AchAccountType](#tzero-v1-common-PaymentDetails-Ach-AchAccountType) |  |  |
+| payment_reference | [string](../scalar/#string) |  | Payment reference/description (optional) |
 
 
 
@@ -97,6 +99,7 @@ The China National Advanced Payment System
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary name in Latin characters |
 | business | [PaymentDetails.Cnaps.Business](#tzero-v1-common-PaymentDetails-Cnaps-Business) |  |  |
 | person | [PaymentDetails.Cnaps.Person](#tzero-v1-common-PaymentDetails-Cnaps-Person) |  |  |
+| payment_reference | [string](../scalar/#string) |  | Payment reference/description (optional) |
 
 
 
@@ -389,6 +392,27 @@ or traditional bank account details (bank code, branch, account number)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-Rtp"></a>
+
+### PaymentDetails.Rtp
+RTP - Real-Time Payments (USA)
+Real-time bank-to-bank transfers using routing and account numbers
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| routing_number | [string](../scalar/#string) |  | ABA routing number (9 digits) |
+| account_number | [string](../scalar/#string) |  |  |
+| account_type | [PaymentDetails.Rtp.RtpAccountType](#tzero-v1-common-PaymentDetails-Rtp-RtpAccountType) |  |  |
+| bank_name | [string](../scalar/#string) |  |  |
+| payment_reference | [string](../scalar/#string) |  | Payment reference/description (optional) |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Sepa"></a>
 
 ### PaymentDetails.Sepa
@@ -515,6 +539,19 @@ Intermediary bank details (optional)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-Rtp-RtpAccountType"></a>
+
+### PaymentDetails.Rtp.RtpAccountType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| RTP_ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
+| RTP_ACCOUNT_TYPE_CHECKING | 10 |  |
+| RTP_ACCOUNT_TYPE_SAVINGS | 20 |  |
+
+
+
 <a name="tzero-v1-common-PaymentMethodType"></a>
 
 ### PaymentMethodType
@@ -539,6 +576,7 @@ Intermediary bank details (optional)
 | PAYMENT_METHOD_TYPE_AFRICAN_MOBILE_MONEY | 160 | African Mobile Money  - Mobile money system across multiple countries: Kenya (Mpesa, Airtel), Tanzania, Mozambique, DRC, Lesotho, Ghana, Egypt, South Africa etc. |
 | PAYMENT_METHOD_TYPE_CNAPS | 170 | The China National Advanced Payment System |
 | PAYMENT_METHOD_TYPE_NIP | 180 | NIP - Nigeria Instant Payment system |
+| PAYMENT_METHOD_TYPE_RTP | 190 | RTP - Real-Time Payments (USA) |
 
 
  <!-- end enums -->

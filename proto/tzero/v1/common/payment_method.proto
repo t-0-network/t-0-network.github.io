@@ -31,6 +31,8 @@ enum PaymentMethodType {
   PAYMENT_METHOD_TYPE_CNAPS = 170;
   // NIP - Nigeria Instant Payment system
   PAYMENT_METHOD_TYPE_NIP = 180;
+  // RTP - Real-Time Payments (USA)
+  PAYMENT_METHOD_TYPE_RTP = 190;
 }
 
 message PaymentDetails {
@@ -97,6 +99,10 @@ message PaymentDetails {
     // NIP - Nigeria Instant Payment system
     // Nigeria
     Nip nip = 180;
+
+    // RTP - Real-Time Payments
+    // United States
+    Rtp rtp = 190;
   };
 
   message Sepa {
@@ -401,6 +407,11 @@ message PaymentDetails {
       not_in: [0]
     }];
 
+    // Payment reference/description (optional)
+    string payment_reference = 50 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+
     enum AchAccountType {
       ACH_ACCOUNT_TYPE_UNSPECIFIED = 0;
       ACH_ACCOUNT_TYPE_CHECKING = 10;
@@ -669,6 +680,11 @@ message PaymentDetails {
       Person person = 60;
     }
 
+    // Payment reference/description (optional)
+    string payment_reference = 70 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+
     message Business {
       // Business license number - 18 digits
       string license_number = 10 [(buf.validate.field).string = {
@@ -716,6 +732,45 @@ message PaymentDetails {
     string payment_reference = 40 [(buf.validate.field).string = {
       max_len: 140
     }];
+  }
+
+  // RTP - Real-Time Payments (USA)
+  // Real-time bank-to-bank transfers using routing and account numbers
+  message Rtp {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_RTP;
+
+    // ABA routing number (9 digits)
+    string routing_number = 10 [(buf.validate.field).string = {
+      min_len: 9,
+      max_len: 9,
+      pattern: "^[0-9]{9}$"
+    }];
+
+    string account_number = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 17,
+      pattern: "^[0-9]+$"
+    }];
+
+    RtpAccountType account_type = 30 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    string bank_name = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional)
+    string payment_reference = 50 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+
+    enum RtpAccountType {
+      RTP_ACCOUNT_TYPE_UNSPECIFIED = 0;
+      RTP_ACCOUNT_TYPE_CHECKING = 10;
+      RTP_ACCOUNT_TYPE_SAVINGS = 20;
+    }
   }
 }
 
