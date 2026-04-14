@@ -7,6 +7,28 @@
     --bg-default-border: hsl(var(--primary-800-hsl),0.1);
     --bg-default-color: var(--text-default);
     --bg-mermaid: var(--gray-100);
+
+    --primary:     #15803d;
+    --primary-50:  #c5fed2;
+    --primary-100: #50fe89;
+    --primary-200: #2de070;
+    --primary-300: #24be5e;
+    --primary-400: #1da04e;
+    --primary-500: #15803d;
+    --primary-600: #0f6730;
+    --primary-700: #084d22;
+    --primary-800: #043616;
+
+    --primary-hsl:     142.4, 71.8%, 29.2%;
+    --primary-50-hsl:  133.7, 96.6%, 88.4%;
+    --primary-100-hsl: 139.7, 98.9%, 65.5%;
+    --primary-200-hsl: 142.5, 74.3%, 52.7%;
+    --primary-300-hsl: 142.6, 68.1%, 44.3%;
+    --primary-400-hsl: 142.4, 69.3%, 37.1%;
+    --primary-500-hsl: 142.4, 71.8%, 29.2%;
+    --primary-600-hsl: 142.5, 74.6%, 23.1%;
+    --primary-700-hsl: 142.6, 81.2%, 16.7%;
+    --primary-800-hsl: 141.6, 86.2%, 11.4%;
 }
 
 [data-dark-mode] {

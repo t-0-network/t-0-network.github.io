@@ -1,6 +1,6 @@
 baseURL = 'https://docs.t-0.network'
 languageCode = 'en-us'
-title = 'T-0 Network'
+title = 't-0 Network'
 
 [module]
     [[module.imports]]
@@ -21,7 +21,7 @@ title = 'T-0 Network'
 
 [params]
     [params.docs]
-        title = "T-0 Network"
+        title = "t-0 Network"
         breadcrumbs = false
     [params.footer]
-        copyright = "©2025 New Settlement Technologies Inc."
+        copyright = "© 2026 New Settlement Technologies Inc."
