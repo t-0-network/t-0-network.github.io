@@ -57,13 +57,13 @@ sequenceDiagram
 ## Payment Flow Description
 
 ### 1. UpdateQuote
-Payout Provider streams exchange rate quotes to the Network at a regular interval of their choosing (every 1 to 20 seconds), indicating rates at which they are willing to convert USDT to local currency for payouts. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). Each quote is valid for the publishing interval plus 30 seconds (e.g., 50 seconds for a 20-second interval), ensuring that a payment originator always has at least 30 seconds to use any quote regardless of when it was fetched. This continuous streaming serves both as a rate dissemination method and a liveness check.
+Payout Provider streams pay-out quotes to the Network, indicating rates at which they will convert USD to local currency for payouts. Quotes cover supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). The provider picks the cadence and sets each quote's `expiration`; continuous streaming keeps rates fresh and doubles as a liveness signal. See [Quote management](../quote-management) for the publishing contract.
 
 ### 2. Get Quote
 OFI requests a quote for a specific payment, specifying the amount (either in settlement currency USD or payout currency) and target currency. The request initiates the payment flow.
 
 ### 3. Quote Response
-Network searches the order book for the best available quote that satisfies the required volume. Selection considers both rate competitiveness and available credit limit capacity between counterparties. Response includes the local currency amount, USDT settlement amount, and quote ID. Average latency: 20-50 milliseconds.
+Network searches the order book for the best available quote that satisfies the required volume. Selection considers both rate competitiveness and available credit limit capacity between counterparties. Response includes the local currency amount, USD settlement amount, and quote ID. Average latency: 20-50 milliseconds.
 
 ### 4. USDT Settlement Transfer
 The OFI initiates a USDT transfer from their whitelisted wallet to the Payout Provider's whitelisted wallet on a supported blockchain. Settlement is not required per-payment; providers can batch multiple payments into a single settlement transaction to reduce blockchain transaction costs. 
@@ -88,7 +88,7 @@ If no quote ID was provided, the Network selects the best available quote based 
 Network confirms the payment request is accepted and will be routed to the selected Payout Provider.
 
 ### 11. Payout Request
-Network sends payout instruction to the Payout Provider including: amount in local currency, USDT settlement amount, quote ID, recipient bank account details, and complete travel rule data for compliance validation.
+Network sends payout instruction to the Payout Provider including: amount in local currency, USD settlement amount, quote ID, recipient bank account details, and complete travel rule data for compliance validation.
 
 ### 12. Payout Accepted
 Payout Provider responds within 30 seconds indicating acceptance or rejection. If accepted, the provider commits to completing the payout. At this moment of acceptance, settlement amounts are locked in. Provider validates travel rule data against internal AML rules and may reject if suspicious transactions are identified.
