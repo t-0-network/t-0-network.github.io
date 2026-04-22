@@ -57,7 +57,7 @@ sequenceDiagram
 ## Payment Flow Description
 
 ### 1. UpdateQuote
-Payout Provider streams exchange rate quotes to the Network at a regular interval of their choosing (every 1 to 20 seconds), indicating rates at which they are willing to convert USDT to local currency for payouts. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). Each quote is valid for the publishing interval plus 30 seconds (e.g., 50 seconds for a 20-second interval), ensuring that a payment originator always has at least 30 seconds to use any quote regardless of when it was fetched. This continuous streaming serves both as a rate dissemination method and a liveness check.
+Payout Provider streams pay-out quotes to the Network, indicating rates at which they will convert USDT to local currency for payouts. Quotes cover supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). The provider picks the cadence and sets each quote's `expiration`; continuous streaming keeps rates fresh and doubles as a liveness signal. See [Quote management](../quote-management) for the publishing contract.
 
 ### 2. Get Quote
 OFI requests a quote for a specific payment, specifying the amount (either in settlement currency USD or payout currency) and target currency. The request initiates the payment flow.

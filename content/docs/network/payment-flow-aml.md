@@ -47,10 +47,10 @@ sequenceDiagram
 ## Manual AML flow Description
 
 ### 1. UpdateQuote (Pay-in Provider)
-Pay-in Provider streams exchange rate quotes to the Network every 5 seconds, indicating rates at which they are willing to convert local currency to USDT for pay-ins. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). Each quote is valid for the publishing interval plus 30 seconds (e.g., 35 seconds for a 5-second interval).
+Pay-in Provider streams exchange rate quotes to the Network at a cadence of their choosing, indicating rates at which they are willing to convert local currency to USDT for pay-ins. Quotes include rates for all supported currencies across standard volume bands ($1K, $5K, $10K, $25K, $250K, $1M). See [Quote management](../quote-management) for the publishing contract.
 
 ### 2. UpdateQuote (Payout Provider)
-Payout Provider streams exchange rate quotes to the Network every 5 seconds, indicating rates at which they are willing to convert USDT to local currency for payouts. This continuous streaming serves both as a rate dissemination method and a liveness check.
+Payout Provider streams exchange rate quotes to the Network at a cadence of their choosing, indicating rates at which they are willing to convert USDT to local currency for payouts. Continuous streaming keeps rates fresh and doubles as a liveness signal.
 
 ### 3. Get Quote
 Pay-in Provider requests a quote for a specific payment, specifying the amount (either in settlement currency USD or payout currency) and target currency. The request initiates the payment flow.
