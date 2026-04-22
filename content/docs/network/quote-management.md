@@ -19,7 +19,7 @@ A provider publishes quotes on two independent streams that map to the two direc
 
 | Stream  | RPC                                                         | What it covers |
 |---------|-------------------------------------------------------------|----------------|
-| Pay-out | `tzero.v1.payment.NetworkService/UpdateQuote`               | Rates at which the provider accepts USDT settlement and disburses local currency to a beneficiary. Used in the [payment flow](../payment-flow). |
+| Pay-out | `tzero.v1.payment.NetworkService/UpdateQuote`               | Rates at which the provider accepts USD settlement and disburses local currency to a beneficiary. Used in the [payment flow](../payment-flow). |
 | Pay-in  | `tzero.v1.payment_intent.PaymentIntentService/UpdateQuote`  | Rates at which the provider collects local currency from an end-user and settles in USD. Used in the [payment intent flow](../payment-intent-flow). |
 
 The network stores the two streams in separate tables. A publish to one has no effect on the other. A provider operating in both directions calls both RPCs. A provider operating in one direction leaves the other empty.
