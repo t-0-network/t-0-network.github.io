@@ -494,7 +494,6 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | pay_out | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-out operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
-| pay_in | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | **Deprecated.** Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band.  Deprecated: pay-in quotes are no longer used. |
 
 
 
@@ -511,7 +510,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | currency | [string](../scalar/#string) |  | BRL, EUR, GBP, etc. (ISO 4217 currency code) |
-| quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  |  |
+| quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | **Deprecated.** Deprecated: rate type is no longer used; the server ignores the value. |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
 | bands | [UpdateQuoteRequest.Quote.Band](#tzero-v1-payment-UpdateQuoteRequest-Quote-Band) | repeated | list of bands for this quote |
 | expiration | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | expiration time of the quote |
@@ -567,6 +566,9 @@ This message has no fields defined.
 | REASON_UNSPECIFIED | 0 |  |
 | REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, or the requested amount exceeds the provider's max_amount band). |
 | REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | At least one provider quoted, but none has enough credit / prefunding headroom to execute the requested amount. Call GetQuote to inspect `all_quotes[].settlement` for the per-provider prefunding gap. |
+| REASON_AMOUNT_EXCEEDS_QUOTE_BAND | 30 | The pinned quote's band cannot cover the requested amount. The quote is still live; retry with a smaller amount, split the payment across bands, or request a fresh GetQuote for a quote that covers the full amount. |
+| REASON_QUOTE_EXPIRED | 40 | The pinned quote's expires_at has passed. Auto-retry by calling GetQuote to obtain a fresh quote id and re-submit with it. |
+| REASON_QUOTE_ID_UNKNOWN | 50 | The pinned quote id does not exist for the pay-in/pay-out provider pair. Indicates a client-side plumbing bug (stale / mismatched id); no auto-retry will succeed until the client fixes quote propagation. |
 
 
 
