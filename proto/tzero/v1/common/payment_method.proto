@@ -33,6 +33,20 @@ enum PaymentMethodType {
   PAYMENT_METHOD_TYPE_NIP = 180;
   // RTP - Real-Time Payments (USA)
   PAYMENT_METHOD_TYPE_RTP = 190;
+  // Chilean domestic bank transfer (CLP)
+  PAYMENT_METHOD_TYPE_CHILEAN_BANK_TRANSFER = 200;
+  // Peruvian domestic bank transfer (PEN, USD-PE)
+  PAYMENT_METHOD_TYPE_PERU_BANK_TRANSFER = 210;
+  // Argentinian domestic bank transfer via CBU/CVU (ARS)
+  PAYMENT_METHOD_TYPE_ARGENTINIAN_BANK_TRANSFER = 220;
+  // Mexican domestic bank transfer via SPEI/CLABE (MXN)
+  PAYMENT_METHOD_TYPE_MEXICAN_BANK_TRANSFER = 230;
+  // Colombian ACH bank transfer (COP)
+  PAYMENT_METHOD_TYPE_COLOMBIAN_ACH = 240;
+  // Colombian Bre-B high-speed payment rail (COP)
+  PAYMENT_METHOD_TYPE_COLOMBIAN_BREB = 250;
+  // GIP - Ghana Interbank Payment (GhIPSS)
+  PAYMENT_METHOD_TYPE_GIP = 260;
 }
 
 message PaymentDetails {
@@ -103,6 +117,34 @@ message PaymentDetails {
     // RTP - Real-Time Payments
     // United States
     Rtp rtp = 190;
+
+    // Chilean domestic bank transfer
+    // Chile
+    ChileanBankTransfer chilean_bank_transfer = 200;
+
+    // Peruvian domestic bank transfer
+    // Peru
+    PeruBankTransfer peru_bank_transfer = 210;
+
+    // Argentinian domestic bank transfer via CBU/CVU
+    // Argentina
+    ArgentinianBankTransfer argentinian_bank_transfer = 220;
+
+    // Mexican domestic bank transfer via SPEI/CLABE
+    // Mexico
+    MexicanBankTransfer mexican_bank_transfer = 230;
+
+    // Colombian ACH bank transfer
+    // Colombia
+    ColombianAch colombian_ach = 240;
+
+    // Colombian Bre-B high-speed payment rail
+    // Colombia
+    ColombianBreb colombian_breb = 250;
+
+    // GIP - Ghana Interbank Payment (GhIPSS)
+    // Ghana
+    Gip gip = 260;
   };
 
   message Sepa {
@@ -771,6 +813,296 @@ message PaymentDetails {
       RTP_ACCOUNT_TYPE_CHECKING = 10;
       RTP_ACCOUNT_TYPE_SAVINGS = 20;
     }
+  }
+
+  // Chilean domestic bank transfer
+  // Uses RUT (national taxpayer ID) as the beneficiary identifier.
+  message ChileanBankTransfer {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_CHILEAN_BANK_TRANSFER;
+
+    // RUT of the beneficiary - 7-9 digits + check digit (K or 0-9).
+    // Example: "12345678-9", "1234567-K".
+    string document_number = 10 [(buf.validate.field).string = {
+      min_len: 9,
+      max_len: 11,
+      pattern: "^[0-9]{7,9}-[0-9Kk]$"
+    }];
+
+    // Beneficiary full name (max 45 chars; provider truncates if longer).
+    string beneficiary_name = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 45
+    }];
+
+    // Destination bank code - 3 digits (e.g. "012" for BCI).
+    string bank_code = 30 [(buf.validate.field).string = {
+      min_len: 3,
+      max_len: 3,
+      pattern: "^[0-9]{3}$"
+    }];
+
+    // Destination account number - up to 18 digits (zero-padded by the provider if needed).
+    string account_number = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 18,
+      pattern: "^[0-9]{1,18}$"
+    }];
+
+    // Account type. Optional - required by some provider fallbacks (e.g. Itau),
+    // ignored by others (e.g. BCI).
+    optional AccountType account_type = 50 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    enum AccountType {
+      ACCOUNT_TYPE_UNSPECIFIED = 0;
+      // Cuenta Corriente
+      ACCOUNT_TYPE_CHECKING = 10;
+      // Cuenta Vista / Cuenta RUT
+      ACCOUNT_TYPE_VISTA = 20;
+      // Cuenta de Ahorro
+      ACCOUNT_TYPE_SAVINGS = 40;
+    }
+  }
+
+  // Peruvian domestic bank transfer (PEN, USD-PE)
+  message PeruBankTransfer {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_PERU_BANK_TRANSFER;
+
+    // Document number of the beneficiary.
+    // Per document_type: DNI up to 8 digits; CE and RUC may be longer.
+    string document_number = 10 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 20,
+      pattern: "^[0-9]+$"
+    }];
+
+    // Document type. Optional - defaults to DNI on the provider side if unset.
+    optional DocumentType document_type = 20 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    // Destination bank code (mapped to provider-specific bank codes internally).
+    string bank_code = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 10
+    }];
+
+    // Destination account number.
+    string account_number = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 30
+    }];
+
+    AccountType account_type = 50 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    enum DocumentType {
+      DOCUMENT_TYPE_UNSPECIFIED = 0;
+      // DNI - Documento Nacional de Identidad (max 8 digits)
+      DOCUMENT_TYPE_DNI = 10;
+      // CE - Carnet de Extranjeria (foreigner ID)
+      DOCUMENT_TYPE_CE = 20;
+      // RUC - Registro Unico de Contribuyentes (business tax ID)
+      DOCUMENT_TYPE_RUC = 30;
+    }
+
+    enum AccountType {
+      ACCOUNT_TYPE_UNSPECIFIED = 0;
+      ACCOUNT_TYPE_CHECKING = 10;
+      ACCOUNT_TYPE_SAVINGS = 20;
+    }
+  }
+
+  // Argentinian domestic bank transfer via CBU or CVU.
+  // CUIT/CUIL of the beneficiary is carried in Travel Rule Data, not here.
+  message ArgentinianBankTransfer {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_ARGENTINIAN_BANK_TRANSFER;
+
+    // CBU (traditional bank account) or CVU (virtual account, starts with "000"),
+    // exactly 22 digits.
+    string account_number = 10 [(buf.validate.field).string = {
+      min_len: 22,
+      max_len: 22,
+      pattern: "^[0-9]{22}$"
+    }];
+  }
+
+  // Mexican domestic bank transfer via SPEI using a CLABE account number.
+  // RFC of the beneficiary is carried in Travel Rule Data, not here.
+  message MexicanBankTransfer {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_MEXICAN_BANK_TRANSFER;
+
+    // Beneficiary full name.
+    string beneficiary_name = 10 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Bank institution code.
+    string bank_code = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 10
+    }];
+
+    // CLABE (Clave Bancaria Estandarizada) - exactly 18 digits.
+    // Format: 3 digits bank code + 3 digits plaza code + 11 digits account + 1 check digit.
+    string account_number = 30 [(buf.validate.field).string = {
+      min_len: 18,
+      max_len: 18,
+      pattern: "^[0-9]{18}$"
+    }];
+  }
+
+  // Colombian ACH (Automated Clearing House) bank transfer.
+  message ColombianAch {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_COLOMBIAN_ACH;
+
+    string document_number = 10 [(buf.validate.field).string = {
+      min_len: 5,
+      max_len: 15
+    }];
+
+    DocumentType document_type = 20 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    string bank_code = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 10
+    }];
+
+    string account_number = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 30
+    }];
+
+    AccountType account_type = 50 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    string beneficiary_name = 60 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Beneficiary phone number. Optional - required only for Row provider;
+    // Mono/Cobre use a default when omitted.
+    optional string phone_number = 70 [(buf.validate.field).string = {
+      min_len: 7,
+      max_len: 20,
+      pattern: "^[0-9]+$"
+    }];
+
+    enum DocumentType {
+      DOCUMENT_TYPE_UNSPECIFIED = 0;
+      // CC - Cedula de Ciudadania
+      DOCUMENT_TYPE_CC = 10;
+      // CE - Cedula de Extranjeria
+      DOCUMENT_TYPE_CE = 20;
+      // NIT - Numero de Identificacion Tributaria (business tax ID)
+      DOCUMENT_TYPE_NIT = 30;
+      // TI - Tarjeta de Identidad
+      DOCUMENT_TYPE_TI = 40;
+      // PP - Pasaporte
+      DOCUMENT_TYPE_PP = 50;
+    }
+
+    enum AccountType {
+      ACCOUNT_TYPE_UNSPECIFIED = 0;
+      // Cuenta de Ahorros
+      ACCOUNT_TYPE_SAVINGS = 10;
+      // Cuenta Corriente
+      ACCOUNT_TYPE_CHECKING = 20;
+    }
+  }
+
+  // Colombian Bre-B high-speed payment rail from Banco de la Republica.
+  // Same fields as ColombianAch except no phone_number.
+  message ColombianBreb {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_COLOMBIAN_BREB;
+
+    string document_number = 10 [(buf.validate.field).string = {
+      min_len: 5,
+      max_len: 15
+    }];
+
+    DocumentType document_type = 20 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    string bank_code = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 10
+    }];
+
+    string account_number = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 30
+    }];
+
+    AccountType account_type = 50 [(buf.validate.field).enum = {
+      not_in: [0]
+    }];
+
+    string beneficiary_name = 60 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    enum DocumentType {
+      DOCUMENT_TYPE_UNSPECIFIED = 0;
+      // CC - Cedula de Ciudadania
+      DOCUMENT_TYPE_CC = 10;
+      // CE - Cedula de Extranjeria
+      DOCUMENT_TYPE_CE = 20;
+      // NIT - Numero de Identificacion Tributaria (business tax ID)
+      DOCUMENT_TYPE_NIT = 30;
+      // TI - Tarjeta de Identidad
+      DOCUMENT_TYPE_TI = 40;
+      // PP - Pasaporte
+      DOCUMENT_TYPE_PP = 50;
+    }
+
+    enum AccountType {
+      ACCOUNT_TYPE_UNSPECIFIED = 0;
+      // Cuenta de Ahorros
+      ACCOUNT_TYPE_SAVINGS = 10;
+      // Cuenta Corriente
+      ACCOUNT_TYPE_CHECKING = 20;
+    }
+  }
+
+  // GIP - Ghana Interbank Payment operated by GhIPSS.
+  // Domestic bank transfers using a bank sort code and account number.
+  message Gip {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_GIP;
+
+    // Destination bank sort code (6 numeric digits assigned by GhIPSS).
+    string sort_code = 10 [(buf.validate.field).string = {
+      min_len: 6,
+      max_len: 6,
+      pattern: "^[0-9]{6}$"
+    }];
+
+    // Destination account number.
+    string account_number = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 20,
+      pattern: "^[0-9]+$"
+    }];
+
+    // Name registered on the destination account.
+    string account_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    string reference = 40 [(buf.validate.field).string = {
+      max_len: 140
+    }];
   }
 }
 
