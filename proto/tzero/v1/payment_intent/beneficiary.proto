@@ -59,7 +59,7 @@ message PaymentIntentUpdateRequest {
   message FundsReceived {
     /**
      * The settlement amount credited to your balance.
-     * This is calculated as: source_amount / rate
+     * This is calculated as: (source_amount / rate) - fix
      *
      * Note: Fees are NOT deducted from this amount. Fees are tracked
      * separately and settled in periodic fee settlements.
@@ -92,6 +92,16 @@ message PaymentIntentUpdateRequest {
      * Present when the pay-in provider has registered travel rule data.
      */
     TravelRuleData travel_rule_data = 60 [(buf.validate.field).required = true];
+
+    /**
+     * Flat USD surcharge retained by the pay-in provider per transfer.
+     * Already subtracted from settlement_amount. Surface to beneficiaries that
+     * need to audit the settlement math: settlement = (payment_amount / rate) - fix.
+     */
+    tzero.v1.common.Decimal fix = 70 [(buf.validate.field).cel = {
+      message: "fix must be non-negative"
+      expression: "this.unscaled >= 0"
+    }];
 
     message TravelRuleData {
       /**

@@ -108,6 +108,18 @@ message UpdateQuoteRequest {
 
       // USD/currency rate
       tzero.v1.common.Decimal rate = 50 [(buf.validate.field).required = true];
+
+      /**
+       * Fixed charge in USD retained by the pay-in provider per transfer.
+       * Covers flat operational costs that do not scale with amount
+       * (wire fees, rail fees, compliance checks).
+       * Subtracted from the settlement amount: settlement = (amount / rate) - fix.
+       * Defaults to 0 when absent — no fixed charge applied.
+       */
+      optional tzero.v1.common.Decimal fix = 60 [(buf.validate.field).cel = {
+        message: "fix must be non-negative"
+        expression: "this.unscaled >= 0"
+      }];
     }
   }
 }
@@ -185,6 +197,16 @@ message GetQuoteResponse {
        * Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived
        */
       tzero.v1.common.Decimal indicative_rate = 30;
+
+      /**
+       * Indicative fixed charge in USD retained by the pay-in provider per transfer.
+       * Settlement is calculated as (amount / indicative_rate) - indicative_fix.
+       * Indicative only: the actual fix is locked in at ConfirmFundsReceived time.
+       */
+      tzero.v1.common.Decimal indicative_fix = 40 [(buf.validate.field).cel = {
+        message: "indicative_fix must be non-negative"
+        expression: "this.unscaled >= 0"
+      }];
     }
   }
 
@@ -224,6 +246,17 @@ message PaymentIntentPayInDetails {
    * Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived
    */
   tzero.v1.common.Decimal indicative_rate = 40;
+
+  /**
+   * Indicative fixed charge in USD retained by the pay-in provider per transfer.
+   * Settlement is calculated as (amount / indicative_rate) - indicative_fix.
+   *
+   * Note: This is indicative only. The actual fix is locked in at ConfirmFundsReceived time.
+   */
+  tzero.v1.common.Decimal indicative_fix = 50 [(buf.validate.field).cel = {
+    message: "indicative_fix must be non-negative"
+    expression: "this.unscaled >= 0"
+  }];
 }
 
 /**
@@ -408,6 +441,11 @@ message ConfirmFundsReceivedResponse {
       REJECT_REASON_CONFIRMATION_CODE_MISMATCH = 10;
       REJECT_REASON_NO_ACTIVE_QUOTE = 20;
       REJECT_REASON_PROVIDER_NOT_ALLOWED = 30;
+      /**
+       * The pay-in amount would yield a zero or negative beneficiary
+       * settlement (pay_in / rate − fix) at every active quote.
+       */
+      REJECT_REASON_AMOUNT_TOO_SMALL = 40;
     }
   }
 }

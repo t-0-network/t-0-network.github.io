@@ -228,7 +228,7 @@ message PayoutResponse {
 
   message Failed {
     Reason reason = 10;
-    optional string details = 20;
+    optional string details = 20 [(buf.validate.field).string.max_len = 1024];
 
     enum Reason {
       REASON_UNSPECIFIED = 0;
@@ -284,14 +284,17 @@ message UpdatePaymentRequest {
 
   message Failed {
     Reason reason = 10;
-    optional string details = 20;
+    optional string details = 20 [(buf.validate.field).string.max_len = 1024];
 
+    // Additive-only. Consumers must treat unknown values as UNSPECIFIED.
     enum Reason {
       REASON_UNSPECIFIED = 0;
       REASON_NO_QUOTE_AFTER_AML_APPROVAL = 1; // AML review completed, but the pay-out provider no longer has a valid quote available.
       REASON_QUOTE_REJECTED_AFTER_AML_APPROVAL = 2; // AML review completed and a new quote was required, but the pay-in provider rejected the updated quote (e.g. due to rate change after AML delay).
       REASON_AML_RISK_CHECK_FAILED = 3; // Payment was rejected by the pay-out provider because the AML / risk checks failed.
       REASON_CREDIT_LIMIT_EXCEEDED_AFTER_AML_APPROVAL = 4; // AML review completed and a new quote was found, but the updated settlement amount exceeds the credit limit between the pay-in and pay-out providers.
+      REASON_REJECTED_BY_BENEFICIARY = 5; // Pay-out provider rejected the initial PayOut request (no AML check involved).
+      REASON_FINALIZE_FAILURE = 6; // Pay-out provider accepted initially, then reported failure via FinalizePayout (e.g. payment rails rejected).
     }
   }
 
