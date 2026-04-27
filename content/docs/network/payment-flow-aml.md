@@ -15,7 +15,7 @@ Cross-border payments carry inherent compliance risks, as funds move between dif
 
 ```mermaid
 sequenceDiagram
-    actor PIP as Pay-in Provider
+    actor PIP as Payout Requester
     participant N as Network
     actor POP as Payout Provider
 
