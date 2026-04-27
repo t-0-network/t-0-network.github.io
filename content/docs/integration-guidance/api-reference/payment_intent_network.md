@@ -182,7 +182,7 @@ Payment intent created successfully.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_intent_id | [uint64](../scalar/#uint64) |  | Unique identifier for this payment intent. Store this ID to correlate with: - PaymentIntentUpdate notifications you'll receive |
-| pay_in_details | [PaymentIntentPayInDetails](#tzero-v1-payment_intent-PaymentIntentPayInDetails) | repeated | Available payment options for the end-user. Present these options to your user so they can choose how to pay. Each entry contains the payment details needed to complete the payment. |
+| pay_in_details | [PaymentIntentPayInDetails](#tzero-v1-payment_intent-PaymentIntentPayInDetails) | repeated | Available payment options for the end-user. Present these options to your user so they can choose how to pay. Each entry contains the payment details needed to complete the payment.  Indicative rate/fix are resolved live on every call, including idempotent retries. The set of options (provider, payment_method, payment_details) is fixed at first call; individual options whose underlying quote has lapsed are omitted on retry. |
 
 
 
@@ -287,8 +287,8 @@ Contains the payment method, provider info, payment details, and indicative exch
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method type (e.g., SEPA, SWIFT, mobile money). Determines which payment details format is provided. |
 | provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Providers can use this to identify counterparties. |
 | payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | Payment details for the end-user to make the payment. Contains bank account info, mobile money details, etc. based on payment_method. This should be displayed to the end-user to complete their payment. |
-| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived |
-| indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix.  Note: This is indicative only. The actual fix is locked in at ConfirmFundsReceived time. |
+| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Resolved live from the network's current quote snapshot on every call, including idempotent retries. The binding rate is locked in at ConfirmFundsReceived and may differ. |
+| indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix.  Resolved live from the network's current quote snapshot on every call, including idempotent retries. The binding fix is locked in at ConfirmFundsReceived and may differ. |
 
 
 
@@ -389,7 +389,7 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | FAILURE_REASON_UNSPECIFIED | 0 |  |
-| FAILURE_REASON_QUOTE_NOT_FOUND | 10 | No quotes found for the requested currency/amount. |
+| FAILURE_REASON_QUOTE_NOT_FOUND | 10 | No live quote covers the requested currency/amount. On first call this means the intent was never created. On an idempotent retry this means every stored offer has since lost its live quote; a subsequent retry may succeed once providers republish. |
 | FAILURE_REASON_REJECTED | 20 | Payment intent rejected. |
 
 
