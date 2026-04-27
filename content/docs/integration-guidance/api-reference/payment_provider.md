@@ -512,7 +512,7 @@ This message has no fields defined.
 <a name="tzero-v1-payment-UpdatePaymentRequest-Failed-Reason"></a>
 
 ### UpdatePaymentRequest.Failed.Reason
-
+Additive-only. Consumers must treat unknown values as UNSPECIFIED.
 
 | Name | Number | Description |
 | ---- | ------ | ----------- |
@@ -521,6 +521,8 @@ This message has no fields defined.
 | REASON_QUOTE_REJECTED_AFTER_AML_APPROVAL | 2 | AML review completed and a new quote was required, but the pay-in provider rejected the updated quote (e.g. due to rate change after AML delay). |
 | REASON_AML_RISK_CHECK_FAILED | 3 | Payment was rejected by the pay-out provider because the AML / risk checks failed. |
 | REASON_CREDIT_LIMIT_EXCEEDED_AFTER_AML_APPROVAL | 4 | AML review completed and a new quote was found, but the updated settlement amount exceeds the credit limit between the pay-in and pay-out providers. |
+| REASON_REJECTED_BY_BENEFICIARY | 5 | Pay-out provider rejected the initial PayOut request (no AML check involved). |
+| REASON_FINALIZE_FAILURE | 6 | Pay-out provider accepted initially, then reported failure via FinalizePayout (e.g. payment rails rejected). |
 
 
  <!-- end enums -->

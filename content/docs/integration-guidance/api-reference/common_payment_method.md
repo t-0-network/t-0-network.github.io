@@ -39,6 +39,13 @@ toc: true
 | naps | [PaymentDetails.Cnaps](#tzero-v1-common-PaymentDetails-Cnaps) |  | The China National Advanced Payment System |
 | nip | [PaymentDetails.Nip](#tzero-v1-common-PaymentDetails-Nip) |  | NIP - Nigeria Instant Payment system Nigeria |
 | rtp | [PaymentDetails.Rtp](#tzero-v1-common-PaymentDetails-Rtp) |  | RTP - Real-Time Payments United States |
+| chilean_bank_transfer | [PaymentDetails.ChileanBankTransfer](#tzero-v1-common-PaymentDetails-ChileanBankTransfer) |  | Chilean domestic bank transfer Chile |
+| peru_bank_transfer | [PaymentDetails.PeruBankTransfer](#tzero-v1-common-PaymentDetails-PeruBankTransfer) |  | Peruvian domestic bank transfer Peru |
+| argentinian_bank_transfer | [PaymentDetails.ArgentinianBankTransfer](#tzero-v1-common-PaymentDetails-ArgentinianBankTransfer) |  | Argentinian domestic bank transfer via CBU/CVU Argentina |
+| mexican_bank_transfer | [PaymentDetails.MexicanBankTransfer](#tzero-v1-common-PaymentDetails-MexicanBankTransfer) |  | Mexican domestic bank transfer via SPEI/CLABE Mexico |
+| colombian_ach | [PaymentDetails.ColombianAch](#tzero-v1-common-PaymentDetails-ColombianAch) |  | Colombian ACH bank transfer Colombia |
+| colombian_breb | [PaymentDetails.ColombianBreb](#tzero-v1-common-PaymentDetails-ColombianBreb) |  | Colombian Bre-B high-speed payment rail Colombia |
+| gip | [PaymentDetails.Gip](#tzero-v1-common-PaymentDetails-Gip) |  | GIP - Ghana Interbank Payment (GhIPSS) Ghana |
 
 
 
@@ -78,6 +85,44 @@ toc: true
 | beneficiary_phone | [string](../scalar/#string) |  | Phone number in international format without + sign Required: Yes |
 | account_reference | [string](../scalar/#string) |  | Account reference (max 12 chars, alphanumeric) Required: Yes |
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary name |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ArgentinianBankTransfer"></a>
+
+### PaymentDetails.ArgentinianBankTransfer
+Argentinian domestic bank transfer via CBU or CVU.
+CUIT/CUIL of the beneficiary is carried in Travel Rule Data, not here.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account_number | [string](../scalar/#string) |  | CBU (traditional bank account) or CVU (virtual account, starts with "000"), exactly 22 digits. |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ChileanBankTransfer"></a>
+
+### PaymentDetails.ChileanBankTransfer
+Chilean domestic bank transfer
+Uses RUT (national taxpayer ID) as the beneficiary identifier.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| document_number | [string](../scalar/#string) |  | RUT of the beneficiary - 7-9 digits + check digit (K or 0-9). Example: "12345678-9", "1234567-K". |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary full name (max 45 chars; provider truncates if longer). |
+| bank_code | [string](../scalar/#string) |  | Destination bank code - 3 digits (e.g. "012" for BCI). |
+| account_number | [string](../scalar/#string) |  | Destination account number - up to 18 digits (zero-padded by the provider if needed). |
+| account_type | [PaymentDetails.ChileanBankTransfer.AccountType](#tzero-v1-common-PaymentDetails-ChileanBankTransfer-AccountType) | optional | Account type. Optional - required by some provider fallbacks (e.g. Itau), ignored by others (e.g. BCI). |
 
 
 
@@ -139,6 +184,50 @@ The China National Advanced Payment System
 
 
 
+<a name="tzero-v1-common-PaymentDetails-ColombianAch"></a>
+
+### PaymentDetails.ColombianAch
+Colombian ACH (Automated Clearing House) bank transfer.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| document_number | [string](../scalar/#string) |  |  |
+| document_type | [PaymentDetails.ColombianAch.DocumentType](#tzero-v1-common-PaymentDetails-ColombianAch-DocumentType) |  |  |
+| bank_code | [string](../scalar/#string) |  |  |
+| account_number | [string](../scalar/#string) |  |  |
+| account_type | [PaymentDetails.ColombianAch.AccountType](#tzero-v1-common-PaymentDetails-ColombianAch-AccountType) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  |  |
+| phone_number | [string](../scalar/#string) | optional | Beneficiary phone number. Optional - required only for Row provider; Mono/Cobre use a default when omitted. |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ColombianBreb"></a>
+
+### PaymentDetails.ColombianBreb
+Colombian Bre-B high-speed payment rail from Banco de la Republica.
+Same fields as ColombianAch except no phone_number.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| document_number | [string](../scalar/#string) |  |  |
+| document_type | [PaymentDetails.ColombianBreb.DocumentType](#tzero-v1-common-PaymentDetails-ColombianBreb-DocumentType) |  |  |
+| bank_code | [string](../scalar/#string) |  |  |
+| account_number | [string](../scalar/#string) |  |  |
+| account_type | [PaymentDetails.ColombianBreb.AccountType](#tzero-v1-common-PaymentDetails-ColombianBreb-AccountType) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  |  |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-DomesticWire"></a>
 
 ### PaymentDetails.DomesticWire
@@ -191,6 +280,26 @@ The China National Advanced Payment System
 | beneficiary_name | [string](../scalar/#string) |  |  |
 | beneficiary_phone | [string](../scalar/#string) |  | Recipient phone |
 | payment_reference | [string](../scalar/#string) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Gip"></a>
+
+### PaymentDetails.Gip
+GIP - Ghana Interbank Payment operated by GhIPSS.
+Domestic bank transfers using a bank sort code and account number.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| sort_code | [string](../scalar/#string) |  | Destination bank sort code (6 numeric digits assigned by GhIPSS). |
+| account_number | [string](../scalar/#string) |  | Destination account number. |
+| account_name | [string](../scalar/#string) |  | Name registered on the destination account. |
+| reference | [string](../scalar/#string) |  | Payment reference/description (optional). |
 
 
 
@@ -289,6 +398,25 @@ Method 2: IMPS P2P (Mobile + MMID)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-MexicanBankTransfer"></a>
+
+### PaymentDetails.MexicanBankTransfer
+Mexican domestic bank transfer via SPEI using a CLABE account number.
+RFC of the beneficiary is carried in Travel Rule Data, not here.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary full name. |
+| bank_code | [string](../scalar/#string) |  | Bank institution code. |
+| account_number | [string](../scalar/#string) |  | CLABE (Clave Bancaria Estandarizada) - exactly 18 digits. Format: 3 digits bank code + 3 digits plaza code + 11 digits account + 1 check digit. |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Nip"></a>
 
 ### PaymentDetails.Nip
@@ -343,6 +471,26 @@ Transfers are made using the mobile number linked to the wallet account; CNIC is
 | cnic | [string](../scalar/#string) |  | CNIC (Computerized National Identity Card) - 13 digits without dashes |
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name as registered with the wallet |
 | payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional) |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-PeruBankTransfer"></a>
+
+### PaymentDetails.PeruBankTransfer
+Peruvian domestic bank transfer (PEN, USD-PE)
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| document_number | [string](../scalar/#string) |  | Document number of the beneficiary. Per document_type: DNI up to 8 digits; CE and RUC may be longer. |
+| document_type | [PaymentDetails.PeruBankTransfer.DocumentType](#tzero-v1-common-PaymentDetails-PeruBankTransfer-DocumentType) | optional | Document type. Optional - defaults to DNI on the provider side if unset. |
+| bank_code | [string](../scalar/#string) |  | Destination bank code (mapped to provider-specific bank codes internally). |
+| account_number | [string](../scalar/#string) |  | Destination account number. |
+| account_type | [PaymentDetails.PeruBankTransfer.AccountType](#tzero-v1-common-PaymentDetails-PeruBankTransfer-AccountType) |  |  |
 
 
 
@@ -507,6 +655,78 @@ Intermediary bank details (optional)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-ChileanBankTransfer-AccountType"></a>
+
+### PaymentDetails.ChileanBankTransfer.AccountType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
+| ACCOUNT_TYPE_CHECKING | 10 | Cuenta Corriente |
+| ACCOUNT_TYPE_VISTA | 20 | Cuenta Vista / Cuenta RUT |
+| ACCOUNT_TYPE_SAVINGS | 40 | Cuenta de Ahorro |
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ColombianAch-AccountType"></a>
+
+### PaymentDetails.ColombianAch.AccountType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
+| ACCOUNT_TYPE_SAVINGS | 10 | Cuenta de Ahorros |
+| ACCOUNT_TYPE_CHECKING | 20 | Cuenta Corriente |
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ColombianAch-DocumentType"></a>
+
+### PaymentDetails.ColombianAch.DocumentType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DOCUMENT_TYPE_UNSPECIFIED | 0 |  |
+| DOCUMENT_TYPE_CC | 10 | CC - Cedula de Ciudadania |
+| DOCUMENT_TYPE_CE | 20 | CE - Cedula de Extranjeria |
+| DOCUMENT_TYPE_NIT | 30 | NIT - Numero de Identificacion Tributaria (business tax ID) |
+| DOCUMENT_TYPE_TI | 40 | TI - Tarjeta de Identidad |
+| DOCUMENT_TYPE_PP | 50 | PP - Pasaporte |
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ColombianBreb-AccountType"></a>
+
+### PaymentDetails.ColombianBreb.AccountType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
+| ACCOUNT_TYPE_SAVINGS | 10 | Cuenta de Ahorros |
+| ACCOUNT_TYPE_CHECKING | 20 | Cuenta Corriente |
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ColombianBreb-DocumentType"></a>
+
+### PaymentDetails.ColombianBreb.DocumentType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DOCUMENT_TYPE_UNSPECIFIED | 0 |  |
+| DOCUMENT_TYPE_CC | 10 | CC - Cedula de Ciudadania |
+| DOCUMENT_TYPE_CE | 20 | CE - Cedula de Extranjeria |
+| DOCUMENT_TYPE_NIT | 30 | NIT - Numero de Identificacion Tributaria (business tax ID) |
+| DOCUMENT_TYPE_TI | 40 | TI - Tarjeta de Identidad |
+| DOCUMENT_TYPE_PP | 50 | PP - Pasaporte |
+
+
+
 <a name="tzero-v1-common-PaymentDetails-PakistanMobileWallet-PakistanWalletProvider"></a>
 
 ### PaymentDetails.PakistanMobileWallet.PakistanWalletProvider
@@ -520,6 +740,33 @@ Intermediary bank details (optional)
 | PAKISTAN_WALLET_PROVIDER_SADAPAY | 30 |  |
 | PAKISTAN_WALLET_PROVIDER_NAYAPAY | 40 |  |
 | PAKISTAN_WALLET_PROVIDER_OTHER | 100 |  |
+
+
+
+<a name="tzero-v1-common-PaymentDetails-PeruBankTransfer-AccountType"></a>
+
+### PaymentDetails.PeruBankTransfer.AccountType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| ACCOUNT_TYPE_UNSPECIFIED | 0 |  |
+| ACCOUNT_TYPE_CHECKING | 10 |  |
+| ACCOUNT_TYPE_SAVINGS | 20 |  |
+
+
+
+<a name="tzero-v1-common-PaymentDetails-PeruBankTransfer-DocumentType"></a>
+
+### PaymentDetails.PeruBankTransfer.DocumentType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| DOCUMENT_TYPE_UNSPECIFIED | 0 |  |
+| DOCUMENT_TYPE_DNI | 10 | DNI - Documento Nacional de Identidad (max 8 digits) |
+| DOCUMENT_TYPE_CE | 20 | CE - Carnet de Extranjeria (foreigner ID) |
+| DOCUMENT_TYPE_RUC | 30 | RUC - Registro Unico de Contribuyentes (business tax ID) |
 
 
 
@@ -577,6 +824,13 @@ Intermediary bank details (optional)
 | PAYMENT_METHOD_TYPE_CNAPS | 170 | The China National Advanced Payment System |
 | PAYMENT_METHOD_TYPE_NIP | 180 | NIP - Nigeria Instant Payment system |
 | PAYMENT_METHOD_TYPE_RTP | 190 | RTP - Real-Time Payments (USA) |
+| PAYMENT_METHOD_TYPE_CHILEAN_BANK_TRANSFER | 200 | Chilean domestic bank transfer (CLP) |
+| PAYMENT_METHOD_TYPE_PERU_BANK_TRANSFER | 210 | Peruvian domestic bank transfer (PEN, USD-PE) |
+| PAYMENT_METHOD_TYPE_ARGENTINIAN_BANK_TRANSFER | 220 | Argentinian domestic bank transfer via CBU/CVU (ARS) |
+| PAYMENT_METHOD_TYPE_MEXICAN_BANK_TRANSFER | 230 | Mexican domestic bank transfer via SPEI/CLABE (MXN) |
+| PAYMENT_METHOD_TYPE_COLOMBIAN_ACH | 240 | Colombian ACH bank transfer (COP) |
+| PAYMENT_METHOD_TYPE_COLOMBIAN_BREB | 250 | Colombian Bre-B high-speed payment rail (COP) |
+| PAYMENT_METHOD_TYPE_GIP | 260 | GIP - Ghana Interbank Payment (GhIPSS) |
 
 
  <!-- end enums -->

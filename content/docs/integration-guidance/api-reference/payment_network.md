@@ -565,8 +565,8 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
-| REASON_QUOTE_NOT_FOUND | 10 | No matching quote for the specified payout currency found or provider limits would exceed by processing this payment |
-| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | Payments with amount in pay out currency require available credit or pre-deposit |
+| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, or the requested amount exceeds the provider's max_amount band). |
+| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | At least one provider quoted, but none has enough credit / prefunding headroom to execute the requested amount. Call GetQuote to inspect `all_quotes[].settlement` for the per-provider prefunding gap. |
 
 
 
@@ -578,7 +578,8 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
-| REASON_QUOTE_NOT_FOUND | 10 | No matching quote par for the specified payout currency found or provider limits would exceed by processing this payment |
+| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, or the requested amount exceeds the provider's max_amount band). |
+| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | At least one provider quoted, but none has enough credit / prefunding headroom to execute the requested amount. Inspect `all_quotes[].settlement` for the per-provider prefunding gap. |
 
 
 

@@ -267,6 +267,7 @@ Contains the payment method, provider info, and indicative exchange rate.
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method type (e.g., SEPA, SWIFT, mobile money). |
 | provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Providers can use this to identify counterparties. |
 | indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived |
+| indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix. Indicative only: the actual fix is locked in at ConfirmFundsReceived time. |
 
 
 
@@ -287,6 +288,7 @@ Contains the payment method, provider info, payment details, and indicative exch
 | provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Providers can use this to identify counterparties. |
 | payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | Payment details for the end-user to make the payment. Contains bank account info, mobile money details, etc. based on payment_method. This should be displayed to the end-user to complete their payment. |
 | indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived |
+| indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix.  Note: This is indicative only. The actual fix is locked in at ConfirmFundsReceived time. |
 
 
 
@@ -341,6 +343,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | client_quote_id | [string](../scalar/#string) |  | unique client generated id for this band |
 | max_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/currency rate |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) | optional | Fixed charge in USD retained by the pay-in provider per transfer. Covers flat operational costs that do not scale with amount (wire fees, rail fees, compliance checks). Subtracted from the settlement amount: settlement = (amount / rate) - fix. Defaults to 0 when absent — no fixed charge applied. |
 
 
 
@@ -374,6 +377,7 @@ This message has no fields defined.
 | REJECT_REASON_CONFIRMATION_CODE_MISMATCH | 10 |  |
 | REJECT_REASON_NO_ACTIVE_QUOTE | 20 |  |
 | REJECT_REASON_PROVIDER_NOT_ALLOWED | 30 |  |
+| REJECT_REASON_AMOUNT_TOO_SMALL | 40 | The pay-in amount would yield a zero or negative beneficiary settlement (pay_in / rate − fix) at every active quote. |
 
 
 
