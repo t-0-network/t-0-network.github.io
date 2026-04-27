@@ -1,6 +1,6 @@
 ---
 weight: 301
-title: "Introduction Guidance"
+title: "Integration Guidance"
 description: ""
 icon: "article"
 date: "2025-06-16T12:09:09+02:00"
@@ -9,9 +9,14 @@ draft: false
 toc: true
 ---
 
-Payment providers integrate with the T-0 Network in two ways: through the SDK, or by implementing the protocols directly. Both use the Connect RPC framework, which supports gRPC and REST/JSON encoding.
+Correspondents integrate with the t-0 Network in two ways: through the SDK, or by implementing the protocols directly. Both use the Connect RPC framework, which supports gRPC and REST/JSON encoding.
 
 You will implement client-side calls to network services and server-side endpoints that receive network callbacks. All communication uses cryptographic signatures for authentication and integrity verification.
+
+## SDK - Recommended Integration Approach
+The SDK is the fastest integration path. It handles request signing, signature verification, and key management, so you can focus on your business logic.
+We recommend running it inside a standalone adapter service that sits between your system and the t-0 Network, keeping integration concerns isolated from your existing codebase and making SDK updates straightforward to roll out.
+You can run a single command to scaffold a pre-configured project, ready to deploy. Available for Go, TypeScript, Python, Java, and C# on [GitHub](https://github.com/t-0-network/provider-sdk), along with per-language documentation.
 
 ## API Endpoints
 * Production: `https://api.t-0.network`
@@ -19,11 +24,6 @@ You will implement client-side calls to network services and server-side endpoin
 
 ## Idempotency and Request Safety
 All network methods specify idempotency levels for safe retry behavior and duplicate prevention. See [Idempotency](idempotency) for the full reliability contract and provider implementation requirements.
-
-## SDK Integration Approach
-The SDK is the fastest integration path. It handles request signing, signature verification, and key management for you. The Go SDK is available now; additional languages are available on request.
-
-With the SDK, you write callback handlers for network-initiated operations like payout requests and payment status updates. The SDK manages the HTTP server, retry logic, and connection lifecycle. You focus on business logic.
 
 ## Protocol Implementation Approach
 If you need full control or cannot use the SDK, implement the Connect RPC protocol directly. You manage both client-side and server-side aspects, including cryptographic operations.
