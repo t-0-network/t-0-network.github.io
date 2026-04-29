@@ -14,6 +14,6 @@ The t-0 Network monitors transfers between the unique wallet associated with eac
 
 - Ethereum
 - Binance Smart Chain
-- Polygon
+- Tron
 
 For more information about settlement between network members, [see Settlement with Counterparties](provider-settlement)
