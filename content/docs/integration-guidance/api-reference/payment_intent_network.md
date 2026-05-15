@@ -24,10 +24,10 @@ This service is hosted by the T-0 Network and called by providers.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment_intent-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment_intent-UpdateQuoteResponse) | Used by the provider to publish payment intent (pay-in) quotes into the network. These quotes include tiered pricing bands and an expiration timestamp. |
+| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment_intent-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment_intent-UpdateQuoteResponse) | Atomically replaces the calling provider's full pay-in quote set. An empty payment_intent_quotes withdraws all of this provider's quotes. |
 | GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-GetQuoteResponse) | GetQuote returns available quotes for a given currency and amount.  Use this to check indicative rates before creating a payment intent. The returned quotes show which providers can accept pay-ins and their current rates.  Note: Quotes are indicative only. The actual rate used for settlement is determined at the time of ConfirmFundsReceived. |
 | CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-CreatePaymentIntentResponse) | CreatePaymentIntent initiates a new payment intent.  Called by the beneficiary provider (the one who will receive the settlement). The network finds suitable pay-in providers, retrieves their payment details, and returns available payment options to present to the end-user.  The returned payment_intent_id must be stored by the beneficiary provider to correlate with the PaymentIntentUpdate notification received later.  Idempotency: Multiple calls with the same external_reference return the same payment_intent_id. |
-| ConfirmFundsReceived | [ConfirmFundsReceivedRequest](#tzero-v1-payment_intent-ConfirmFundsReceivedRequest) | [ConfirmFundsReceivedResponse](#tzero-v1-payment_intent-ConfirmFundsReceivedResponse) | ConfirmFundsReceived confirms that the pay-in provider has received funds from the end-user. |
+| ConfirmFundsReceived | [ConfirmFundsReceivedRequest](#tzero-v1-payment_intent-ConfirmFundsReceivedRequest) | [ConfirmFundsReceivedResponse](#tzero-v1-payment_intent-ConfirmFundsReceivedResponse) | Confirms funds landed for a payment intent and locks the binding settlement rate. Business failures return a typed Reject.Reason rather than a Connect transport error. |
 
  <!-- end services -->
 
@@ -44,7 +44,7 @@ Request to confirm that funds have been received from the end-user.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_intent_id | [uint64](../scalar/#uint64) |  | The payment intent ID being confirmed. Must be a valid, pending payment intent. |
-| confirmation_code | [string](../scalar/#string) |  | Confirmation code received in the get payment details along with the payment_intent_id. This is to prevent the accidental confirmation of the wrong payment intent. |
+| confirmation_code | [string](../scalar/#string) |  | Confirmation code received in the get payment details along with the payment_intent_id. This prevents accidental confirmation of the wrong payment intent. The network generates this as a UUID at CreatePaymentIntent time; non-UUID strings still pass field-level length validation here and surface as a REJECT_REASON_CONFIRMATION_CODE_MISMATCH at the orchestrator (preserving the "wrong code is a domain reject, not a transport error" contract). |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used by the end-user. Must match one of the payment methods returned in CreatePaymentIntentResponse. |
 | transaction_reference | [string](../scalar/#string) |  | Transaction reference |
 | originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the pay-in provider that received the funds. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
@@ -378,6 +378,7 @@ This message has no fields defined.
 | REJECT_REASON_NO_ACTIVE_QUOTE | 20 |  |
 | REJECT_REASON_PROVIDER_NOT_ALLOWED | 30 |  |
 | REJECT_REASON_AMOUNT_TOO_SMALL | 40 | The pay-in amount would yield a zero or negative beneficiary settlement (pay_in / rate − fix) at every active quote. |
+| REJECT_REASON_NO_VALID_OFFER | 50 | The (pay-in provider, payment method) tuple was not offered on this intent. Either the intent was rejected during creation, or this provider's GetPaymentDetails response was invalid for the requested method. |
 
 
 

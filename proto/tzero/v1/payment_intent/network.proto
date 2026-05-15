@@ -21,9 +21,9 @@ import "google/protobuf/timestamp.proto";
  */
 service PaymentIntentService {
   /**
-  * Used by the provider to publish payment intent (pay-in) quotes into the network.
-  * These quotes include tiered pricing bands and an expiration timestamp.
- */
+   * Atomically replaces the calling provider's full pay-in quote set.
+   * An empty payment_intent_quotes withdraws all of this provider's quotes.
+   */
   rpc UpdateQuote(UpdateQuoteRequest) returns (UpdateQuoteResponse)  {
     option idempotency_level = IDEMPOTENT;
   };
@@ -58,7 +58,8 @@ service PaymentIntentService {
   };
 
   /**
-   * ConfirmFundsReceived confirms that the pay-in provider has received funds from the end-user.
+   * Confirms funds landed for a payment intent and locks the binding settlement rate.
+   * Business failures return a typed Reject.Reason rather than a Connect transport error.
    */
   rpc ConfirmFundsReceived(ConfirmFundsReceivedRequest) returns (ConfirmFundsReceivedResponse) {
     option idempotency_level = IDEMPOTENT;
@@ -104,10 +105,22 @@ message UpdateQuoteRequest {
       }];
 
       // max amount of USD this quote is applicable for. Please look into documentation for valid amounts.
-      tzero.v1.common.Decimal max_amount = 40 [(buf.validate.field).required = true];
+      tzero.v1.common.Decimal max_amount = 40 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).cel = {
+          message: "max_amount must be greater than zero",
+          expression: "this.unscaled > 0"
+        }
+      ];
 
       // USD/currency rate
-      tzero.v1.common.Decimal rate = 50 [(buf.validate.field).required = true];
+      tzero.v1.common.Decimal rate = 50 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).cel = {
+          message: "rate must be greater than zero",
+          expression: "this.unscaled > 0"
+        }
+      ];
 
       /**
        * Fixed charge in USD retained by the pay-in provider per transfer.
@@ -143,14 +156,20 @@ message GetQuoteRequest {
    * Pay-in amount in the specified currency.
    * This is the fiat amount the end-user will pay.
    */
-  tzero.v1.common.Decimal amount = 30 [(buf.validate.field).required = true];
+  tzero.v1.common.Decimal amount = 30 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      message: "amount must be greater than zero",
+      expression: "this.unscaled > 0"
+    }
+  ];
 
   /**
    * Optional list of pay-in provider IDs to filter by.
    * When specified, only quotes from these providers are returned.
    * When empty, quotes from all providers are returned.
    */
-  repeated uint32 pay_in_provider_ids = 40;
+  repeated uint32 pay_in_provider_ids = 40 [(buf.validate.field).repeated.max_items = 100];
 }
 
 message GetQuoteResponse {
@@ -196,7 +215,13 @@ message GetQuoteResponse {
        *
        * Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived
        */
-      tzero.v1.common.Decimal indicative_rate = 30;
+      tzero.v1.common.Decimal indicative_rate = 30 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).cel = {
+          message: "indicative_rate must be greater than zero",
+          expression: "this.unscaled > 0"
+        }
+      ];
 
       /**
        * Indicative fixed charge in USD retained by the pay-in provider per transfer.
@@ -247,7 +272,13 @@ message PaymentIntentPayInDetails {
    * including idempotent retries. The binding rate is locked in at
    * ConfirmFundsReceived and may differ.
    */
-  tzero.v1.common.Decimal indicative_rate = 40;
+  tzero.v1.common.Decimal indicative_rate = 40 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      message: "indicative_rate must be greater than zero",
+      expression: "this.unscaled > 0"
+    }
+  ];
 
   /**
    * Indicative fixed charge in USD retained by the pay-in provider per transfer.
@@ -273,7 +304,10 @@ message CreatePaymentIntentRequest {
    * return the existing payment_intent_id instead of creating a new one.
    * Should be unique per beneficiary provider.
    */
-  string external_reference = 10;
+  string external_reference = 10 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 256
+  }];
 
   /**
    * Pay-in currency code in ISO 4217 format.
@@ -288,7 +322,13 @@ message CreatePaymentIntentRequest {
    * Pay-in amount in the specified currency.
    * The exact fiat amount the end-user should pay.
    */
-  tzero.v1.common.Decimal amount = 30 [(buf.validate.field).required = true];
+  tzero.v1.common.Decimal amount = 30 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      message: "amount must be greater than zero",
+      expression: "this.unscaled > 0"
+    }
+  ];
 
   /**
    * Travel rule compliance data.
@@ -301,7 +341,7 @@ message CreatePaymentIntentRequest {
    * When specified, only quotes from these providers will be used.
    * When empty, all available providers are considered.
    */
-  repeated uint32 pay_in_provider_ids = 50;
+  repeated uint32 pay_in_provider_ids = 50 [(buf.validate.field).repeated.max_items = 100];
 
   /**
    * Travel rule data containing originator information.
@@ -364,7 +404,7 @@ message CreatePaymentIntentResponse {
     /**
      * The reason for failure.
      */
-    Reason reason = 10;
+    Reason reason = 10 [(buf.validate.field).enum.not_in = 0];
 
     enum Reason {
       FAILURE_REASON_UNSPECIFIED = 0;
@@ -393,17 +433,27 @@ message ConfirmFundsReceivedRequest {
    */
   uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
 
-  /*
-   * Confirmation code received in the get payment details along with the payment_intent_id. This is to prevent
-   * the accidental confirmation of the wrong payment intent.
+  /**
+   * Confirmation code received in the get payment details along with the payment_intent_id.
+   * This prevents accidental confirmation of the wrong payment intent. The network
+   * generates this as a UUID at CreatePaymentIntent time; non-UUID strings still pass
+   * field-level length validation here and surface as a REJECT_REASON_CONFIRMATION_CODE_MISMATCH
+   * at the orchestrator (preserving the "wrong code is a domain reject, not a transport error"
+   * contract).
    */
-  string confirmation_code = 20;
+  string confirmation_code = 20 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 64
+  }];
 
   /**
    * The payment method used by the end-user.
    * Must match one of the payment methods returned in CreatePaymentIntentResponse.
    */
-  tzero.v1.common.PaymentMethodType payment_method = 30;
+  tzero.v1.common.PaymentMethodType payment_method = 30 [(buf.validate.field).enum = {
+    defined_only: true,
+    not_in: [0]
+  }];
 
   /*
    * Transaction reference
@@ -446,7 +496,7 @@ message ConfirmFundsReceivedResponse {
    * Funds rejected.
    */
   message Reject {
-    Reason reason = 10;
+    Reason reason = 10 [(buf.validate.field).enum.not_in = 0];
 
     enum Reason {
       REJECT_REASON_UNSPECIFIED = 0;
@@ -458,6 +508,13 @@ message ConfirmFundsReceivedResponse {
        * settlement (pay_in / rate − fix) at every active quote.
        */
       REJECT_REASON_AMOUNT_TOO_SMALL = 40;
+      /**
+       * The (pay-in provider, payment method) tuple was not offered on
+       * this intent. Either the intent was rejected during creation,
+       * or this provider's GetPaymentDetails response was invalid for
+       * the requested method.
+       */
+      REJECT_REASON_NO_VALID_OFFER = 50;
     }
   }
 }
