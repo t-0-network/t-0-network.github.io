@@ -107,7 +107,13 @@ message UpdateQuoteRequest {
 
       tzero.v1.common.Decimal max_amount = 40 [(buf.validate.field).required = true]; // max amount of USD this quote is applicable for. Please look into documentation for valid amounts.
 
-      tzero.v1.common.Decimal rate = 50 [(buf.validate.field).required = true]; // USD/currency rate
+      tzero.v1.common.Decimal rate = 50 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).cel = {
+          message: "rate must be greater than zero"
+          expression: "this.unscaled > 0"
+        }
+      ]; // USD/currency rate
 
       /**
        * Fixed charge in USD applied per transfer on top of the exchange rate.
@@ -115,7 +121,10 @@ message UpdateQuoteRequest {
        * Added to the settlement amount: settlement = (amount / rate) + fix.
        * Defaults to 0 when absent — no fixed charge applied.
        */
-      optional tzero.v1.common.Decimal fix = 60;
+      optional tzero.v1.common.Decimal fix = 60 [(buf.validate.field).cel = {
+        message: "fix must be non-negative"
+        expression: "this.unscaled >= 0"
+      }];
     }
   }
 }
