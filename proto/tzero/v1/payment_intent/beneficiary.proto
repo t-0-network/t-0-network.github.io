@@ -2,10 +2,10 @@ syntax = "proto3";
 
 package tzero.v1.payment_intent;
 
-import "tzero/v1/common/common.proto";
-import "tzero/v1/common/payment_method.proto";
 import "buf/validate/validate.proto";
 import "ivms101/v1/ivms/ivms101.proto";
+import "tzero/v1/common/common.proto";
+import "tzero/v1/common/payment_method.proto";
 
 /**
  * BeneficiaryService must be implemented by beneficiary providers to receive
@@ -28,7 +28,7 @@ service BeneficiaryService {
    */
   rpc PaymentIntentUpdate(PaymentIntentUpdateRequest) returns (PaymentIntentUpdateResponse) {
     option idempotency_level = IDEMPOTENT;
-  };
+  }
 }
 
 /**
@@ -82,10 +82,15 @@ message PaymentIntentUpdateRequest {
      */
     tzero.v1.common.PaymentMethodType payment_method = 40;
 
-    /*
-     * Unique transaction reference identifying the pay-in transaction
+    /**
+     * Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id), forwarded from ConfirmFundsReceived.
+     * Reconcile against your records; serves as the anchor for dispute resolution.
+     * See docs/tech/TRANSACTION_REFERENCE.md.
      */
-    string transaction_reference = 50;
+    string transaction_reference = 50 [(buf.validate.field).string = {
+      min_len: 1
+      max_len: 256
+    }];
 
     /**
      * Travel rule data of the pay-in provider's legal entity that received the funds.

@@ -3,10 +3,10 @@ syntax = "proto3";
 package tzero.v1.payment_intent;
 
 import "buf/validate/validate.proto";
+import "google/protobuf/timestamp.proto";
+import "ivms101/v1/ivms/ivms101.proto";
 import "tzero/v1/common/common.proto";
 import "tzero/v1/common/payment_method.proto";
-import "ivms101/v1/ivms/ivms101.proto";
-import "google/protobuf/timestamp.proto";
 
 /**
  * PaymentIntentService provides Payment Intent APIs for providers.
@@ -24,9 +24,9 @@ service PaymentIntentService {
    * Atomically replaces the calling provider's full pay-in quote set.
    * An empty payment_intent_quotes withdraws all of this provider's quotes.
    */
-  rpc UpdateQuote(UpdateQuoteRequest) returns (UpdateQuoteResponse)  {
+  rpc UpdateQuote(UpdateQuoteRequest) returns (UpdateQuoteResponse) {
     option idempotency_level = IDEMPOTENT;
-  };
+  }
 
   /**
    * GetQuote returns available quotes for a given currency and amount.
@@ -39,7 +39,7 @@ service PaymentIntentService {
    */
   rpc GetQuote(GetQuoteRequest) returns (GetQuoteResponse) {
     option idempotency_level = IDEMPOTENT;
-  };
+  }
 
   /**
    * CreatePaymentIntent initiates a new payment intent.
@@ -55,7 +55,7 @@ service PaymentIntentService {
    */
   rpc CreatePaymentIntent(CreatePaymentIntentRequest) returns (CreatePaymentIntentResponse) {
     option idempotency_level = IDEMPOTENT;
-  };
+  }
 
   /**
    * Confirms funds landed for a payment intent and locks the binding settlement rate.
@@ -63,7 +63,7 @@ service PaymentIntentService {
    */
   rpc ConfirmFundsReceived(ConfirmFundsReceivedRequest) returns (ConfirmFundsReceivedResponse) {
     option idempotency_level = IDEMPOTENT;
-  };
+  }
 }
 
 /*
@@ -79,7 +79,7 @@ message UpdateQuoteRequest {
   message Quote {
     // BRL, EUR, GBP, etc. (ISO 4217 currency code)
     string currency = 10 [(buf.validate.field).string = {
-      len: 3,
+      len: 3
       pattern: "^[A-Z]{3}$"
     }];
 
@@ -87,9 +87,7 @@ message UpdateQuoteRequest {
     tzero.v1.common.PaymentMethodType payment_method = 25 [(buf.validate.field).required = true];
 
     // list of bands for this quote
-    repeated Band bands = 30 [(buf.validate.field).repeated = {
-      min_items: 1
-    }];
+    repeated Band bands = 30 [(buf.validate.field).repeated = {min_items: 1}];
 
     // expiration time of the quote
     google.protobuf.Timestamp expiration = 60 [(buf.validate.field).timestamp.gt_now = true];
@@ -100,7 +98,7 @@ message UpdateQuoteRequest {
     message Band {
       // unique client generated id for this band
       string client_quote_id = 10 [(buf.validate.field).string = {
-        min_len: 1,
+        min_len: 1
         max_len: 64
       }];
 
@@ -108,7 +106,7 @@ message UpdateQuoteRequest {
       tzero.v1.common.Decimal max_amount = 40 [
         (buf.validate.field).required = true,
         (buf.validate.field).cel = {
-          message: "max_amount must be greater than zero",
+          message: "max_amount must be greater than zero"
           expression: "this.unscaled > 0"
         }
       ];
@@ -117,7 +115,7 @@ message UpdateQuoteRequest {
       tzero.v1.common.Decimal rate = 50 [
         (buf.validate.field).required = true,
         (buf.validate.field).cel = {
-          message: "rate must be greater than zero",
+          message: "rate must be greater than zero"
           expression: "this.unscaled > 0"
         }
       ];
@@ -148,7 +146,7 @@ message GetQuoteRequest {
    * Examples: "EUR", "GBP", "USD", "KES"
    */
   string currency = 20 [(buf.validate.field).string = {
-    len: 3,
+    len: 3
     pattern: "^[A-Z]{3}$"
   }];
 
@@ -159,7 +157,7 @@ message GetQuoteRequest {
   tzero.v1.common.Decimal amount = 30 [
     (buf.validate.field).required = true,
     (buf.validate.field).cel = {
-      message: "amount must be greater than zero",
+      message: "amount must be greater than zero"
       expression: "this.unscaled > 0"
     }
   ];
@@ -218,7 +216,7 @@ message GetQuoteResponse {
       tzero.v1.common.Decimal indicative_rate = 30 [
         (buf.validate.field).required = true,
         (buf.validate.field).cel = {
-          message: "indicative_rate must be greater than zero",
+          message: "indicative_rate must be greater than zero"
           expression: "this.unscaled > 0"
         }
       ];
@@ -275,7 +273,7 @@ message PaymentIntentPayInDetails {
   tzero.v1.common.Decimal indicative_rate = 40 [
     (buf.validate.field).required = true,
     (buf.validate.field).cel = {
-      message: "indicative_rate must be greater than zero",
+      message: "indicative_rate must be greater than zero"
       expression: "this.unscaled > 0"
     }
   ];
@@ -305,7 +303,7 @@ message CreatePaymentIntentRequest {
    * Should be unique per beneficiary provider.
    */
   string external_reference = 10 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 256
   }];
 
@@ -314,7 +312,7 @@ message CreatePaymentIntentRequest {
    * The currency that the end-user will pay in.
    */
   string currency = 20 [(buf.validate.field).string = {
-    len: 3,
+    len: 3
     pattern: "^[A-Z]{3}$"
   }];
 
@@ -325,7 +323,7 @@ message CreatePaymentIntentRequest {
   tzero.v1.common.Decimal amount = 30 [
     (buf.validate.field).required = true,
     (buf.validate.field).cel = {
-      message: "amount must be greater than zero",
+      message: "amount must be greater than zero"
       expression: "this.unscaled > 0"
     }
   ];
@@ -442,7 +440,7 @@ message ConfirmFundsReceivedRequest {
    * contract).
    */
   string confirmation_code = 20 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 64
   }];
 
@@ -451,15 +449,17 @@ message ConfirmFundsReceivedRequest {
    * Must match one of the payment methods returned in CreatePaymentIntentResponse.
    */
   tzero.v1.common.PaymentMethodType payment_method = 30 [(buf.validate.field).enum = {
-    defined_only: true,
+    defined_only: true
     not_in: [0]
   }];
 
-  /*
-   * Transaction reference
+  /**
+   * Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id) — do not generate.
+   * Forwarded to the beneficiary for end-to-end tracking and dispute resolution.
+   * See docs/tech/TRANSACTION_REFERENCE.md.
    */
   string transaction_reference = 40 [(buf.validate.field).string = {
-    min_len: 1,
+    min_len: 1
     max_len: 256
   }];
 
@@ -489,8 +489,7 @@ message ConfirmFundsReceivedResponse {
    * The beneficiary provider will receive a PaymentIntentUpdate notification
    * with settlement details.
    */
-  message Accept {
-  }
+  message Accept {}
 
   /**
    * Funds rejected.
