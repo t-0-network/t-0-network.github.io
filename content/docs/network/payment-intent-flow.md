@@ -203,10 +203,13 @@ Called by pay-in providers to confirm receipt of funds from the end-user.
 
 **Request Fields:**
 
-| Field               | Type              | Description                        |
-|---------------------|-------------------|------------------------------------|
-| `payment_intent_id` | uint64            | The payment intent being confirmed |
-| `payment_method`    | PaymentMethodType | The method used by the end-user    |
+| Field                                 | Type                       | Description                                                                                              |
+|---------------------------------------|----------------------------|----------------------------------------------------------------------------------------------------------|
+| `payment_intent_id`                   | uint64                     | The payment intent being confirmed                                                                       |
+| `confirmation_code`                   | string                     | UUID returned by `GetPaymentDetails`; guards against accidental confirmation of the wrong payment intent |
+| `payment_method`                      | PaymentMethodType          | The method used by the end-user                                                                          |
+| `transaction_reference`               | string                     | Your payment system's native reference for this pay-in (see below)                                       |
+| `originator_provider_legal_entity_id` | uint32 (optional)          | Legal entity that received the funds; required if the provider has multiple registered entities         |
 
 **Response:**
 
@@ -218,6 +221,8 @@ Returns `Accept` or `Reject`. On acceptance:
 4. Beneficiary provider receives a notification
 
 **Important:** This endpoint assumes full payment. Partial payments are not supported.
+
+**About `transaction_reference`.** This is the identifier your payment rail assigned to the incoming transfer — SEPA `EndToEndId`, SWIFT `UETR`, PIX `e2e_id`, and so on. It should be payment-system-wide so the network can pass it through to the beneficiary, and so the same transaction is identifiable on both sides of the rail for end-to-end tracking and dispute resolution. Do not generate a new ID — use the one the rail issued.
 
 ---
 
