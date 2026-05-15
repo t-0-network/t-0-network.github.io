@@ -46,7 +46,7 @@ Request to confirm that funds have been received from the end-user.
 | payment_intent_id | [uint64](../scalar/#uint64) |  | The payment intent ID being confirmed. Must be a valid, pending payment intent. |
 | confirmation_code | [string](../scalar/#string) |  | Confirmation code received in the get payment details along with the payment_intent_id. This prevents accidental confirmation of the wrong payment intent. The network generates this as a UUID at CreatePaymentIntent time; non-UUID strings still pass field-level length validation here and surface as a REJECT_REASON_CONFIRMATION_CODE_MISMATCH at the orchestrator (preserving the "wrong code is a domain reject, not a transport error" contract). |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used by the end-user. Must match one of the payment methods returned in CreatePaymentIntentResponse. |
-| transaction_reference | [string](../scalar/#string) |  | Transaction reference |
+| transaction_reference | [string](../scalar/#string) |  | Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id) — do not generate. Forwarded to the beneficiary for end-to-end tracking and dispute resolution. See docs/tech/TRANSACTION_REFERENCE.md. |
 | originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the pay-in provider that received the funds. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
 
 
