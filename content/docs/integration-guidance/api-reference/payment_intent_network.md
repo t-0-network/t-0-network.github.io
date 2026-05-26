@@ -80,7 +80,12 @@ The beneficiary provider will receive a PaymentIntentUpdate notification
 with settlement details.
 
 
-This message has no fields defined.
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The settlement amount in USD that the pay-in provider owes the beneficiary provider for this payment intent. Locked from the chosen quote at confirm-time as (payment_amount / rate) − fix. |
+| rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/<pay-in currency> exchange rate locked in for this settlement. Matches the rate forwarded to the beneficiary in PaymentIntentUpdate.FundsReceived. |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Flat USD charge retained by the pay-in provider per transfer, already subtracted from settlement_amount. Surfaced so the pay-in provider can audit the settlement formula: settlement = (payment_amount / rate) − fix. |
+
 
 
 
@@ -379,6 +384,7 @@ This message has no fields defined.
 | REJECT_REASON_PROVIDER_NOT_ALLOWED | 30 |  |
 | REJECT_REASON_AMOUNT_TOO_SMALL | 40 | The pay-in amount would yield a zero or negative beneficiary settlement (pay_in / rate − fix) at every active quote. |
 | REJECT_REASON_NO_VALID_OFFER | 50 | The (pay-in provider, payment method) tuple was not offered on this intent. Either the intent was rejected during creation, or this provider's GetPaymentDetails response was invalid for the requested method. |
+| REJECT_REASON_TRANSACTION_REFERENCE_ALREADY_USED | 60 | Transaction_reference is already attached to a different pay-in with the same payment_method. References must be unique per payment_method; retry with a fresh transaction_reference, or treat the prior pay-in as the authoritative confirmation. |
 
 
 

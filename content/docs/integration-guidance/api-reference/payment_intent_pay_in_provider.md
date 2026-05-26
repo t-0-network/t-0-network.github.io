@@ -48,6 +48,7 @@ Request for payment details.
 | currency | [string](../scalar/#string) |  | The currency for the pay-in. ISO 4217 currency code (e.g., "EUR", "GBP", "KES"). |
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The amount to be paid in the specified currency. |
 | travel_rule | [GetPaymentDetailsRequest.TravelRuleData](#tzero-v1-payment_intent-GetPaymentDetailsRequest-TravelRuleData) |  | Travel rule data for this payment |
+| beneficiary_provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the beneficiary provider (the FI the funds are destined for). Stable, opaque identifier — pay-in providers can use this directly to resolve the beneficiary in their own systems. |
 
 
 
