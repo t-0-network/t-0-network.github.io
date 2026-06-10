@@ -137,7 +137,7 @@ Travel rule data containing originator information.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | The natural or legal person or legal arrangement who is identified as the receiver of the requested payment. |
-| payer | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | Optional travel rule data of the payer |
+| payer | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | no validation: ivms101.Person opaque to protovalidate; structural checks delegated to travel-rule layer |
 
 
 
@@ -306,10 +306,14 @@ Contains the payment method, provider info, payment details, and indicative exch
 ### UpdateQuoteRequest
 Base currency is always USD, so the quotes are always in USD/currency format.
 
+*
+Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the
+unique client_quote_id for each band.
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_quotes | [UpdateQuoteRequest.Quote](#tzero-v1-payment_intent-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
+| payment_intent_quotes | [UpdateQuoteRequest.Quote](#tzero-v1-payment_intent-UpdateQuoteRequest-Quote) | repeated | no validation: zero items is valid — empty list withdraws all quotes for this provider |
 
 
 

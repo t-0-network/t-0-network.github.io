@@ -46,6 +46,14 @@ toc: true
 | colombian_ach | [PaymentDetails.ColombianAch](#tzero-v1-common-PaymentDetails-ColombianAch) |  | Colombian ACH bank transfer Colombia |
 | colombian_breb | [PaymentDetails.ColombianBreb](#tzero-v1-common-PaymentDetails-ColombianBreb) |  | Colombian Bre-B high-speed payment rail Colombia |
 | gip | [PaymentDetails.Gip](#tzero-v1-common-PaymentDetails-Gip) |  | GIP - Ghana Interbank Payment (GhIPSS) Ghana |
+| uaefts | [PaymentDetails.Uaefts](#tzero-v1-common-PaymentDetails-Uaefts) |  | UAEFTS - UAE Funds Transfer System United Arab Emirates |
+| vietqr | [PaymentDetails.VietQr](#tzero-v1-common-PaymentDetails-VietQr) |  | VietQR - QR-addressed bank transfer Vietnam |
+| napas | [PaymentDetails.Napas](#tzero-v1-common-PaymentDetails-Napas) |  | NAPAS 247 - instant transfer by account or card Vietnam |
+| fast | [PaymentDetails.Fast](#tzero-v1-common-PaymentDetails-Fast) |  | FAST - instant payment via IBAN or KOLAS proxy Turkey |
+| promptpay | [PaymentDetails.PromptPay](#tzero-v1-common-PaymentDetails-PromptPay) |  | PromptPay - proxy-addressed instant transfer Thailand |
+| thai_bank_transfer | [PaymentDetails.ThaiBankTransfer](#tzero-v1-common-PaymentDetails-ThaiBankTransfer) |  | Thai domestic bank transfer (ORFT/BAHTNET) Thailand |
+| indonesian_bank_transfer | [PaymentDetails.IndonesianBankTransfer](#tzero-v1-common-PaymentDetails-IndonesianBankTransfer) |  | Indonesian domestic bank transfer (BI-FAST and other rails) Indonesia |
+| indonesian_e_wallet | [PaymentDetails.IndonesianEWallet](#tzero-v1-common-PaymentDetails-IndonesianEWallet) |  | Indonesian e-wallet Indonesia |
 
 
 
@@ -250,6 +258,42 @@ Same fields as ColombianAch except no phone_number.
 
 
 
+<a name="tzero-v1-common-PaymentDetails-Fast"></a>
+
+### PaymentDetails.Fast
+FAST - Turkish instant payment system. Addressed by IBAN or a KOLAS proxy.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| iban | [string](../scalar/#string) |  | Turkish IBAN (26 characters: TR + 24 digits). |
+| proxy | [PaymentDetails.Fast.Proxy](#tzero-v1-common-PaymentDetails-Fast-Proxy) |  | KOLAS proxy (mobile / email / national ID / passport). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Fast-Proxy"></a>
+
+### PaymentDetails.Fast.Proxy
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| proxy_type | [PaymentDetails.Fast.Proxy.ProxyType](#tzero-v1-common-PaymentDetails-Fast-Proxy-ProxyType) |  | KOLAS proxy type - determines the format of value. |
+| value | [string](../scalar/#string) |  | KOLAS proxy value; format depends on proxy_type: - MOBILE: international format (e.g. "+905XXXXXXXXX") - EMAIL: valid email address - NATIONAL_ID: Turkish national ID number - PASSPORT: passport number |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Fps"></a>
 
 ### PaymentDetails.Fps
@@ -361,6 +405,63 @@ Method 2: IMPS P2P (Mobile + MMID)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-IndonesianBankTransfer"></a>
+
+### PaymentDetails.IndonesianBankTransfer
+Indonesian domestic bank transfer (BI-FAST and other rails). Addressed by
+account number, or by a BI-FAST proxy (mobile / email).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| account | [PaymentDetails.IndonesianBankTransfer.Account](#tzero-v1-common-PaymentDetails-IndonesianBankTransfer-Account) |  | Bank account (Indonesian bank code + account number). |
+| mobile | [string](../scalar/#string) |  | BI-FAST proxy: mobile number (international format). |
+| email | [string](../scalar/#string) |  | BI-FAST proxy: email address. |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-IndonesianBankTransfer-Account"></a>
+
+### PaymentDetails.IndonesianBankTransfer.Account
+
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bank_code | [string](../scalar/#string) |  | Indonesian bank code. |
+| account_number | [string](../scalar/#string) |  | Beneficiary account number. |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-IndonesianEWallet"></a>
+
+### PaymentDetails.IndonesianEWallet
+Indonesian e-wallet transfer (GoPay, OVO, DANA, ShopeePay, LinkAja, etc.).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| provider | [string](../scalar/#string) |  | E-wallet provider name (e.g. GoPay, OVO, DANA, ShopeePay, LinkAja). |
+| mobile_number | [string](../scalar/#string) |  | Indonesian mobile number linked to the wallet (international format). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Instapay"></a>
 
 ### PaymentDetails.Instapay
@@ -410,6 +511,26 @@ RFC of the beneficiary is carried in Travel Rule Data, not here.
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary full name. |
 | bank_code | [string](../scalar/#string) |  | Bank institution code. |
 | account_number | [string](../scalar/#string) |  | CLABE (Clave Bancaria Estandarizada) - exactly 18 digits. Format: 3 digits bank code + 3 digits plaza code + 11 digits account + 1 check digit. |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Napas"></a>
+
+### PaymentDetails.Napas
+NAPAS 247 - Vietnamese instant transfer addressed by account number or card number.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bank_bin | [string](../scalar/#string) |  | NAPAS bank identifier (6 digits). |
+| account_number | [string](../scalar/#string) |  | Account number (up to 19 digits). |
+| card_number | [string](../scalar/#string) |  | Card number (16-19 digits). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
 
 
 
@@ -540,6 +661,25 @@ or traditional bank account details (bank code, branch, account number)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-PromptPay"></a>
+
+### PaymentDetails.PromptPay
+PromptPay - Thai instant transfer addressed by a registered proxy.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| proxy_type | [PaymentDetails.PromptPay.ProxyType](#tzero-v1-common-PaymentDetails-PromptPay-ProxyType) |  | Proxy type - determines the format of identifier. |
+| identifier | [string](../scalar/#string) |  | Proxy value; format depends on proxy_type: - MOBILE: Thai mobile number - NATIONAL_ID: 13-digit Thai national ID - TAX_ID: Thai tax identification number |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Rtp"></a>
 
 ### PaymentDetails.Rtp
@@ -614,6 +754,64 @@ Intermediary bank details (optional)
 | swift_code | [string](../scalar/#string) |  |  |
 | bank_name | [string](../scalar/#string) |  |  |
 | account_number | [string](../scalar/#string) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-ThaiBankTransfer"></a>
+
+### PaymentDetails.ThaiBankTransfer
+Thai domestic bank transfer (ORFT online transfer, BAHTNET RTGS).
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bank_code | [string](../scalar/#string) |  | Thai bank code. |
+| account_number | [string](../scalar/#string) |  | Beneficiary account number (up to 15 digits). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-Uaefts"></a>
+
+### PaymentDetails.Uaefts
+UAEFTS - UAE Funds Transfer System operated by the Central Bank of the UAE.
+Domestic transfers addressed by IBAN.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| iban | [string](../scalar/#string) |  | UAE IBAN (23 characters: AE + 2 check digits + 19 digits). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| purpose_code | [string](../scalar/#string) |  | CBUAE purpose-of-payment code (3 uppercase letters). Format-checked only; the code list changes regularly and is intentionally not validated here. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
+
+
+
+
+
+
+
+<a name="tzero-v1-common-PaymentDetails-VietQr"></a>
+
+### PaymentDetails.VietQr
+VietQR - Vietnamese bank transfer addressed by a resolved QR code.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| bank_bin | [string](../scalar/#string) |  | NAPAS bank identifier (6 digits). |
+| account_number | [string](../scalar/#string) |  | Beneficiary account number (up to 19 digits). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
 
 
 
@@ -727,6 +925,21 @@ Intermediary bank details (optional)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-Fast-Proxy-ProxyType"></a>
+
+### PaymentDetails.Fast.Proxy.ProxyType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PROXY_TYPE_UNSPECIFIED | 0 |  |
+| PROXY_TYPE_MOBILE | 10 | Mobile phone number |
+| PROXY_TYPE_EMAIL | 20 | Email address |
+| PROXY_TYPE_NATIONAL_ID | 30 | National ID number |
+| PROXY_TYPE_PASSPORT | 40 | Passport number |
+
+
+
 <a name="tzero-v1-common-PaymentDetails-PakistanMobileWallet-PakistanWalletProvider"></a>
 
 ### PaymentDetails.PakistanMobileWallet.PakistanWalletProvider
@@ -786,6 +999,20 @@ Intermediary bank details (optional)
 
 
 
+<a name="tzero-v1-common-PaymentDetails-PromptPay-ProxyType"></a>
+
+### PaymentDetails.PromptPay.ProxyType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| PROXY_TYPE_UNSPECIFIED | 0 |  |
+| PROXY_TYPE_MOBILE | 10 | Mobile phone number |
+| PROXY_TYPE_NATIONAL_ID | 20 | National ID number (13 digits) |
+| PROXY_TYPE_TAX_ID | 30 | Tax identification number |
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Rtp-RtpAccountType"></a>
 
 ### PaymentDetails.Rtp.RtpAccountType
@@ -831,6 +1058,14 @@ Intermediary bank details (optional)
 | PAYMENT_METHOD_TYPE_COLOMBIAN_ACH | 240 | Colombian ACH bank transfer (COP) |
 | PAYMENT_METHOD_TYPE_COLOMBIAN_BREB | 250 | Colombian Bre-B high-speed payment rail (COP) |
 | PAYMENT_METHOD_TYPE_GIP | 260 | GIP - Ghana Interbank Payment (GhIPSS) |
+| PAYMENT_METHOD_TYPE_UAEFTS | 270 | UAEFTS - UAE Funds Transfer System (United Arab Emirates) |
+| PAYMENT_METHOD_TYPE_VIETQR | 280 | VietQR - Vietnamese QR-addressed bank transfer |
+| PAYMENT_METHOD_TYPE_NAPAS | 290 | NAPAS 247 - Vietnamese instant transfer by account or card |
+| PAYMENT_METHOD_TYPE_FAST | 300 | FAST - Turkish instant payment system (Turkey) |
+| PAYMENT_METHOD_TYPE_PROMPTPAY | 310 | PromptPay - Thai proxy-addressed instant transfer (Thailand) |
+| PAYMENT_METHOD_TYPE_THAI_BANK_TRANSFER | 320 | Thai domestic bank transfer - ORFT/BAHTNET (Thailand) |
+| PAYMENT_METHOD_TYPE_INDONESIAN_BANK_TRANSFER | 330 | Indonesian domestic bank transfer - BI-FAST and other rails (Indonesia) |
+| PAYMENT_METHOD_TYPE_INDONESIAN_E_WALLET | 340 | Indonesian e-wallet - GoPay, OVO, DANA, ShopeePay, LinkAja, etc. (Indonesia) |
 
 
  <!-- end enums -->
