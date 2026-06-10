@@ -66,7 +66,7 @@ Request for payment details.
 | ----- | ---- | ----- | ----------- |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | The natural or legal person or legal arrangement who is identified by the beneficiary provider as the receiver of the requested payment. |
 | beneficiary_provider | [ivms101.LegalPerson](../ivms_ivms101/#ivms101-LegalPerson) |  | Beneficiary provider travel rule data. |
-| payer | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | Optional travel rule data of the payer |
+| payer | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | no validation: ivms101.Person opaque to protovalidate; structural checks delegated to travel-rule layer |
 
 
 

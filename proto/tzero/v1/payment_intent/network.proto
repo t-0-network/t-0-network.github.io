@@ -74,6 +74,7 @@ message UpdateQuoteRequest {
    * Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the
    * unique client_quote_id for each band.
    */
+  // no validation: zero items is valid — empty list withdraws all quotes for this provider
   repeated Quote payment_intent_quotes = 10;
 
   message Quote {
@@ -84,7 +85,10 @@ message UpdateQuoteRequest {
     }];
 
     // Payment method must be specified
-    tzero.v1.common.PaymentMethodType payment_method = 25 [(buf.validate.field).required = true];
+    tzero.v1.common.PaymentMethodType payment_method = 25 [(buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }];
 
     // list of bands for this quote
     repeated Band bands = 30 [(buf.validate.field).repeated = {min_items: 1}];
@@ -200,7 +204,10 @@ message GetQuoteResponse {
       /**
        * The payment method type (e.g., SEPA, SWIFT, mobile money).
        */
-      tzero.v1.common.PaymentMethodType payment_method = 10;
+      tzero.v1.common.PaymentMethodType payment_method = 10 [(buf.validate.field).enum = {
+        defined_only: true
+        not_in: [0]
+      }];
 
       /**
        * The T-0 provider ID of the pay-in provider offering this quote.
@@ -226,10 +233,13 @@ message GetQuoteResponse {
        * Settlement is calculated as (amount / indicative_rate) - indicative_fix.
        * Indicative only: the actual fix is locked in at ConfirmFundsReceived time.
        */
-      tzero.v1.common.Decimal indicative_fix = 40 [(buf.validate.field).cel = {
-        message: "indicative_fix must be non-negative"
-        expression: "this.unscaled >= 0"
-      }];
+      tzero.v1.common.Decimal indicative_fix = 40 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).cel = {
+          message: "indicative_fix must be non-negative"
+          expression: "this.unscaled >= 0"
+        }
+      ];
     }
   }
 
@@ -248,7 +258,10 @@ message PaymentIntentPayInDetails {
    * The payment method type (e.g., SEPA, SWIFT, mobile money).
    * Determines which payment details format is provided.
    */
-  tzero.v1.common.PaymentMethodType payment_method = 10;
+  tzero.v1.common.PaymentMethodType payment_method = 10 [(buf.validate.field).enum = {
+    defined_only: true
+    not_in: [0]
+  }];
 
   /**
    * The T-0 provider ID of the pay-in provider offering this quote.
@@ -261,7 +274,7 @@ message PaymentIntentPayInDetails {
    * Contains bank account info, mobile money details, etc. based on payment_method.
    * This should be displayed to the end-user to complete their payment.
    */
-  tzero.v1.common.PaymentDetails payment_details = 30;
+  tzero.v1.common.PaymentDetails payment_details = 30 [(buf.validate.field).required = true];
 
   /**
    * Indicative exchange rate USD/XXX (base currency is always USD).
@@ -286,10 +299,13 @@ message PaymentIntentPayInDetails {
    * including idempotent retries. The binding fix is locked in at
    * ConfirmFundsReceived and may differ.
    */
-  tzero.v1.common.Decimal indicative_fix = 50 [(buf.validate.field).cel = {
-    message: "indicative_fix must be non-negative"
-    expression: "this.unscaled >= 0"
-  }];
+  tzero.v1.common.Decimal indicative_fix = 50 [
+    (buf.validate.field).required = true,
+    (buf.validate.field).cel = {
+      message: "indicative_fix must be non-negative"
+      expression: "this.unscaled >= 0"
+    }
+  ];
 }
 
 /**
@@ -354,6 +370,7 @@ message CreatePaymentIntentRequest {
     /**
      * Optional travel rule data of the payer
      */
+    // no validation: ivms101.Person opaque to protovalidate; structural checks delegated to travel-rule layer
     optional ivms101.Person payer = 40;
   }
 }
