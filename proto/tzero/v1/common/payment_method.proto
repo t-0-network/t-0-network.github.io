@@ -2,7 +2,6 @@ syntax = "proto3";
 
 package tzero.v1.common;
 
-import "tzero/v1/common/common.proto";
 import "buf/validate/validate.proto";
 import "google/protobuf/descriptor.proto";
 
@@ -47,6 +46,22 @@ enum PaymentMethodType {
   PAYMENT_METHOD_TYPE_COLOMBIAN_BREB = 250;
   // GIP - Ghana Interbank Payment (GhIPSS)
   PAYMENT_METHOD_TYPE_GIP = 260;
+  // UAEFTS - UAE Funds Transfer System (United Arab Emirates)
+  PAYMENT_METHOD_TYPE_UAEFTS = 270;
+  // VietQR - Vietnamese QR-addressed bank transfer
+  PAYMENT_METHOD_TYPE_VIETQR = 280;
+  // NAPAS 247 - Vietnamese instant transfer by account or card
+  PAYMENT_METHOD_TYPE_NAPAS = 290;
+  // FAST - Turkish instant payment system (Turkey)
+  PAYMENT_METHOD_TYPE_FAST = 300;
+  // PromptPay - Thai proxy-addressed instant transfer (Thailand)
+  PAYMENT_METHOD_TYPE_PROMPTPAY = 310;
+  // Thai domestic bank transfer - ORFT/BAHTNET (Thailand)
+  PAYMENT_METHOD_TYPE_THAI_BANK_TRANSFER = 320;
+  // Indonesian domestic bank transfer - BI-FAST and other rails (Indonesia)
+  PAYMENT_METHOD_TYPE_INDONESIAN_BANK_TRANSFER = 330;
+  // Indonesian e-wallet - GoPay, OVO, DANA, ShopeePay, LinkAja, etc. (Indonesia)
+  PAYMENT_METHOD_TYPE_INDONESIAN_E_WALLET = 340;
 }
 
 message PaymentDetails {
@@ -145,6 +160,38 @@ message PaymentDetails {
     // GIP - Ghana Interbank Payment (GhIPSS)
     // Ghana
     Gip gip = 260;
+
+    // UAEFTS - UAE Funds Transfer System
+    // United Arab Emirates
+    Uaefts uaefts = 270;
+
+    // VietQR - QR-addressed bank transfer
+    // Vietnam
+    VietQr vietqr = 280;
+
+    // NAPAS 247 - instant transfer by account or card
+    // Vietnam
+    Napas napas = 290;
+
+    // FAST - instant payment via IBAN or KOLAS proxy
+    // Turkey
+    Fast fast = 300;
+
+    // PromptPay - proxy-addressed instant transfer
+    // Thailand
+    PromptPay promptpay = 310;
+
+    // Thai domestic bank transfer (ORFT/BAHTNET)
+    // Thailand
+    ThaiBankTransfer thai_bank_transfer = 320;
+
+    // Indonesian domestic bank transfer (BI-FAST and other rails)
+    // Indonesia
+    IndonesianBankTransfer indonesian_bank_transfer = 330;
+
+    // Indonesian e-wallet
+    // Indonesia
+    IndonesianEWallet indonesian_e_wallet = 340;
   };
 
   message Sepa {
@@ -1101,6 +1148,316 @@ message PaymentDetails {
 
     // Payment reference/description (optional).
     string reference = 40 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+  }
+
+  // UAEFTS - UAE Funds Transfer System operated by the Central Bank of the UAE.
+  // Domestic transfers addressed by IBAN.
+  message Uaefts {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_UAEFTS;
+
+    // UAE IBAN (23 characters: AE + 2 check digits + 19 digits).
+    string iban = 10 [(buf.validate.field).string = {
+      len: 23,
+      pattern: "^AE[0-9]{21}$"
+    }];
+
+    // Beneficiary's full name.
+    string beneficiary_name = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // CBUAE purpose-of-payment code (3 uppercase letters). Format-checked only;
+    // the code list changes regularly and is intentionally not validated here.
+    string purpose_code = 30 [(buf.validate.field).string = {
+      len: 3,
+      pattern: "^[A-Z]{3}$"
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 40 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+  }
+
+  // VietQR - Vietnamese bank transfer addressed by a resolved QR code.
+  message VietQr {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_VIETQR;
+
+    // NAPAS bank identifier (6 digits).
+    string bank_bin = 10 [(buf.validate.field).string = {
+      len: 6,
+      pattern: "^[0-9]{6}$"
+    }];
+
+    // Beneficiary account number (up to 19 digits).
+    string account_number = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 19,
+      pattern: "^[0-9]{1,19}$"
+    }];
+
+    // Beneficiary's full name.
+    string beneficiary_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 40 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+  }
+
+  // NAPAS 247 - Vietnamese instant transfer addressed by account number or card number.
+  message Napas {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_NAPAS;
+
+    // NAPAS bank identifier (6 digits).
+    string bank_bin = 10 [(buf.validate.field).string = {
+      len: 6,
+      pattern: "^[0-9]{6}$"
+    }];
+
+    oneof destination {
+      option (buf.validate.oneof).required = true;
+
+      // Account number (up to 19 digits).
+      string account_number = 20 [(buf.validate.field).string = {
+        min_len: 1,
+        max_len: 19,
+        pattern: "^[0-9]{1,19}$"
+      }];
+
+      // Card number (16-19 digits).
+      string card_number = 30 [(buf.validate.field).string = {
+        min_len: 16,
+        max_len: 19,
+        pattern: "^[0-9]{16,19}$"
+      }];
+    }
+
+    // Beneficiary's full name.
+    string beneficiary_name = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 50 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+  }
+
+  // FAST - Turkish instant payment system. Addressed by IBAN or a KOLAS proxy.
+  message Fast {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_FAST;
+
+    oneof destination {
+      option (buf.validate.oneof).required = true;
+
+      // Turkish IBAN (26 characters: TR + 24 digits).
+      string iban = 10 [(buf.validate.field).string = {
+        len: 26,
+        pattern: "^TR[0-9]{24}$"
+      }];
+
+      // KOLAS proxy (mobile / email / national ID / passport).
+      Proxy proxy = 20;
+    }
+
+    // Beneficiary's full name.
+    string beneficiary_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 40 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+
+    message Proxy {
+      // KOLAS proxy type - determines the format of value.
+      ProxyType proxy_type = 10 [(buf.validate.field).enum = {
+        defined_only: true,
+        not_in: [0]
+      }];
+
+      // KOLAS proxy value; format depends on proxy_type:
+      // - MOBILE: international format (e.g. "+905XXXXXXXXX")
+      // - EMAIL: valid email address
+      // - NATIONAL_ID: Turkish national ID number
+      // - PASSPORT: passport number
+      string value = 20 [(buf.validate.field).string = {
+        min_len: 1,
+        max_len: 140
+      }];
+
+      enum ProxyType {
+        PROXY_TYPE_UNSPECIFIED = 0;
+        // Mobile phone number
+        PROXY_TYPE_MOBILE = 10;
+        // Email address
+        PROXY_TYPE_EMAIL = 20;
+        // National ID number
+        PROXY_TYPE_NATIONAL_ID = 30;
+        // Passport number
+        PROXY_TYPE_PASSPORT = 40;
+      }
+    }
+  }
+
+  // PromptPay - Thai instant transfer addressed by a registered proxy.
+  message PromptPay {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_PROMPTPAY;
+
+    // Proxy type - determines the format of identifier.
+    ProxyType proxy_type = 10 [(buf.validate.field).enum = {
+      defined_only: true,
+      not_in: [0]
+    }];
+
+    // Proxy value; format depends on proxy_type:
+    // - MOBILE: Thai mobile number
+    // - NATIONAL_ID: 13-digit Thai national ID
+    // - TAX_ID: Thai tax identification number
+    string identifier = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Beneficiary's full name.
+    string beneficiary_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 40 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+
+    enum ProxyType {
+      PROXY_TYPE_UNSPECIFIED = 0;
+      // Mobile phone number
+      PROXY_TYPE_MOBILE = 10;
+      // National ID number (13 digits)
+      PROXY_TYPE_NATIONAL_ID = 20;
+      // Tax identification number
+      PROXY_TYPE_TAX_ID = 30;
+    }
+  }
+
+  // Thai domestic bank transfer (ORFT online transfer, BAHTNET RTGS).
+  message ThaiBankTransfer {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_THAI_BANK_TRANSFER;
+
+    // Thai bank code.
+    string bank_code = 10 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 10
+    }];
+
+    // Beneficiary account number (up to 15 digits).
+    string account_number = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 15,
+      pattern: "^[0-9]{1,15}$"
+    }];
+
+    // Beneficiary's full name.
+    string beneficiary_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 40 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+  }
+
+  // Indonesian domestic bank transfer (BI-FAST and other rails). Addressed by
+  // account number, or by a BI-FAST proxy (mobile / email).
+  message IndonesianBankTransfer {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_INDONESIAN_BANK_TRANSFER;
+
+    oneof destination {
+      option (buf.validate.oneof).required = true;
+
+      // Bank account (Indonesian bank code + account number).
+      Account account = 10;
+
+      // BI-FAST proxy: mobile number (international format).
+      string mobile = 20 [(buf.validate.field).string = {
+        min_len: 8,
+        max_len: 16,
+        pattern: "^[+]?[0-9]{8,15}$"
+      }];
+
+      // BI-FAST proxy: email address.
+      string email = 30 [(buf.validate.field).string = {
+        email: true,
+        max_len: 254
+      }];
+    }
+
+    // Beneficiary's full name.
+    string beneficiary_name = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 50 [(buf.validate.field).string = {
+      max_len: 140
+    }];
+
+    message Account {
+      // Indonesian bank code.
+      string bank_code = 10 [(buf.validate.field).string = {
+        min_len: 1,
+        max_len: 10
+      }];
+
+      // Beneficiary account number.
+      string account_number = 20 [(buf.validate.field).string = {
+        min_len: 1,
+        max_len: 20,
+        pattern: "^[0-9]+$"
+      }];
+    }
+  }
+
+  // Indonesian e-wallet transfer (GoPay, OVO, DANA, ShopeePay, LinkAja, etc.).
+  message IndonesianEWallet {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_INDONESIAN_E_WALLET;
+
+    // E-wallet provider name (e.g. GoPay, OVO, DANA, ShopeePay, LinkAja).
+    string provider = 10 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 30,
+      pattern: "^[A-Za-z0-9 ]+$"
+    }];
+
+    // Indonesian mobile number linked to the wallet (international format).
+    string mobile_number = 20 [(buf.validate.field).string = {
+      min_len: 8,
+      max_len: 16,
+      pattern: "^[+]?[0-9]{8,15}$"
+    }];
+
+    // Beneficiary's full name.
+    string beneficiary_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    // Payment reference/description (optional).
+    optional string payment_reference = 40 [(buf.validate.field).string = {
       max_len: 140
     }];
   }
