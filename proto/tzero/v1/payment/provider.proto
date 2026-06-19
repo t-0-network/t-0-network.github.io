@@ -86,6 +86,7 @@ message AppendLedgerEntriesRequest {
       Payout payout = 130;
       ProviderSettlement provider_settlement = 140;
       FeeSettlement fee_settlement = 150;
+      PiFundsReceived pi_funds_received = 160;
     };
 
     message Payout {
@@ -98,6 +99,25 @@ message AppendLedgerEntriesRequest {
 
     message FeeSettlement {
       uint64 fee_settlement_id = 10 [(buf.validate.field).uint64.gt = 0];
+    }
+
+    /**
+     * Funds were received from the payer by the pay-in provider, creating the
+     * inter-provider obligation to settle. The descriptor fields mirror values
+     * the entries already encode; the entries remain authoritative for balances.
+     * Only payment_intent_id is guaranteed non-zero; the remaining descriptor
+     * fields may be zero-valued.
+     */
+    message PiFundsReceived {
+      uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
+      uint32 pay_in_provider_id = 20;
+      uint32 beneficiary_provider_id = 30;
+      // no validation: descriptor mirror of the entries, which are authoritative for balances
+      tzero.v1.common.Decimal settlement_amount = 40;
+      // no validation: descriptor mirror of the entries, which are authoritative for balances
+      tzero.v1.common.Decimal beneficiary_fee = 50;
+      // no validation: descriptor mirror of the entries, which are authoritative for balances
+      tzero.v1.common.Decimal pay_in_fee = 60;
     }
   }
 

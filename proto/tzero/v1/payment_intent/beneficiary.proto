@@ -85,7 +85,6 @@ message PaymentIntentUpdateRequest {
     /**
      * Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id), forwarded from ConfirmFundsReceived.
      * Reconcile against your records; serves as the anchor for dispute resolution.
-     * See docs/tech/TRANSACTION_REFERENCE.md.
      */
     string transaction_reference = 50 [(buf.validate.field).string = {
       min_len: 1

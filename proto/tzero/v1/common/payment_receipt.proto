@@ -28,6 +28,8 @@ message PaymentReceipt {
   }
 
   message Swift {
+    // SWIFT end-to-end transaction reference (UETR), a UUID.
+    optional string uetr = 10 [(buf.validate.field).string.uuid = true];
   }
 
   message Pix {
