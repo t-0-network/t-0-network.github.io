@@ -104,7 +104,10 @@ toc: true
 
 
 
-This message has no fields defined.
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| uetr | [string](../scalar/#string) | optional | SWIFT end-to-end transaction reference (UETR), a UUID. |
+
 
 
 

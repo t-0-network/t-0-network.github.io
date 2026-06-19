@@ -362,7 +362,7 @@ Domestic bank transfers using a bank sort code and account number.
 | account_ifsc | [PaymentDetails.IndianBankTransfer.AccountIFSC](#tzero-v1-common-PaymentDetails-IndianBankTransfer-AccountIFSC) |  | 1) ACCOUNT + IFSC (NEFT/RTGS/IMPS P2A) |
 | imps | [PaymentDetails.IndianBankTransfer.IMPS](#tzero-v1-common-PaymentDetails-IndianBankTransfer-IMPS) |  | 2) IMPS P2P (MOBILE + MMID) |
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary name |
-| beneficiary_type | [string](../scalar/#string) |  | Beneficiary type |
+| beneficiary_type | [PaymentDetails.IndianBankTransfer.BeneficiaryType](#tzero-v1-common-PaymentDetails-IndianBankTransfer-BeneficiaryType) |  | Whether the beneficiary is an individual or a company. INR payout rails always require the distinction. |
 | payment_reference | [string](../scalar/#string) |  |  |
 
 
@@ -937,6 +937,19 @@ VietQR - Vietnamese bank transfer addressed by a resolved QR code.
 | PROXY_TYPE_EMAIL | 20 | Email address |
 | PROXY_TYPE_NATIONAL_ID | 30 | National ID number |
 | PROXY_TYPE_PASSPORT | 40 | Passport number |
+
+
+
+<a name="tzero-v1-common-PaymentDetails-IndianBankTransfer-BeneficiaryType"></a>
+
+### PaymentDetails.IndianBankTransfer.BeneficiaryType
+
+
+| Name | Number | Description |
+| ---- | ------ | ----------- |
+| BENEFICIARY_TYPE_UNSPECIFIED | 0 |  |
+| BENEFICIARY_TYPE_INDIVIDUAL | 10 | Natural person. |
+| BENEFICIARY_TYPE_COMPANY | 20 | Business entity. |
 
 
 
