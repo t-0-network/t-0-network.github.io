@@ -78,6 +78,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | payout | [AppendLedgerEntriesRequest.Transaction.Payout](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-Payout) |  |  |
 | provider_settlement | [AppendLedgerEntriesRequest.Transaction.ProviderSettlement](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-ProviderSettlement) |  |  |
 | fee_settlement | [AppendLedgerEntriesRequest.Transaction.FeeSettlement](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-FeeSettlement) |  |  |
+| pi_funds_received | [AppendLedgerEntriesRequest.Transaction.PiFundsReceived](#tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PiFundsReceived) |  |  |
 
 
 
@@ -110,6 +111,31 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_id | [uint64](../scalar/#uint64) |  |  |
+
+
+
+
+
+
+
+<a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PiFundsReceived"></a>
+
+### AppendLedgerEntriesRequest.Transaction.PiFundsReceived
+Funds were received from the payer by the pay-in provider, creating the
+inter-provider obligation to settle. The descriptor fields mirror values
+the entries already encode; the entries remain authoritative for balances.
+Only payment_intent_id is guaranteed non-zero; the remaining descriptor
+fields may be zero-valued.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payment_intent_id | [uint64](../scalar/#uint64) |  |  |
+| pay_in_provider_id | [uint32](../scalar/#uint32) |  |  |
+| beneficiary_provider_id | [uint32](../scalar/#uint32) |  |  |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | no validation: descriptor mirror of the entries, which are authoritative for balances |
+| beneficiary_fee | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | no validation: descriptor mirror of the entries, which are authoritative for balances |
+| pay_in_fee | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | no validation: descriptor mirror of the entries, which are authoritative for balances |
 
 
 

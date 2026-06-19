@@ -473,7 +473,6 @@ message ConfirmFundsReceivedRequest {
   /**
    * Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id) — do not generate.
    * Forwarded to the beneficiary for end-to-end tracking and dispute resolution.
-   * See docs/tech/TRANSACTION_REFERENCE.md.
    */
   string transaction_reference = 40 [(buf.validate.field).string = {
     min_len: 1

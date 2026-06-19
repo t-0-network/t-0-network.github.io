@@ -389,15 +389,24 @@ message PaymentDetails {
       max_len: 70
     }];
 
-    // Beneficiary type
-    string beneficiary_type = 40 [(buf.validate.field).string = {
-      min_len: 8,
-      max_len: 30
+    // Whether the beneficiary is an individual or a company.
+    // INR payout rails always require the distinction.
+    BeneficiaryType beneficiary_type = 40 [(buf.validate.field).enum = {
+      defined_only: true,
+      not_in: [0]
     }];
 
     string payment_reference = 50 [(buf.validate.field).string = {
       max_len: 140,
     }];
+
+    enum BeneficiaryType {
+      BENEFICIARY_TYPE_UNSPECIFIED = 0;
+      // Natural person.
+      BENEFICIARY_TYPE_INDIVIDUAL = 10;
+      // Business entity.
+      BENEFICIARY_TYPE_COMPANY = 20;
+    }
   }
 
   message Swift {

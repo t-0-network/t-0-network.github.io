@@ -62,7 +62,7 @@ Notification that funds were received from the payer by pay-in provider.
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The exchange rate used for settlement. |
 | payment_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The fiat amount received from the end-user. Matches the amount originally requested in CreatePaymentIntent. |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used for the pay-in |
-| transaction_reference | [string](../scalar/#string) |  | Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id), forwarded from ConfirmFundsReceived. Reconcile against your records; serves as the anchor for dispute resolution. See docs/tech/TRANSACTION_REFERENCE.md. |
+| transaction_reference | [string](../scalar/#string) |  | Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id), forwarded from ConfirmFundsReceived. Reconcile against your records; serves as the anchor for dispute resolution. |
 | travel_rule_data | [PaymentIntentUpdateRequest.FundsReceived.TravelRuleData](#tzero-v1-payment_intent-PaymentIntentUpdateRequest-FundsReceived-TravelRuleData) |  | Travel rule data of the pay-in provider's legal entity that received the funds. Present when the pay-in provider has registered travel rule data. |
 | fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Flat USD surcharge retained by the pay-in provider per transfer. Already subtracted from settlement_amount. Surface to beneficiaries that need to audit the settlement math: settlement = (payment_amount / rate) - fix. |
 
