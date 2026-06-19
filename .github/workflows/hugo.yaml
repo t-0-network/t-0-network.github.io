@@ -19,6 +19,10 @@ jobs:
     runs-on: blacksmith-2vcpu-ubuntu-2404
     env:
       HUGO_VERSION: 0.157.0
+      # Force module fetches through the public proxy. The Blacksmith runner's
+      # GOPROXY otherwise falls through to direct git against the flaky gopkg.in
+      # (502s), which protoc-gen-doc's legacy deps still resolve from.
+      GOPROXY: https://proxy.golang.org,direct
     steps:
       - name: Install Hugo CLI
         run: |
