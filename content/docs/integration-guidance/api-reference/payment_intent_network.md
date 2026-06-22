@@ -20,13 +20,11 @@ Payment Intent is a flow where:
 3. Pay-in provider confirms funds received
 4. Settlement will happen periodically between providers
 
-This service is hosted by the T-0 Network and called by providers.
-
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment_intent-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment_intent-UpdateQuoteResponse) | Atomically replaces the calling provider's full pay-in quote set. An empty payment_intent_quotes withdraws all of this provider's quotes. |
 | GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-GetQuoteResponse) | GetQuote returns available quotes for a given currency and amount.  Use this to check indicative rates before creating a payment intent. The returned quotes show which providers can accept pay-ins and their current rates.  Note: Quotes are indicative only. The actual rate used for settlement is determined at the time of ConfirmFundsReceived. |
-| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-CreatePaymentIntentResponse) | CreatePaymentIntent initiates a new payment intent.  Called by the beneficiary provider (the one who will receive the settlement). The network finds suitable pay-in providers, retrieves their payment details, and returns available payment options to present to the end-user.  The returned payment_intent_id must be stored by the beneficiary provider to correlate with the PaymentIntentUpdate notification received later.  Idempotency: Multiple calls with the same external_reference return the same payment_intent_id. |
+| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-CreatePaymentIntentResponse) | CreatePaymentIntent initiates a new payment intent.  Returns the available payment options to present to the end-user.  The returned payment_intent_id must be stored by the beneficiary provider to correlate with the PaymentIntentUpdate notification received later.  Idempotency: Multiple calls with the same external_reference return the same payment_intent_id. |
 | ConfirmFundsReceived | [ConfirmFundsReceivedRequest](#tzero-v1-payment_intent-ConfirmFundsReceivedRequest) | [ConfirmFundsReceivedResponse](#tzero-v1-payment_intent-ConfirmFundsReceivedResponse) | Confirms funds landed for a payment intent and locks the binding settlement rate. Business failures return a typed Reject.Reason rather than a Connect transport error. |
 
  <!-- end services -->
@@ -44,7 +42,7 @@ Request to confirm that funds have been received from the end-user.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_intent_id | [uint64](../scalar/#uint64) |  | The payment intent ID being confirmed. Must be a valid, pending payment intent. |
-| confirmation_code | [string](../scalar/#string) |  | Confirmation code received in the get payment details along with the payment_intent_id. This prevents accidental confirmation of the wrong payment intent. The network generates this as a UUID at CreatePaymentIntent time; non-UUID strings still pass field-level length validation here and surface as a REJECT_REASON_CONFIRMATION_CODE_MISMATCH at the orchestrator (preserving the "wrong code is a domain reject, not a transport error" contract). |
+| confirmation_code | [string](../scalar/#string) |  | Confirmation code received in the GetPaymentDetails response along with the payment_intent_id. Guards against confirming the wrong payment intent; a mismatch is rejected with REJECT_REASON_CONFIRMATION_CODE_MISMATCH. |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method used by the end-user. Must match one of the payment methods returned in CreatePaymentIntentResponse. |
 | transaction_reference | [string](../scalar/#string) |  | Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id) — do not generate. Forwarded to the beneficiary for end-to-end tracking and dispute resolution. |
 | originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the pay-in provider that received the funds. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
@@ -84,7 +82,7 @@ with settlement details.
 | ----- | ---- | ----- | ----------- |
 | settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The settlement amount in USD that the pay-in provider owes the beneficiary provider for this payment intent. Locked from the chosen quote at confirm-time as (payment_amount / rate) − fix. |
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/<pay-in currency> exchange rate locked in for this settlement. Matches the rate forwarded to the beneficiary in PaymentIntentUpdate.FundsReceived. |
-| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Flat USD charge retained by the pay-in provider per transfer, already subtracted from settlement_amount. Surfaced so the pay-in provider can audit the settlement formula: settlement = (payment_amount / rate) − fix. |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Flat USD charge retained by the pay-in provider per transfer, already subtracted from settlement_amount. Settlement is computed as (payment_amount / rate) − fix. |
 
 
 
@@ -186,8 +184,8 @@ Payment intent created successfully.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](../scalar/#uint64) |  | Unique identifier for this payment intent. Store this ID to correlate with: - PaymentIntentUpdate notifications you'll receive |
-| pay_in_details | [PaymentIntentPayInDetails](#tzero-v1-payment_intent-PaymentIntentPayInDetails) | repeated | Available payment options for the end-user. Present these options to your user so they can choose how to pay. Each entry contains the payment details needed to complete the payment.  Indicative rate/fix are resolved live on every call, including idempotent retries. The set of options (provider, payment_method, payment_details) is fixed at first call; individual options whose underlying quote has lapsed are omitted on retry. |
+| payment_intent_id | [uint64](../scalar/#uint64) |  | Unique identifier for this payment intent. Store this ID to correlate with: - PaymentIntentUpdate notifications delivered later |
+| pay_in_details | [PaymentIntentPayInDetails](#tzero-v1-payment_intent-PaymentIntentPayInDetails) | repeated | Available payment options for the end-user. Present these options to the end-user so they can choose how to pay. Each entry contains the payment details needed to complete the payment.  Indicative rate/fix are resolved live on every call, including idempotent retries. The set of options is fixed at first call; individual options whose underlying quote has lapsed are omitted on retry. |
 
 
 
@@ -270,7 +268,7 @@ Contains the payment method, provider info, and indicative exchange rate.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method type (e.g., SEPA, SWIFT, mobile money). |
-| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Providers can use this to identify counterparties. |
+| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. |
 | indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived |
 | indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix. Indicative only: the actual fix is locked in at ConfirmFundsReceived time. |
 
@@ -290,10 +288,10 @@ Contains the payment method, provider info, payment details, and indicative exch
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method type (e.g., SEPA, SWIFT, mobile money). Determines which payment details format is provided. |
-| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. Providers can use this to identify counterparties. |
+| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. |
 | payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | Payment details for the end-user to make the payment. Contains bank account info, mobile money details, etc. based on payment_method. This should be displayed to the end-user to complete their payment. |
-| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Resolved live from the network's current quote snapshot on every call, including idempotent retries. The binding rate is locked in at ConfirmFundsReceived and may differ. |
-| indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix.  Resolved live from the network's current quote snapshot on every call, including idempotent retries. The binding fix is locked in at ConfirmFundsReceived and may differ. |
+| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Reflects the current quote on every call, including idempotent retries. The binding rate is locked in at ConfirmFundsReceived and may differ. |
+| indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix.  Reflects the current quote on every call, including idempotent retries. The binding fix is locked in at ConfirmFundsReceived and may differ. |
 
 
 
@@ -350,7 +348,7 @@ unique client_quote_id for each band.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | client_quote_id | [string](../scalar/#string) |  | unique client generated id for this band |
-| max_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | max amount of USD this quote is applicable for. Please look into documentation for valid amounts. |
+| max_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Maximum amount of USD this band applies to. |
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/currency rate |
 | fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) | optional | Fixed charge in USD retained by the pay-in provider per transfer. Covers flat operational costs that do not scale with amount (wire fees, rail fees, compliance checks). Subtracted from the settlement amount: settlement = (amount / rate) - fix. Defaults to 0 when absent — no fixed charge applied. |
 
@@ -387,7 +385,7 @@ This message has no fields defined.
 | REJECT_REASON_NO_ACTIVE_QUOTE | 20 |  |
 | REJECT_REASON_PROVIDER_NOT_ALLOWED | 30 |  |
 | REJECT_REASON_AMOUNT_TOO_SMALL | 40 | The pay-in amount would yield a zero or negative beneficiary settlement (pay_in / rate − fix) at every active quote. |
-| REJECT_REASON_NO_VALID_OFFER | 50 | The (pay-in provider, payment method) tuple was not offered on this intent. Either the intent was rejected during creation, or this provider's GetPaymentDetails response was invalid for the requested method. |
+| REJECT_REASON_NO_VALID_OFFER | 50 | The requested payment method was not offered on this intent — either the intent was rejected at creation, or no valid payment details were returned for the method. Retry with a method from the returned options. |
 | REJECT_REASON_TRANSACTION_REFERENCE_ALREADY_USED | 60 | Transaction_reference is already attached to a different pay-in with the same payment_method. References must be unique per payment_method; retry with a fresh transaction_reference, or treat the prior pay-in as the authoritative confirmation. |
 
 
