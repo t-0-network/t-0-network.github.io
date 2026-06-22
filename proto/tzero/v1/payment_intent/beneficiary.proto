@@ -8,23 +8,21 @@ import "tzero/v1/common/common.proto";
 import "tzero/v1/common/payment_method.proto";
 
 /**
- * BeneficiaryService must be implemented by beneficiary providers to receive
- * notifications about payment intent status changes.
+ * Beneficiary provider surface for payment intent status notifications.
  *
  * Beneficiary providers are those who:
  * - Create payment intents via CreatePaymentIntent
  * - Receive settlement (in settlement currency via configured blockchain network)
  * - Need to be notified of payment status changes
  *
- * The network calls this service to notify the beneficiary when:
+ * Notifications are delivered when:
  * - Funds have been received from the payer by pay-in provider
  */
 service BeneficiaryService {
   /**
    * PaymentIntentUpdate notifies the beneficiary provider of status changes.
    *
-   * Idempotency: This endpoint must be idempotent. The network may retry
-   * delivery in case of failures or timeouts.
+   * Delivery is retried on failure or timeout; handling must be idempotent.
    */
   rpc PaymentIntentUpdate(PaymentIntentUpdateRequest) returns (PaymentIntentUpdateResponse) {
     option idempotency_level = IDEMPOTENT;
@@ -58,7 +56,7 @@ message PaymentIntentUpdateRequest {
    */
   message FundsReceived {
     /**
-     * The settlement amount credited to your balance.
+     * The settlement amount credited to the beneficiary balance.
      * This is calculated as: (source_amount / rate) - fix
      *
      * Note: Fees are NOT deducted from this amount. Fees are tracked
@@ -84,7 +82,7 @@ message PaymentIntentUpdateRequest {
 
     /**
      * Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id), forwarded from ConfirmFundsReceived.
-     * Reconcile against your records; serves as the anchor for dispute resolution.
+     * Reconcile against the beneficiary's records; serves as the anchor for dispute resolution.
      */
     string transaction_reference = 50 [(buf.validate.field).string = {
       min_len: 1
@@ -99,8 +97,8 @@ message PaymentIntentUpdateRequest {
 
     /**
      * Flat USD surcharge retained by the pay-in provider per transfer.
-     * Already subtracted from settlement_amount. Surface to beneficiaries that
-     * need to audit the settlement math: settlement = (payment_amount / rate) - fix.
+     * Already subtracted from settlement_amount.
+     * Settlement is computed as (payment_amount / rate) - fix.
      */
     tzero.v1.common.Decimal fix = 70 [(buf.validate.field).cel = {
       message: "fix must be non-negative"

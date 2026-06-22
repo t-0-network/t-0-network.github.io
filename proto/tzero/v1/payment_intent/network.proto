@@ -16,8 +16,6 @@ import "tzero/v1/common/payment_method.proto";
  * 2. End-user pays via one of the returned payment options
  * 3. Pay-in provider confirms funds received
  * 4. Settlement will happen periodically between providers
- *
- * This service is hosted by the T-0 Network and called by providers.
  */
 service PaymentIntentService {
   /**
@@ -44,9 +42,7 @@ service PaymentIntentService {
   /**
    * CreatePaymentIntent initiates a new payment intent.
    *
-   * Called by the beneficiary provider (the one who will receive the settlement).
-   * The network finds suitable pay-in providers, retrieves their payment details,
-   * and returns available payment options to present to the end-user.
+   * Returns the available payment options to present to the end-user.
    *
    * The returned payment_intent_id must be stored by the beneficiary provider
    * to correlate with the PaymentIntentUpdate notification received later.
@@ -106,7 +102,7 @@ message UpdateQuoteRequest {
         max_len: 64
       }];
 
-      // max amount of USD this quote is applicable for. Please look into documentation for valid amounts.
+      // Maximum amount of USD this band applies to.
       tzero.v1.common.Decimal max_amount = 40 [
         (buf.validate.field).required = true,
         (buf.validate.field).cel = {
@@ -211,7 +207,6 @@ message GetQuoteResponse {
 
       /**
        * The T-0 provider ID of the pay-in provider offering this quote.
-       * Providers can use this to identify counterparties.
        */
       uint32 provider_id = 20;
 
@@ -265,7 +260,6 @@ message PaymentIntentPayInDetails {
 
   /**
    * The T-0 provider ID of the pay-in provider offering this quote.
-   * Providers can use this to identify counterparties.
    */
   uint32 provider_id = 20;
 
@@ -279,7 +273,7 @@ message PaymentIntentPayInDetails {
   /**
    * Indicative exchange rate USD/XXX (base currency is always USD).
    *
-   * Resolved live from the network's current quote snapshot on every call,
+   * Reflects the current quote on every call,
    * including idempotent retries. The binding rate is locked in at
    * ConfirmFundsReceived and may differ.
    */
@@ -295,7 +289,7 @@ message PaymentIntentPayInDetails {
    * Indicative fixed charge in USD retained by the pay-in provider per transfer.
    * Settlement is calculated as (amount / indicative_rate) - indicative_fix.
    *
-   * Resolved live from the network's current quote snapshot on every call,
+   * Reflects the current quote on every call,
    * including idempotent retries. The binding fix is locked in at
    * ConfirmFundsReceived and may differ.
    */
@@ -395,19 +389,18 @@ message CreatePaymentIntentResponse {
     /**
      * Unique identifier for this payment intent.
      * Store this ID to correlate with:
-     * - PaymentIntentUpdate notifications you'll receive
+     * - PaymentIntentUpdate notifications delivered later
      */
     uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
 
     /**
      * Available payment options for the end-user.
-     * Present these options to your user so they can choose how to pay.
+     * Present these options to the end-user so they can choose how to pay.
      * Each entry contains the payment details needed to complete the payment.
      *
      * Indicative rate/fix are resolved live on every call, including idempotent
-     * retries. The set of options (provider, payment_method, payment_details)
-     * is fixed at first call; individual options whose underlying quote has
-     * lapsed are omitted on retry.
+     * retries. The set of options is fixed at first call; individual options
+     * whose underlying quote has lapsed are omitted on retry.
      */
     repeated PaymentIntentPayInDetails pay_in_details = 20;
   }
@@ -449,12 +442,9 @@ message ConfirmFundsReceivedRequest {
   uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
 
   /**
-   * Confirmation code received in the get payment details along with the payment_intent_id.
-   * This prevents accidental confirmation of the wrong payment intent. The network
-   * generates this as a UUID at CreatePaymentIntent time; non-UUID strings still pass
-   * field-level length validation here and surface as a REJECT_REASON_CONFIRMATION_CODE_MISMATCH
-   * at the orchestrator (preserving the "wrong code is a domain reject, not a transport error"
-   * contract).
+   * Confirmation code received in the GetPaymentDetails response along with the payment_intent_id.
+   * Guards against confirming the wrong payment intent; a mismatch is rejected with
+   * REJECT_REASON_CONFIRMATION_CODE_MISMATCH.
    */
   string confirmation_code = 20 [(buf.validate.field).string = {
     min_len: 1
@@ -533,8 +523,8 @@ message ConfirmFundsReceivedResponse {
 
     /**
      * Flat USD charge retained by the pay-in provider per transfer,
-     * already subtracted from settlement_amount. Surfaced so the pay-in
-     * provider can audit the settlement formula: settlement = (payment_amount / rate) − fix.
+     * already subtracted from settlement_amount.
+     * Settlement is computed as (payment_amount / rate) − fix.
      */
     tzero.v1.common.Decimal fix = 30 [
       (buf.validate.field).required = true,
@@ -562,10 +552,9 @@ message ConfirmFundsReceivedResponse {
        */
       REJECT_REASON_AMOUNT_TOO_SMALL = 40;
       /**
-       * The (pay-in provider, payment method) tuple was not offered on
-       * this intent. Either the intent was rejected during creation,
-       * or this provider's GetPaymentDetails response was invalid for
-       * the requested method.
+       * The requested payment method was not offered on this intent — either the
+       * intent was rejected at creation, or no valid payment details were returned
+       * for the method. Retry with a method from the returned options.
        */
       REJECT_REASON_NO_VALID_OFFER = 50;
       /**
