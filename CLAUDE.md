@@ -36,3 +36,8 @@ All prose in this repo must follow the stop-slop skill (`.claude/skills/stop-slo
 - Generate docs: `./_gen/gen.sh`
 - Run Hugo dev server: `hugo server`
 - Build site: `hugo --gc --minify`
+
+## Git / deployment
+
+- The `t-0-network` org enforces a branch ruleset on `master`: changes must go through a pull request (1 approving review), no direct pushes, no force-push, no branch deletion. Push a feature branch and open a PR — never push to `master` directly.
+- Merging to `master` triggers the GitHub Pages deploy (`.github/workflows/hugo.yaml`).
