@@ -10,6 +10,10 @@ on:
 jobs:
   generate:
     runs-on: blacksmith-4vcpu-ubuntu-2404
+    env:
+      # Same gopkg.in direct-git fragility as the Hugo deploy: route module
+      # fetches through the reliable public proxy.
+      GOPROXY: https://proxy.golang.org,direct
     steps:
       - name: Generate GitHub APP Token
         uses: actions/create-github-app-token@v3
