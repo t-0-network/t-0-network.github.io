@@ -12,17 +12,17 @@ toc: true
 <a name="tzero-v1-payment-ProviderService"></a>
 
 ## ProviderService
-This service must be implemented by the provider.
+Provider surface for executing payouts and receiving payment, limit, and ledger updates.
 
 All methods of this service must be idempotent, meaning they are safe to retry and multiple calls with the same parameters must not have additional effect.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| PayOut | [PayoutRequest](#tzero-v1-payment-PayoutRequest) | [PayoutResponse](#tzero-v1-payment-PayoutResponse) | Network instructs the provider to execute a payout to the recipient. This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
-| UpdatePayment | [UpdatePaymentRequest](#tzero-v1-payment-UpdatePaymentRequest) | [UpdatePaymentResponse](#tzero-v1-payment-UpdatePaymentResponse) | Network provides an update on the status of a payment. This can be either a success or a failure. This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
-| UpdateLimit | [UpdateLimitRequest](#tzero-v1-payment-UpdateLimitRequest) | [UpdateLimitResponse](#tzero-v1-payment-UpdateLimitResponse) | This rpc is used to notify the provider about the changes in credit limit and/or credit usage. |
-| AppendLedgerEntries | [AppendLedgerEntriesRequest](#tzero-v1-payment-AppendLedgerEntriesRequest) | [AppendLedgerEntriesResponse](#tzero-v1-payment-AppendLedgerEntriesResponse) | Network can send all the updates about ledger entries of the provider's accounts. It can be used to keep track of the provider's exposure to other participants and other important financial events. (see the list in the message below) |
-| ApprovePaymentQuotes | [ApprovePaymentQuoteRequest](#tzero-v1-payment-ApprovePaymentQuoteRequest) | [ApprovePaymentQuoteResponse](#tzero-v1-payment-ApprovePaymentQuoteResponse) | Pay-in provider approves the final pay-out quotes. This is the "Last Look" endpoint - it must be called after manual AML check completes (if one was required). It allows pay-in provider to verify and approve final rates before payment is executed. |
+| PayOut | [PayoutRequest](#tzero-v1-payment-PayoutRequest) | [PayoutResponse](#tzero-v1-payment-PayoutResponse) | Execute a payout to the recipient. This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
+| UpdatePayment | [UpdatePaymentRequest](#tzero-v1-payment-UpdatePaymentRequest) | [UpdatePaymentResponse](#tzero-v1-payment-UpdatePaymentResponse) | Reports the current status of a payment — either a success or a failure. This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
+| UpdateLimit | [UpdateLimitRequest](#tzero-v1-payment-UpdateLimitRequest) | [UpdateLimitResponse](#tzero-v1-payment-UpdateLimitResponse) | Delivers updated credit limit and credit usage. |
+| AppendLedgerEntries | [AppendLedgerEntriesRequest](#tzero-v1-payment-AppendLedgerEntriesRequest) | [AppendLedgerEntriesResponse](#tzero-v1-payment-AppendLedgerEntriesResponse) | Carries ledger-entry updates for the provider's accounts. It can be used to keep track of the provider's exposure to other participants and other important financial events. (see the list in the message below) |
+| ApprovePaymentQuotes | [ApprovePaymentQuoteRequest](#tzero-v1-payment-ApprovePaymentQuoteRequest) | [ApprovePaymentQuoteResponse](#tzero-v1-payment-ApprovePaymentQuoteResponse) | Approves the final pay-out quotes — the "Last Look" before payment executes. Applies after a manual AML check completes, when one was required. |
 
  <!-- end services -->
 
@@ -244,12 +244,12 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](../scalar/#uint64) |  | payment id assigned by the network (provider should store this id to provide details in UpdatePayout later) |
+| payment_id | [uint64](../scalar/#uint64) |  | Payment id assigned by the network. Store it to reference this payment in FinalizePayout later. |
 | payout_id | [uint64](../scalar/#uint64) |  | **Deprecated.** payout_id is deprecated now, since it's 1->1 mapping between payout_id and payment_id |
 | currency | [string](../scalar/#string) |  | currency of the payout (participant could support multiple currencies) This is the currency in which the payout should be made. |
 | client_quote_id | [string](../scalar/#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
-| payout_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) | optional | payout_method is the payment method for the payout, e.g. bank transfer, crypto transfer, etc. This is used to specify how the payout should be made. |
+| payout_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) | optional | Payment details specifying how the payout should be made (bank transfer, crypto transfer, etc.). |
 | pay_in_provider_id | [uint32](../scalar/#uint32) |  | Pay-in provider id which initiated the pay out. |
 | travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) |  |  |
 
@@ -269,7 +269,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
-| originator_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | IVMS101 travel rule data of the originating provider's legal entity. Resolved by the network from the entity specified in CreatePaymentRequest. |
+| originator_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | IVMS101 travel rule data of the originating provider's legal entity. Taken from the originator entity in the corresponding CreatePaymentRequest. |
 
 
 
