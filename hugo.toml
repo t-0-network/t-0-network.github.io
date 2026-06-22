@@ -3,6 +3,10 @@ languageCode = 'en-us'
 title = 't-0 Network'
 
 [module]
+    # Hugo Modules use their own proxy (default "direct" = git/VCS) and ignore the
+    # GOPROXY env. Point it at the public proxy so module downloads are zips, not
+    # git — the legacy protoc-gen-doc dep chain flakes on `git fetch --unshallow`.
+    proxy = "https://proxy.golang.org"
     [[module.imports]]
         path = "github.com/colinwilson/lotusdocs"
         disable = false
