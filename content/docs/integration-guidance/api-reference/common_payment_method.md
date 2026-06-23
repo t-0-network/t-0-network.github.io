@@ -54,6 +54,7 @@ toc: true
 | thai_bank_transfer | [PaymentDetails.ThaiBankTransfer](#tzero-v1-common-PaymentDetails-ThaiBankTransfer) |  | Thai domestic bank transfer (ORFT/BAHTNET) Thailand |
 | indonesian_bank_transfer | [PaymentDetails.IndonesianBankTransfer](#tzero-v1-common-PaymentDetails-IndonesianBankTransfer) |  | Indonesian domestic bank transfer (BI-FAST and other rails) Indonesia |
 | indonesian_e_wallet | [PaymentDetails.IndonesianEWallet](#tzero-v1-common-PaymentDetails-IndonesianEWallet) |  | Indonesian e-wallet Indonesia |
+| provider_defined | [PaymentDetails.ProviderDefined](#tzero-v1-common-PaymentDetails-ProviderDefined) |  | Provider-defined opaque envelope - format agreed off-network |
 
 
 
@@ -680,6 +681,26 @@ PromptPay - Thai instant transfer addressed by a registered proxy.
 
 
 
+<a name="tzero-v1-common-PaymentDetails-ProviderDefined"></a>
+
+### PaymentDetails.ProviderDefined
+Provider-defined envelope for payment details that intentionally stay outside
+the Network protocol. The provider and requester agree the payload format
+off-network (JSON, protobuf bytes, YAML, XML, a barcode/auth-code instruction
+format, or any other provider-specific encoding). The payload is opaque and
+forwarded to the provider without interpretation.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| payload | [bytes](../scalar/#bytes) |  | Opaque provider-defined payload; maximum 10 KiB. Format agreed off-network. |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Rtp"></a>
 
 ### PaymentDetails.Rtp
@@ -1079,6 +1100,7 @@ VietQR - Vietnamese bank transfer addressed by a resolved QR code.
 | PAYMENT_METHOD_TYPE_THAI_BANK_TRANSFER | 320 | Thai domestic bank transfer - ORFT/BAHTNET (Thailand) |
 | PAYMENT_METHOD_TYPE_INDONESIAN_BANK_TRANSFER | 330 | Indonesian domestic bank transfer - BI-FAST and other rails (Indonesia) |
 | PAYMENT_METHOD_TYPE_INDONESIAN_E_WALLET | 340 | Indonesian e-wallet - GoPay, OVO, DANA, ShopeePay, LinkAja, etc. (Indonesia) |
+| PAYMENT_METHOD_TYPE_PROVIDER_DEFINED | 350 | Provider-defined envelope: payment details whose structure is defined by the provider and agreed with the requester off-network. The payload is opaque and forwarded to the provider without interpretation. |
 
 
  <!-- end enums -->
