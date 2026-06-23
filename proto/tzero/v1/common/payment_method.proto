@@ -62,6 +62,10 @@ enum PaymentMethodType {
   PAYMENT_METHOD_TYPE_INDONESIAN_BANK_TRANSFER = 330;
   // Indonesian e-wallet - GoPay, OVO, DANA, ShopeePay, LinkAja, etc. (Indonesia)
   PAYMENT_METHOD_TYPE_INDONESIAN_E_WALLET = 340;
+  // Provider-defined envelope: payment details whose structure is defined by the
+  // provider and agreed with the requester off-network. The payload is opaque and
+  // forwarded to the provider without interpretation.
+  PAYMENT_METHOD_TYPE_PROVIDER_DEFINED = 350;
 }
 
 message PaymentDetails {
@@ -192,6 +196,9 @@ message PaymentDetails {
     // Indonesian e-wallet
     // Indonesia
     IndonesianEWallet indonesian_e_wallet = 340;
+
+    // Provider-defined opaque envelope - format agreed off-network
+    ProviderDefined provider_defined = 350;
   };
 
   message Sepa {
@@ -1468,6 +1475,23 @@ message PaymentDetails {
     // Payment reference/description (optional).
     optional string payment_reference = 40 [(buf.validate.field).string = {
       max_len: 140
+    }];
+  }
+
+  /**
+   * Provider-defined envelope for payment details that intentionally stay outside
+   * the Network protocol. The provider and requester agree the payload format
+   * off-network (JSON, protobuf bytes, YAML, XML, a barcode/auth-code instruction
+   * format, or any other provider-specific encoding). The payload is opaque and
+   * forwarded to the provider without interpretation.
+   */
+  message ProviderDefined {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_PROVIDER_DEFINED;
+
+    // Opaque provider-defined payload; maximum 10 KiB. Format agreed off-network.
+    bytes payload = 10 [(buf.validate.field).bytes = {
+      min_len: 1,
+      max_len: 10240
     }];
   }
 }
