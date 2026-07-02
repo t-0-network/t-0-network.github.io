@@ -146,12 +146,17 @@ fields may be zero-valued.
 <a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-ProviderSettlement"></a>
 
 ### AppendLedgerEntriesRequest.Transaction.ProviderSettlement
-
+An on-chain settlement between two providers. The on-chain fields let the
+counterparty reconcile the settlement against the USDT transfer actually
+sent.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | settlement_id | [uint64](../scalar/#uint64) |  |  |
+| blockchain | [tzero.v1.common.Blockchain](../common_common/#tzero-v1-common-Blockchain) |  | no validation: observed settlement chain; informational reconciliation descriptor. defined_only intentionally omitted: this flows network->provider and the receiving provider may lag common.Blockchain, so defined_only would reject an append carrying a newly-added chain. |
+| tx_hash | [string](../scalar/#string) |  | no validation: observed on-chain transaction hash; informational descriptor for reconciliation, not a gating constraint |
+| on_chain_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Observed on-chain (USDT) amount; differs from the settlement amount the ledger entries encode (full precision vs. truncated to cents). |
 
 
 
