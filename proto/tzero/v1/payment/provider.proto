@@ -90,8 +90,30 @@ message AppendLedgerEntriesRequest {
       uint64 payment_id = 10 [(buf.validate.field).uint64.gt = 0];
     }
 
+    /**
+     * An on-chain settlement between two providers. The on-chain fields let the
+     * counterparty reconcile the settlement against the USDT transfer actually
+     * sent.
+     */
     message ProviderSettlement {
       uint64 settlement_id = 10 [(buf.validate.field).uint64.gt = 0];
+      // no validation: observed settlement chain; informational reconciliation
+      // descriptor. defined_only intentionally omitted: this flows network->provider
+      // and the receiving provider may lag common.Blockchain, so defined_only would
+      // reject an append carrying a newly-added chain.
+      tzero.v1.common.Blockchain blockchain = 20;
+      // no validation: observed on-chain transaction hash; informational
+      // descriptor for reconciliation, not a gating constraint
+      string tx_hash = 30;
+      // Observed on-chain (USDT) amount; differs from the settlement amount the
+      // ledger entries encode (full precision vs. truncated to cents).
+      tzero.v1.common.Decimal on_chain_amount = 40 [
+        (buf.validate.field).required = true,
+        (buf.validate.field).cel = {
+          message: "on_chain_amount must be greater than zero"
+          expression: "this.unscaled > 0"
+        }
+      ];
     }
 
     message FeeSettlement {
