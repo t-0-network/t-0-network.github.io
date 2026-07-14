@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<!-- t-0 Network Services Agreement v1.3 — DRAFT for legal review before publication -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>t-0 Network Services Agreement</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --green:#15803D; --green-d:#0f5c2d; --blue:#0369A1; --blue-d:#075985;
+    --ink:#1b1f24; --body:#33393f; --muted:#6b7280; --hair:#e6e8eb; --hair-2:#eef1f3;
+    --bg:#ffffff; --tint:#f6f9f7; --tint-blue:#f2f8fb;
+    --maxw:840px;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0; background:var(--bg); color:var(--body);
+    font-family:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif;
+    font-size:16px; line-height:1.66; -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:var(--maxw); margin:0 auto; padding:0 28px 96px}
+  h1,h2,h3,.brandmark{font-family:"Figtree","Inter",sans-serif}
+  a{color:var(--blue); text-decoration:none}
+  a:hover{text-decoration:underline}
+
+  /* Masthead */
+  header.masthead{padding:56px 0 28px; border-bottom:3px solid var(--green); margin-bottom:8px}
+  .brandmark{font-weight:700; font-size:26px; color:var(--green); letter-spacing:-.01em; display:inline-flex; align-items:center; gap:2px}
+  .brandmark .dash{color:var(--blue)}
+  h1{font-size:34px; line-height:1.15; color:var(--ink); font-weight:700; margin:20px 0 10px; letter-spacing:-.015em}
+  .meta{font-size:14px; color:var(--muted); margin:0}
+  .meta strong{color:var(--body); font-weight:600}
+  .lead{margin:22px 0 0; font-size:16.5px; color:var(--body)}
+  .draftnote{margin:20px 0 0; padding:12px 16px; background:var(--tint-blue); border-left:3px solid var(--blue);
+    border-radius:0 6px 6px 0; font-size:13.5px; color:var(--blue-d)}
+
+  /* TOC */
+  nav.toc{margin:34px 0 8px; padding:22px 24px; background:var(--tint); border:1px solid var(--hair); border-radius:12px}
+  nav.toc h2{font-size:13px; text-transform:uppercase; letter-spacing:.08em; color:var(--green-d); margin:0 0 14px; font-weight:600}
+  nav.toc ol{margin:0; padding:0; list-style:none; column-count:2; column-gap:36px; font-size:14px}
+  nav.toc li{margin:0 0 7px; break-inside:avoid}
+  nav.toc a{color:var(--body)}
+  nav.toc a:hover{color:var(--blue)}
+  nav.toc .num{display:inline-block; width:26px; color:var(--muted); font-variant-numeric:tabular-nums}
+  @media(max-width:640px){nav.toc ol{column-count:1}}
+
+  /* Sections */
+  section{margin:38px 0 0; scroll-margin-top:20px}
+  h2.sec{font-size:20px; color:var(--green-d); font-weight:600; margin:0 0 4px; letter-spacing:-.01em;
+    padding-top:18px; border-top:1px solid var(--hair-2)}
+  h2.sec .n{color:var(--green); font-weight:700; margin-right:10px; font-variant-numeric:tabular-nums}
+  h3.sub{font-size:15px; color:var(--ink); font-weight:600; margin:20px 0 2px}
+  .new-badge{display:inline-block; font-family:"Inter"; font-size:10.5px; font-weight:600; text-transform:uppercase;
+    letter-spacing:.06em; color:var(--blue-d); background:var(--tint-blue); border:1px solid #cfe6f2;
+    padding:1px 7px; border-radius:20px; vertical-align:middle; margin-left:10px}
+
+  /* Clauses */
+  ol.clause{list-style:none; counter-reset:cl; margin:10px 0 0; padding:0}
+  ol.clause>li{counter-increment:cl; position:relative; padding:6px 0 6px 46px; margin:0}
+  ol.clause>li::before{content:counter(sec) "." counter(cl); position:absolute; left:0; top:6px;
+    font-variant-numeric:tabular-nums; color:var(--blue); font-weight:600; font-size:14.5px; font-family:"Figtree"}
+  ol.sub{list-style:none; counter-reset:sub; margin:6px 0 2px; padding:0}
+  ol.sub>li{counter-increment:sub; position:relative; padding:3px 0 3px 40px}
+  ol.sub>li::before{content:"(" counter(sub, lower-alpha) ")"; position:absolute; left:6px; top:3px; color:var(--muted); font-size:14px}
+  section{counter-reset:none}
+  /* section number binding for clause counter display */
+  #s1{counter-reset:secn 1}
+
+  .defn{padding:5px 0 5px 0}
+  .defn dt{float:left; clear:left; font-weight:600; color:var(--ink); margin-right:6px}
+  dl.defs{margin:8px 0 0}
+  dl.defs>div{padding:7px 0; border-bottom:1px solid var(--hair-2)}
+  dl.defs dt{font-weight:600; color:var(--ink); font-family:"Inter"}
+  dl.defs dd{margin:3px 0 0; color:var(--body)}
+  .term{font-weight:600; color:var(--ink)}
+
+  .callout{margin:14px 0; padding:14px 18px; background:var(--tint); border-left:3px solid var(--green); border-radius:0 8px 8px 0}
+  .callout .lbl{font-size:12px; text-transform:uppercase; letter-spacing:.07em; color:var(--green-d); font-weight:600; display:block; margin-bottom:4px; font-family:"Figtree"}
+
+  /* Schedule divider */
+  .sched-head{margin:64px 0 0; padding:28px 0 0; border-top:3px solid var(--blue)}
+  .sched-head .kick{font-size:13px; text-transform:uppercase; letter-spacing:.1em; color:var(--blue-d); font-weight:600; font-family:"Figtree"}
+  .sched-head h2{font-size:26px; color:var(--ink); margin:6px 0 0; font-weight:700; border:0; padding:0}
+  .sched-note{font-size:14px; color:var(--muted); font-style:italic; margin:8px 0 0}
+
+  table.calc{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px}
+  table.calc th,table.calc td{text-align:left; padding:8px 12px; border-bottom:1px solid var(--hair)}
+  table.calc th{color:var(--green-d); font-weight:600; font-family:"Figtree"}
+
+  footer{margin-top:70px; padding-top:24px; border-top:1px solid var(--hair); font-size:13px; color:var(--muted)}
+
+  /* Schedule 1 operating-manual styles */
+  .s1c{margin:0; padding:6px 0 6px 46px; position:relative; line-height:1.66}
+  .s1c .n{position:absolute; left:0; top:6px; color:var(--blue); font-weight:600; font-size:14.5px; font-family:"Figtree","Inter",sans-serif; font-variant-numeric:tabular-nums}
+  p.subh{font-weight:600; color:var(--ink); margin:16px 0 5px; font-size:14.5px; font-family:"Figtree","Inter",sans-serif}
+  ul.blist{margin:6px 0 12px; padding-left:20px}
+  ul.blist li{margin:0 0 6px; padding-left:3px; line-height:1.58}
+  .s1intro{margin:12px 0 6px; color:var(--body)}
+  @media print{
+    body{font-size:11pt} .toc,.draftnote{display:none} header.masthead{border-color:var(--green)}
+    section{page-break-inside:auto} h2.sec{page-break-after:avoid}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="masthead">
+  <span class="brandmark" aria-label="t-0"><svg width="34" height="34" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" role="img" aria-hidden="true"><path d="M23 15.6738c7.3178.0 13.25 5.9323 13.25 13.25V63.2207C34.8595 63.4038 33.4409 63.5 32 63.5 29.861 63.5 27.7715 63.2888 25.75 62.8916V28.9238c0-1.5187-1.2312-2.75-2.75-2.75H.492188c.673572-3.7723 2.019792-7.3137 3.909182-10.5H23z" fill="#15803D"></path><path d="M56.8252 51.7822C52.8758 56.5945 47.5347 60.2365 41.4092 62.1035V51.7822h15.416z" fill="#030712"></path><path d="M14.9004 31.5996C17.8546 31.5998 20.2496 33.9949 20.25 36.9492V61.291C16.3053 59.7451 12.746 57.4423 9.75 54.5654V42.0996H1.74023C.613336 38.8555 11595e-9 35.3739.0 31.75.0 31.6999.00171924 31.6497.00195312 31.5996H14.9004z" fill="#030712"></path><path d="M63.5 37.3701C63.0662 39.7795 62.3567 42.094 61.4082 44.2822H41.4092v-10.5H63.5v3.5879z" fill="#030712"></path><path d="M59.6631 15.7822c1.8484 3.1457 3.1684 6.6345 3.8369 10.3477v.1523H41.2207C40.6371 22.2009 38.7219 18.5497 35.9287 15.7822H59.6631z" fill="#15803D"></path><path d="M32 0c8.3026.0 15.8666 3.13731 21.5537 8.28223H10.4473C16.1343 3.13757 23.6976.235445e-4 32 0z" fill="#030712"></path></svg></span>
+  <h1>Network Services Agreement</h1>
+  <p class="meta"><strong>Version 1.3</strong> &nbsp;·&nbsp; New Settlement Technologies Inc, trading as t-0</p>
+  <p class="lead">This Network Services Agreement, together with the Order Form signed by the Partner and t-0 and any Trade Confirmations entered into under it (together, the <span class="term">Agreement</span>), governs the Partner's access to and use of the t-0 Network. Capitalised terms have the meanings given in Clause&nbsp;1. This Agreement is between New Settlement Technologies Inc (<span class="term">t-0</span>) and the party identified as the Partner on the Order Form (the <span class="term">Partner</span>).</p>
+</header>
+
+<nav class="toc" aria-label="Table of contents">
+  <h2>Contents</h2>
+  <ol>
+    <li><span class="num">1</span><a href="#s1">Interpretation</a></li>
+    <li><span class="num">2</span><a href="#s2">Commencement</a></li>
+    <li><span class="num">3</span><a href="#s3">Order of precedence</a></li>
+    <li><span class="num">4</span><a href="#s4">Implementation</a></li>
+    <li><span class="num">5</span><a href="#s5">Partner obligations</a></li>
+    <li><span class="num">6</span><a href="#s6">t-0 obligations</a></li>
+    <li><span class="num">7</span><a href="#s7">Committed flow and Trade Confirmations</a></li>
+    <li><span class="num">8</span><a href="#s8">Fees, Security Deposits and set-off</a></li>
+    <li><span class="num">9</span><a href="#s9">Compliance with Applicable Laws</a></li>
+    <li><span class="num">10</span><a href="#s10">Sanctions and financial crime</a></li>
+    <li><span class="num">11</span><a href="#s11">Intellectual property</a></li>
+    <li><span class="num">12</span><a href="#s12">Data protection</a></li>
+    <li><span class="num">13</span><a href="#s13">Warranties</a></li>
+    <li><span class="num">14</span><a href="#s14">Limitation of liability</a></li>
+    <li><span class="num">15</span><a href="#s15">Confidentiality</a></li>
+    <li><span class="num">16</span><a href="#s16">Non-circumvention and non-solicitation</a></li>
+    <li><span class="num">17</span><a href="#s17">Suspension</a></li>
+    <li><span class="num">18</span><a href="#s18">Termination</a></li>
+    <li><span class="num">19</span><a href="#s19">Force majeure</a></li>
+    <li><span class="num">20</span><a href="#s20">Assignment</a></li>
+    <li><span class="num">21</span><a href="#s21">Variation and amendment of terms</a></li>
+    <li><span class="num">22</span><a href="#s22">Waiver</a></li>
+    <li><span class="num">23</span><a href="#s23">Rights and remedies</a></li>
+    <li><span class="num">24</span><a href="#s24">Severance</a></li>
+    <li><span class="num">25</span><a href="#s25">Entire agreement</a></li>
+    <li><span class="num">26</span><a href="#s26">No partnership or agency</a></li>
+    <li><span class="num">27</span><a href="#s27">Third party rights</a></li>
+    <li><span class="num">28</span><a href="#s28">Notices</a></li>
+    <li><span class="num">29</span><a href="#s29">Counterparts</a></li>
+    <li><span class="num">30</span><a href="#s30">Dispute resolution</a></li>
+    <li><span class="num">31</span><a href="#s31">Inadequacy of damages</a></li>
+    <li><span class="num">32</span><a href="#s32">Governing law</a></li>
+    <li><span class="num">33</span><a href="#s33">Jurisdiction</a></li>
+    <li><span class="num">S1</span><a href="#sch1">Schedule 1 — Payment Rules (Operating Manual)</a></li>
+    <li><span class="num">S2</span><a href="#sch2">Schedule 2 — Settlement calculations</a></li>
+  </ol>
+</nav>
+
+<!-- 1 -->
+<section id="s1" style="counter-reset:sec 1"><h2 class="sec"><span class="n">1</span>Interpretation</h2>
+<ol class="clause">
+<li>The following definitions apply in this Agreement:
+<dl class="defs">
+  <div><dt>Agreed Reference Rate</dt><dd>the reference rate against which committed pricing is set for a Corridor, as specified in the relevant Trade Confirmation and determined when a payment is accepted.</dd></div>
+  <div><dt>Applicable Laws</dt><dd>all statutes, regulations, rules, by-laws, subordinate legislation, binding codes of practice, and judgments, sanctions, directives, orders or requirements of any regulatory authority (including regulatory permits and licences), in each case to the extent applicable to a Party's performance under this Agreement and in force from time to time during the Term.</dd></div>
+  <div><dt>Business Day</dt><dd>a day, other than a Saturday, Sunday or public holiday, on which commercial banks are open for general business in the principal places of business of both Parties.</dd></div>
+  <div><dt>Calculation Agent</dt><dd>t-0, acting in the role described in Clause 7.7.</dd></div>
+  <div><dt>Committed Basis</dt><dd>dealing on the Network under one or more Trade Confirmations, as described in Clause 7.</dd></div>
+  <div><dt>Committed Flow</dt><dd>payment flow that a Requestor has committed to route, or that t-0 has committed to a Provider, under a Trade Confirmation.</dd></div>
+  <div><dt>Committed Margin</dt><dd>the margin over the Agreed Reference Rate at which committed pricing is offered, as set out in the relevant Trade Confirmation.</dd></div>
+  <div><dt>Committed Rate</dt><dd>the Committed Margin plus the Agreed Reference Rate, as set out in the relevant Trade Confirmation.</dd></div>
+  <div><dt>Committed Volume</dt><dd>the volume of in-scope flow, in a specified Corridor and period, that a Requestor commits to route under a Requestor Trade Confirmation.</dd></div>
+  <div><dt>Confidential Information</dt><dd>all information in any form which concerns the Disclosing Party and is expressed to be confidential or would reasonably be regarded as confidential, including information relating to the Services, the Disclosing Party's business, finances, technology and know-how, and the terms and negotiation of this Agreement; excluding information that was lawfully known to the Receiving Party before receipt, was received from a third party with the right to disclose it, is or becomes public without the Receiving Party's fault, or is independently developed by the Receiving Party.</dd></div>
+  <div><dt>Corridor</dt><dd>has the meaning given in Schedule 1.</dd></div>
+  <div><dt>Data Protection Legislation</dt><dd>all laws and regulations relating to the processing, protection and privacy of personal data that apply to a Party from time to time in the jurisdictions in which it operates, in each case as amended, replaced or superseded.</dd></div>
+  <div><dt>Deficit Fee</dt><dd>the fee payable by t-0 to a Provider on the shortfall between realised volume and t-0's committed volume to that Provider, as set out in the relevant Provider Trade Confirmation.</dd></div>
+  <div><dt>Effective Date</dt><dd>the date on which the Partner signs the Order Form, which may be signed electronically through the t-0 dashboard.</dd></div>
+  <div><dt>End Customer</dt><dd>has the meaning given in Schedule 1.</dd></div>
+  <div><dt>Fees</dt><dd>the fees payable under this Agreement, including the fees set out in the Order Form and any Shortfall Fees, Minimum Access Fees, Network Fees and other amounts payable under a Trade Confirmation.</dd></div>
+  <div><dt>Force Majeure Event</dt><dd>has the meaning given in Clause 19.1.</dd></div>
+  <div><dt>In-scope flow</dt><dd>payment flow that matches every flow characteristic stated in the relevant Trade Confirmation, including direction, settlement asset, payment rail(s), payment type(s), industry or use, and any special condition; flow that does not match is out of scope and does not count toward any Committed Volume or realised volume.</dd></div>
+  <div><dt>Insolvency Event</dt><dd>any of the events customarily constituting insolvency, including a Party being unable to pay its debts within the meaning of section 123 of the Insolvency Act 1986, the making of an administration or winding-up order or resolution (other than a solvent reconstruction), the appointment of a receiver, administrator or similar officer, entry into an arrangement or composition with creditors, cessation of business, or any analogous event in any jurisdiction.</dd></div>
+  <div><dt>Intellectual Property Rights</dt><dd>patents, rights to inventions, copyright and related rights, trademarks, business and domain names, goodwill, rights in designs, database rights, rights in confidential information (including know-how and trade secrets) and all other intellectual property rights, in each case whether registered or unregistered and including all applications and rights to apply, that subsist now or in the future anywhere in the world.</dd></div>
+  <div><dt>Licences</dt><dd>any applicable licences, registrations, authorisations, permits, consents and approvals.</dd></div>
+  <div><dt>Minimum Access Fee</dt><dd>the monthly fee payable by a Requestor for access to committed rates in a Corridor where no Committed Volume is committed, as set out in the relevant Requestor Trade Confirmation.</dd></div>
+  <div><dt>Network Fee</dt><dd>a fee charged by t-0 on settled or In-scope volume, payable by a Provider for introduced flow as set out in the Network Fee Schedule, and by a Requestor where stated in a Trade Confirmation.</dd></div>
+  <div><dt>Network Fee Schedule</dt><dd>the schedule of network fees payable by Providers for introduced flow, published separately by t-0 on a per-currency basis and updated from time to time, referenced in Schedule 1 and subject to variation for a specific flow by a Trade Confirmation.</dd></div>
+  <div><dt>Non-executed Rate</dt><dd>a day on which, as verified by t-0 as Calculation Agent, the rate quoted through the Network for an In-scope payment was worse than the Committed Rate, with the effect set out in the relevant Trade Confirmation.</dd></div>
+  <div><dt>Order Form</dt><dd>the order form signed by the Partner and t-0.</dd></div>
+  <div><dt>Partner's Manager / t-0's Manager</dt><dd>the individuals identified as such on the Order Form or as otherwise notified from time to time.</dd></div>
+  <div><dt>Payment Rules</dt><dd>the rules set out in Schedule 1 (Payment Rules, the Network Operating Manual), as amended under Clause 21.</dd></div>
+  <div><dt>Provider</dt><dd>a licensed financial institution that executes payments locally on the Network, acting as a Payout Provider or a Collection Provider (as defined in Section 2 of Schedule 1). Committed rates are published under a Provider Trade Confirmation.</dd></div>
+  <div><dt>Requestor</dt><dd>a Partner that originates payment activity and holds the End Customer relationship, acting as a Payout Requestor or a Collection Requestor (as defined in Section 2 of Schedule 1). A Requestor need not hold a financial-services licence but must complete Network KYB and due diligence and comply with Schedule 1.</dd></div>
+  <div><dt>Payout / Collection roles</dt><dd>a Payout Requestor, Payout Provider, Collection Requestor and Collection Provider have the meanings given in Section 2 of Schedule 1.</dd></div>
+  <div><dt>Security Deposit</dt><dd>an amount in the Settlement Currency posted by a Requestor to a t-0 wallet as security for its obligations, as described in Clause 8.</dd></div>
+  <div><dt>Services</dt><dd>the services provided to the Partner by t-0 via the t-0 Network.</dd></div>
+  <div><dt>Settlement Currency</dt><dd>USDT and such other digital assets as the t-0 Network may support from time to time.</dd></div>
+  <div><dt>Shortfall Fee</dt><dd>the fee payable by a Requestor to t-0 on the shortfall between its Committed Volume and its realised volume in a Corridor, as set out in the relevant Requestor Trade Confirmation.</dd></div>
+  <div><dt>Supported Blockchains</dt><dd>the blockchains supported by the t-0 Network for settlement in the Settlement Currency from time to time.</dd></div>
+  <div><dt>t-0 Network</dt><dd>has the meaning given in Schedule 1.</dd></div>
+  <div><dt>Term</dt><dd>the period from the Effective Date until this Agreement is terminated.</dd></div>
+  <div><dt>Trade Confirmation</dt><dd>a document (however executed, including electronically or through the Network) agreed between t-0 and a Partner setting out binding committed terms for Committed Flow, as described in Clause 7.</dd></div>
+</dl>
+</li>
+<li>The Schedules form part of this Agreement and any reference to this Agreement includes the Schedules. Headings are for reference only. Words importing the singular include the plural and vice versa; "including" and "in particular" are without limitation; and a reference to a statute includes subordinate legislation and any re-enactment or amendment.</li>
+</ol>
+</section>
+
+<!-- 2 -->
+<section id="s2" style="counter-reset:sec 2"><h2 class="sec"><span class="n">2</span>Commencement</h2>
+<ol class="clause">
+<li>This Agreement comes into force on the Effective Date and continues until terminated in accordance with its terms.</li>
+</ol>
+</section>
+
+<!-- 3 -->
+<section id="s3" style="counter-reset:sec 3"><h2 class="sec"><span class="n">3</span>Order of precedence</h2>
+<ol class="clause">
+<li>This Agreement comprises this Network Services Agreement (including its Schedules), the Order Form, and each Trade Confirmation entered into under it.</li>
+<li>In the event of conflict or inconsistency, the following order of precedence applies, subject to Clause 3.3:
+  <ol class="sub">
+    <li>for the commercial terms of a specific Committed Flow (including the Committed Rate, Committed Margin, Agreed Reference Rate, Committed Volume, Shortfall Fee, Minimum Access Fee, Deficit Fee, Network Fee, ramp, tenor, Non-executed Rate terms, settlement service level and force majeure terms for that flow), the relevant Trade Confirmation prevails;</li>
+    <li>then the Order Form; and</li>
+    <li>then this Network Services Agreement and its Schedules.</li>
+  </ol>
+</li>
+<li>Notwithstanding Clause 3.2, the provisions of this Network Services Agreement dealing with the Payment Rules (Schedule 1), non-circumvention and non-solicitation (Clause 16), intellectual property (Clause 11), confidentiality (Clause 15), data protection (Clause 12), limitation of liability (Clause 14), sanctions and financial crime (Clause 10), and governing law and jurisdiction (Clauses 32 and 33) prevail over any Trade Confirmation or Order Form and may not be varied or disapplied by them, except to the extent expressly varied by a Trade Confirmation signed by both Parties.</li>
+<li>The indicative pricing and volume estimates recorded in the Order Form are not binding. Binding committed terms are set out only in Trade Confirmations.</li>
+</ol>
+</section>
+
+<!-- 4 -->
+<section id="s4" style="counter-reset:sec 4"><h2 class="sec"><span class="n">4</span>Implementation</h2>
+<ol class="clause">
+<li>From the Effective Date, the Parties will co-operate to complete the Integration as soon as practicable and in accordance with the technical specifications set by t-0.</li>
+<li>t-0 will, before the Integration begins, supply such information and assistance as is necessary to enable the Partner to prepare its systems, and will inspect the Partner's systems and specify within a reasonable time any corrections required. If t-0 fails to inspect before the Integration begins, the Partner will not be liable for remedying deficiencies discovered after that date.</li>
+<li>The Partner is responsible, at its own expense, for ensuring each item of software necessary to effect and support the Integration is installed, in working order and available to t-0 no later than the commencement of the Integration.</li>
+</ol>
+</section>
+
+<!-- 5 -->
+<section id="s5" style="counter-reset:sec 5"><h2 class="sec"><span class="n">5</span>Partner obligations</h2>
+<ol class="clause">
+<li>The Partner will adhere to the Payment Rules in Schedule 1 whenever instructing or executing a payment via the t-0 Network.</li>
+<li>The Partner will inform t-0 immediately if it becomes subject to, or is reasonably likely to become subject to, an Insolvency Event.</li>
+<li>The Partner will provide t-0 with all documentation and evidence t-0 reasonably requires to complete its "know your business" and other compliance requirements in respect of the Partner, and will keep the same up to date. Completion of these checks is a condition of going live with the Services.</li>
+</ol>
+</section>
+
+<!-- 6 -->
+<section id="s6" style="counter-reset:sec 6"><h2 class="sec"><span class="n">6</span>t-0 obligations</h2>
+<ol class="clause">
+<li>t-0 will make the t-0 Network available to the Partner so it can access the Services, and will adhere to the Payment Rules in Schedule 1.</li>
+<li>t-0 will make available appropriate software development kits and documentation to enable the Partner to push and retrieve quotes, receive and send payment orders, establish settlement ledgers and limits, and track orders, payments and settlements via the Network.</li>
+</ol>
+</section>
+
+<!-- 7 -->
+<section id="s7" style="counter-reset:sec 7"><h2 class="sec"><span class="n">7</span>Committed flow and Trade Confirmations</h2>
+<ol class="clause">
+<li><span class="term">Basis of dealing.</span> A Partner may transact on the Network on an uncommitted basis, using standing, non-binding indicative terms recorded in the Order Form and adjusted through the API, or, where agreed with t-0, on a Committed Basis under one or more Trade Confirmations.</li>
+<li><span class="term">Trade Confirmations.</span> A Trade Confirmation sets out binding committed terms for Committed Flow. On execution, each Trade Confirmation forms part of this Agreement and is subject to it, save as provided in the order of precedence in Clause 3. Trade Confirmations may be executed in writing, by electronic signature, or through the Network.</li>
+<li><span class="term">Requestor Trade Confirmations.</span> A Requestor will enter into a separate Trade Confirmation for each Corridor, specifying either (a) a Committed Volume for that Corridor and the Shortfall Fee payable if realised volume falls short, or (b) where no Committed Volume is agreed, the Minimum Access Fee payable for access to committed rates; together with the start date, any ramp period, the tenor or cancellation notice, and any Security Deposit.</li>
+<li><span class="term">Provider Trade Confirmations.</span> A Provider will enter into a single Trade Confirmation with t-0, incorporating a rate schedule that sets out, for each Corridor the Provider serves, the Committed Rate (the Committed Margin over the Agreed Reference Rate), the Deficit Fee, the settlement service level and any force majeure terms. Corridors may be added by amending the rate schedule.</li>
+<li><span class="term">t-0 as counterparty.</span> For Committed Flow, t-0 acts as principal counterparty: it receives Committed Volume commitments from Requestors and gives corresponding volume commitments to Providers, and is entitled to receive and liable to pay the associated Fees.</li>
+<li><span class="term">In-scope flow and Non-executed Rates.</span> Committed Volumes and Fees relate to In-scope flow only. The Requestor warrants that it will submit only In-scope flow and will not mischaracterise any payment. A Trade Confirmation may provide that, where a rate quoted through the Network is worse than the Committed Rate, the affected day is a Non-executed Rate that reduces the Committed Volume and relieves the corresponding Fees, and may allow termination, as that Trade Confirmation states.</li>
+<li><span class="term">Settlement unaffected.</span> t-0's role as principal under Clause 7.5 relates only to the volume and rate commitments and associated Fees under Trade Confirmations. The processing and settlement of each individual payment continues to be governed by the Payment Rules in Schedule 1, under which t-0 provides facilitating software, holds no Partner funds, and routes messages between Partners. t-0 is not a counterparty to, and accepts no liability for, the underlying payments themselves.</li>
+<li><span class="term">Calculation Agent.</span> t-0 acts as Calculation Agent for all Committed Flow. Using the secure ledger it maintains and its verification of on-chain settlement, t-0 will determine realised In-scope volume, any Non-executed Rate days, any shortfall or deficit, settlement timing and any Fee payable. Absent manifest error, its determinations are binding on the Parties at first instance, without prejudice to Clause 30 (Dispute resolution).</li>
+<li><span class="term">Force majeure.</span> Relief for events outside a Party's reasonable control is dealt with in Clause 19 and, where more specific to a Committed Flow, in the relevant Trade Confirmation.</li>
+</ol>
+</section>
+
+<!-- 8 -->
+<section id="s8" style="counter-reset:sec 8"><h2 class="sec"><span class="n">8</span>Fees, Security Deposits and set-off</h2>
+<ol class="clause">
+<li>The Partner will pay the Fees set out in the Order Form, which accrue and are payable in accordance with its terms.</li>
+<li>In addition, the Partner will pay any Shortfall Fees, Minimum Access Fees and Network Fees, and t-0 will pay any Deficit Fees, in each case as set out in the relevant Trade Confirmation and as determined by the Calculation Agent.</li>
+<li><span class="term">Network Fee.</span> t-0 charges a Network Fee on settled or In-scope volume. A Provider pays the Network Fee for introduced flow as set out in the Network Fee Schedule. t-0 may also charge a Requestor a Network Fee where stated in a Trade Confirmation. A Network Fee may be varied for a specific flow by a Trade Confirmation.</li>
+<li><span class="term">Minimum Access Fee.</span> The Minimum Access Fee for a Corridor is a monthly floor. In any month, the Requestor pays only the amount (if any) by which the Minimum Access Fee exceeds the Requestor's processed volume in that Corridor multiplied by the Shortfall Fee percentage stated in the relevant Trade Confirmation.</li>
+<li><span class="term">Security Deposits.</span> t-0 may require a Requestor to post and maintain a Security Deposit in the Settlement Currency in a wallet designated by t-0, as security for the Requestor's obligations under any Trade Confirmation. t-0 may apply or draw down the Security Deposit against any Fees (including Shortfall Fees) properly due and unpaid. Any balance remaining after all amounts due have been satisfied will be returned on termination of the relevant Trade Confirmation.</li>
+<li><span class="term">Set-off.</span> t-0 may set off any amount owed by a Partner under this Agreement against any amount owed by t-0 to that Partner (including Deficit Fees), whether under the same or a different Trade Confirmation. Except as expressly provided, all amounts are payable without set-off or deduction by the Partner.</li>
+<li>t-0 will provide an invoice on request for Fees paid via the t-0 Network during the Partner's specified accounting period.</li>
+<li>Unless otherwise stated, all Fees are exclusive of VAT and other applicable taxes, which the Partner will pay in addition.</li>
+</ol>
+</section>
+
+<!-- 9 -->
+<section id="s9" style="counter-reset:sec 9"><h2 class="sec"><span class="n">9</span>Compliance with Applicable Laws</h2>
+<ol class="clause">
+<li>Each Party will, at its own expense, comply with all Applicable Laws relating to its activities under this Agreement, as they change from time to time, and with any conditions binding on it under any Licences.</li>
+</ol>
+</section>
+
+<!-- 10 -->
+<section id="s10" style="counter-reset:sec 10"><h2 class="sec"><span class="n">10</span>Sanctions and financial crime</h2>
+<ol class="clause">
+<li>Each Party represents, on a continuing basis, that neither it nor, so far as it is aware, its beneficial owners or controllers is a person that is the target of economic or trade sanctions administered or enforced by any relevant authority (a <span class="term">Sanctioned Person</span>), and that it is not located, organised or resident in a comprehensively sanctioned jurisdiction.</li>
+<li>The Partner will maintain, and comply with, policies and procedures reasonably designed to ensure compliance with all applicable sanctions, anti-money-laundering and counter-terrorist-financing laws, and will screen its End Customers accordingly.</li>
+<li>The Partner will not use the t-0 Network to process any payment that it knows or reasonably suspects involves a Sanctioned Person, a comprehensively sanctioned jurisdiction, or the proceeds of crime.</li>
+<li>The Partner will notify t-0 promptly if it becomes, or becomes aware that it may become, a Sanctioned Person or the subject of any financial-crime investigation or enforcement action material to this Agreement. t-0 may suspend or terminate the Services in accordance with Clauses 17 and 18 where it reasonably considers there is a sanctions or financial-crime concern.</li>
+</ol>
+</section>
+
+<!-- 11 -->
+<section id="s11" style="counter-reset:sec 11"><h2 class="sec"><span class="n">11</span>Intellectual property</h2>
+<ol class="clause">
+<li>The Partner acquires no rights in any Intellectual Property Rights of t-0 under this Agreement or through the provision of the Services to End Customers, and may use t-0's Intellectual Property Rights only with t-0's prior written consent.</li>
+<li>The t-0 Network is subject to one or more pending patent applications. The Partner acknowledges t-0's exclusive ownership of all Intellectual Property Rights in the t-0 Network, including those applications.</li>
+<li>The Partner will not, and will not permit any affiliate or third party to, reverse engineer, decompile or disassemble the t-0 Network, derive its source code, algorithms or structure, or create derivative works based on it.</li>
+<li>To the extent the Partner acquires any Intellectual Property Rights relating to the Services or t-0, it assigns those rights to t-0 immediately on becoming aware of them, in such form as t-0 reasonably requires.</li>
+</ol>
+</section>
+
+<!-- 12 -->
+<section id="s12" style="counter-reset:sec 12"><h2 class="sec"><span class="n">12</span>Data protection</h2>
+<ol class="clause">
+<li>The Parties acknowledge that provision of the Services requires the sharing of personal data relating to End Customers between the Partner and t-0 (<span class="term">Shared Personal Data</span>), and that each Party anticipates acting as a controller in common in respect of that data.</li>
+<li>Each Party will comply with Data Protection Legislation applicable to a controller in respect of the Shared Personal Data, including ensuring lawful and fair processing, providing all necessary fair-processing notices to End Customers, maintaining appropriate technical and organisational security measures and records of processing, not causing the other Party to breach Data Protection Legislation, and co-operating with the other Party in relation to data-subject requests and regulator communications.</li>
+<li>If a Party receives any complaint or communication from a data-protection regulator relating to the Shared Personal Data or to a potential failure by the other Party to comply, it will promptly notify the other Party and provide the information reasonably requested, to the extent permitted by law.</li>
+</ol>
+</section>
+
+<!-- 13 -->
+<section id="s13" style="counter-reset:sec 13"><h2 class="sec"><span class="n">13</span>Warranties</h2>
+<ol class="clause">
+<li>Each Party warrants, on a continuing basis, that: it has the power and capacity to enter into and perform this Agreement; it holds all Licences necessary to perform its obligations; it will perform in accordance with all Applicable Laws; it is not subject to an Insolvency Event; and, so far as it is aware, the Partner's and its End Customers' receipt and use of the Services will not infringe any third party's rights.</li>
+<li>If a Party becomes aware that it has breached, or may breach, any of these warranties, it will notify the other Party immediately.</li>
+</ol>
+</section>
+
+<!-- 14 -->
+<section id="s14" style="counter-reset:sec 14"><h2 class="sec"><span class="n">14</span>Limitation of liability</h2>
+<ol class="clause">
+<li>Each Party's liability under or in connection with this Agreement, whether in contract, tort (including negligence), misrepresentation or otherwise, is as set out in this Clause 14.</li>
+<li>Nothing in this Agreement limits liability for death or personal injury caused by negligence, fraud or fraudulent misrepresentation, or any liability that cannot be limited or excluded under Applicable Law.</li>
+<li>Nothing in this Agreement limits the Partner's liability to t-0 for misuse of the t-0 Network in breach of Schedule 1 (including the third-party indemnities in Section 17 of Schedule 1) or under Clause 16 (Non-circumvention).</li>
+<li>Nothing in this Clause 14 limits either Party's obligation to pay Fees (including Shortfall Fees, Minimum Access Fees and Deficit Fees) properly due under this Agreement or a Trade Confirmation, which are primary payment obligations and not damages.</li>
+<li>Subject to Clauses 14.2 to 14.4 and the provisions of the Schedules, each Party's aggregate liability to the other under or in connection with this Agreement will not exceed the total Fees paid under this Agreement in the preceding twelve-month period, save that this cap does not apply to any Shortfall Fee owed, and no Party will be liable for any special, indirect or consequential loss.</li>
+<li>Except as expressly stated and subject to Clause 14.2, all terms, warranties and conditions implied by statute, common law or otherwise are excluded to the extent permitted by Applicable Law.</li>
+</ol>
+</section>
+
+<!-- 15 -->
+<section id="s15" style="counter-reset:sec 15"><h2 class="sec"><span class="n">15</span>Confidentiality</h2>
+<ol class="clause">
+<li>Neither Party will disclose the other's Confidential Information to any third party without prior written consent, and each will use the other's Confidential Information only for the purposes of this Agreement, disclosing it only to those of its personnel and End Customers who need to know it and who are bound by confidentiality obligations no less stringent than these.</li>
+<li>Each Party will keep the contents of this Agreement in strict confidence and will not disclose them without the other's prior written consent, except as required by a court or competent regulatory authority, in which case it will notify the other Party, limit the disclosure to what is required, and use reasonable endeavours to preserve confidentiality.</li>
+<li>Neither Party will issue any press release or public announcement relating to this Agreement, the Services or the relationship between the Parties without the other's prior written approval.</li>
+<li>These confidentiality obligations continue during the Term and for seven years after termination or expiry.</li>
+</ol>
+</section>
+
+<!-- 16 -->
+<section id="s16" style="counter-reset:sec 16"><h2 class="sec"><span class="n">16</span>Non-circumvention and non-solicitation</h2>
+<ol class="clause">
+<li>During the Term and for one year after termination or expiry (the <span class="term">Restricted Period</span>), the Partner will not, directly or indirectly, whether on its own behalf or with or for any third party: (a) engage in any arrangement for executing cross-border payments with any other participant in the t-0 Network (or their affiliates) with whom it has previously transacted, or into whose Committed Flow it has been matched or aggregated, via the t-0 Network (each a <span class="term">Restricted Partner</span>); or (b) circumvent or seek to circumvent the t-0 Network for the purpose of executing cross-border payments with a Restricted Partner.</li>
+<li>During the Restricted Period, the Partner will not, directly or indirectly, solicit, entice or encourage any Restricted Partner to enter into any cross-border payments arrangement outside the t-0 Network, or induce any Restricted Partner to reduce or terminate its involvement with the t-0 Network.</li>
+<li>Where a Restricted Partner has been introduced or aggregated through Committed Flow, the Restricted Period runs from the later of termination of this Agreement and the last date on which the Parties participated in Committed Flow involving that Restricted Partner.</li>
+<li>The restrictions in this Clause 16 do not apply where the Partner can provide documentary evidence that its relationship with the relevant counterparty existed independently and before any introduction via the t-0 Network.</li>
+<li>Nothing in this Clause limits t-0's right to seek injunctive or other equitable relief for an actual or threatened breach, in addition to damages or other remedies.</li>
+</ol>
+</section>
+
+<!-- 17 -->
+<section id="s17" style="counter-reset:sec 17"><h2 class="sec"><span class="n">17</span>Suspension</h2>
+<ol class="clause">
+<li>t-0 may suspend the Partner's access to the Services, in whole or in part (including by removing the Partner's committed capacity from the aggregate position in a Corridor), immediately on notice, where: (a) the Partner is in material breach of this Agreement; (b) the Partner has failed to pay any amount properly due and that failure continues; (c) t-0 reasonably suspects financial crime, a sanctions concern, or a breach of Applicable Law; (d) the Partner is subject to, or t-0 reasonably considers it likely to become subject to, an Insolvency Event; or (e) t-0 reasonably considers suspension necessary to protect the integrity or security of the t-0 Network or other Partners.</li>
+<li>Suspension does not relieve the Partner of obligations accrued before or during the suspension. t-0 will restore access promptly once the cause of suspension has been resolved to its reasonable satisfaction, and will act proportionately, limiting any suspension to what is reasonably necessary.</li>
+</ol>
+</section>
+
+<!-- 18 -->
+<section id="s18" style="counter-reset:sec 18"><h2 class="sec"><span class="n">18</span>Termination</h2>
+<ol class="clause">
+<li>Either Party may terminate this Agreement on not less than three months' prior written notice, provided the notice does not expire before the end of the initial term set out in the Order Form (the <span class="term">Initial Term</span>).</li>
+<li>After the Initial Term, this Agreement renews automatically for successive one-year terms unless either Party gives at least 90 days' written notice of termination before the end of the then-current term. If the Partner continues to use the Services after a renewal date, it is deemed to have renewed for the following term.</li>
+<li>Without prejudice to other rights, either Party may terminate immediately on written notice if the other: (a) commits a material breach that, if capable of remedy, is not remedied within 30 days of written notice; (b) commits persistent or continuous service-level failures, including persistent failures to meet the notification and execution Service Levels in Sections 5 and 10 of Schedule 1; (c) is subject to an Insolvency Event; or (d) ceases to trade.</li>
+<li>t-0 may terminate immediately if the Partner commits, is prosecuted for, or is found to have committed, any breach of Applicable Law or any Licence, or is in breach of Schedule 1.</li>
+<li>Individual Trade Confirmations may be terminated in accordance with their own terms without terminating this Agreement. Termination of this Agreement terminates all Trade Confirmations then in effect.</li>
+<li>On termination, this Agreement ceases to have effect except for Clauses 8 (in respect of accrued amounts), 11, 14, 15, 16, 19 to 33, which survive. Termination does not affect rights or obligations accrued at the date of termination.</li>
+</ol>
+</section>
+
+<!-- 19 -->
+<section id="s19" style="counter-reset:sec 19"><h2 class="sec"><span class="n">19</span>Force majeure</h2>
+<ol class="clause">
+<li>A <span class="term">Force Majeure Event</span> is any event beyond a Party's reasonable control and not caused by its own act, omission or breach, including: an outage or degradation of the t-0 Network; a halt, severe congestion or finality failure of a settlement blockchain; downtime of a local payment rail; a government-imposed payment moratorium, capital control or currency inconvertibility; a change of law, licence or regulatory direction that prevents performance in a Corridor; a sanctions designation arising after the relevant Trade Confirmation; a security incident not attributable to the affected Party's own controls; and natural disaster, war, civil unrest, terrorism or pandemic, in each case to the extent it actually prevents performance.</li>
+<li>Neither Party is liable for any failure or delay in performance to the extent caused by a Force Majeure Event. The affected obligations are suspended for the duration of the event. The affected Party will notify the other promptly, use reasonable endeavours to mitigate, and resume performance as soon as practicable.</li>
+<li>For Committed Flow, relief is proportionate to the impairment: no Shortfall Fee or Deficit Fee accrues on flow actually prevented by the Force Majeure Event, and any Committed Volume is reduced for the days affected, as elaborated in the relevant Trade Confirmation. The Calculation Agent will determine, binding at first instance, whether a Force Majeure Event occurred and the extent of the impairment.</li>
+<li>If a Force Majeure Event continues for more than 30 days, either Party may terminate the affected Trade Confirmation or Corridor on notice.</li>
+</ol>
+</section>
+
+<!-- 20 -->
+<section id="s20" style="counter-reset:sec 20"><h2 class="sec"><span class="n">20</span>Assignment</h2>
+<ol class="clause">
+<li>The Partner will not assign, transfer, charge, subcontract or otherwise deal with any of its rights or obligations under this Agreement without t-0's prior written consent.</li>
+<li>t-0 may assign, charge or otherwise deal with any or all of its rights under this Agreement.</li>
+</ol>
+</section>
+
+<!-- 21 -->
+<section id="s21" style="counter-reset:sec 21"><h2 class="sec"><span class="n">21</span>Variation and amendment of terms</h2>
+<ol class="clause">
+<li>t-0 may amend any of the terms of this Agreement, including this Network Services Agreement, the Order Form and the Payment Rules in Schedule 1, but excluding the terms of any executed Trade Confirmation, at any time. Written notice of any amendment will be provided to the Partner by email, and the amendment takes effect from the date stated in the notice.</li>
+<li>This Agreement may also be varied in writing by a Trade Confirmation signed by both Parties, to the extent that Trade Confirmation expressly states, in respect of the Committed Flow it covers.</li>
+<li>The terms of an executed Trade Confirmation may be amended only in accordance with that Trade Confirmation or by written agreement of the Parties to it.</li>
+</ol>
+</section>
+
+<!-- 22 -->
+<section id="s22" style="counter-reset:sec 22"><h2 class="sec"><span class="n">22</span>Waiver</h2>
+<ol class="clause">
+<li>A waiver of any right or remedy is effective only if given in writing and is not a waiver of any subsequent breach. A failure or delay in exercising any right or remedy is not a waiver of it, and no single or partial exercise prevents any further exercise.</li>
+</ol>
+</section>
+
+<!-- 23 -->
+<section id="s23" style="counter-reset:sec 23"><h2 class="sec"><span class="n">23</span>Rights and remedies</h2>
+<ol class="clause">
+<li>The rights and remedies under this Agreement are in addition to, and not exclusive of, any rights or remedies provided by Applicable Law.</li>
+</ol>
+</section>
+
+<!-- 24 -->
+<section id="s24" style="counter-reset:sec 24"><h2 class="sec"><span class="n">24</span>Severance</h2>
+<ol class="clause">
+<li>If any provision is or becomes invalid, illegal or unenforceable, it will be modified to the minimum extent necessary to make it valid and enforceable, or, if that is not possible, deemed deleted. Any such modification or deletion does not affect the validity of the rest of this Agreement.</li>
+</ol>
+</section>
+
+<!-- 25 -->
+<section id="s25" style="counter-reset:sec 25"><h2 class="sec"><span class="n">25</span>Entire agreement</h2>
+<ol class="clause">
+<li>This Agreement, its Schedules, the Order Form and the Trade Confirmations are the entire agreement between the Parties relating to the Services and supersede all previous agreements relating to them. Each Party acknowledges that it has not relied on any representation or assurance not set out in this Agreement, and no standard terms on any purchase order, invoice or similar document will have any effect.</li>
+</ol>
+</section>
+
+<!-- 26 -->
+<section id="s26" style="counter-reset:sec 26"><h2 class="sec"><span class="n">26</span>No partnership or agency</h2>
+<ol class="clause">
+<li>Nothing in this Agreement establishes any partnership or joint venture between the Parties, constitutes either Party the agent of the other, or authorises either Party to make commitments for the other. Each Party acts on its own behalf. This Clause does not affect t-0's role as principal counterparty for Committed Flow under Clause 7 or as Calculation Agent.</li>
+</ol>
+</section>
+
+<!-- 27 -->
+<section id="s27" style="counter-reset:sec 27"><h2 class="sec"><span class="n">27</span>Third party rights</h2>
+<ol class="clause">
+<li>Each Correspondent Partner (as defined in Schedule 1) may enforce the third-party indemnities in Section 17 of Schedule 1 under the Contracts (Rights of Third Parties) Act 1999. Except as stated, no person who is not a party to this Agreement has any right to enforce its terms.</li>
+</ol>
+</section>
+
+<!-- 28 -->
+<section id="s28" style="counter-reset:sec 28"><h2 class="sec"><span class="n">28</span>Notices</h2>
+<ol class="clause">
+<li>Any notice under this Agreement will be signed by or on behalf of the Party giving it, marked for the attention of the relevant contact, and given by prepaid first-class or certified mail, email, or hand delivery to the address or email address specified in the Order Form.</li>
+<li>A notice is deemed delivered: if by mail, within five Business Days; if by courier or hand delivery, within one Business Day; and if by email, on generation of a delivery receipt by the recipient's server or, failing that, on delivery to that server. This Clause does not apply to the service of legal proceedings.</li>
+</ol>
+</section>
+
+<!-- 29 -->
+<section id="s29" style="counter-reset:sec 29"><h2 class="sec"><span class="n">29</span>Counterparts</h2>
+<ol class="clause">
+<li>This Agreement may be executed in any number of counterparts, each of which is an original and all of which together are the same agreement. It is not effective until each Party has executed at least one counterpart, and is dated on the last signature.</li>
+</ol>
+</section>
+
+<!-- 30 -->
+<section id="s30" style="counter-reset:sec 30"><h2 class="sec"><span class="n">30</span>Dispute resolution</h2>
+<ol class="clause">
+<li>The Parties will attempt to resolve any dispute or claim arising out of or in connection with this Agreement (a <span class="term">Dispute</span>) first informally: the t-0 Manager and the Partner's Manager will meet to resolve it within ten Business Days of referral; failing which it will be referred to the CEO of each Party (or their nominees) to meet and resolve.</li>
+<li>If no agreement is reached within 30 days of referral, the dispute-resolution procedure is deemed exhausted and each Party is free to pursue its rights. For Committed Flow, a determination of the Calculation Agent stands unless and until overturned through this procedure or by a court.</li>
+<li>Each Party's rights and obligations continue during dispute-resolution proceedings, except to the extent the Dispute precludes performance.</li>
+</ol>
+</section>
+
+<!-- 31 -->
+<section id="s31" style="counter-reset:sec 31"><h2 class="sec"><span class="n">31</span>Inadequacy of damages</h2>
+<ol class="clause">
+<li>Each Party acknowledges that damages alone may not be an adequate remedy for breach, and that each Party is entitled to seek injunction, specific performance or other equitable relief in any jurisdiction in connection with this Agreement.</li>
+</ol>
+</section>
+
+<!-- 32 -->
+<section id="s32" style="counter-reset:sec 32"><h2 class="sec"><span class="n">32</span>Governing law</h2>
+<ol class="clause">
+<li>This Agreement and any dispute or claim (including non-contractual disputes or claims) arising out of or in connection with it or its subject matter or formation are governed by and construed in accordance with the law of England and Wales.</li>
+</ol>
+</section>
+
+<!-- 33 -->
+<section id="s33" style="counter-reset:sec 33"><h2 class="sec"><span class="n">33</span>Jurisdiction</h2>
+<ol class="clause">
+<li>Each Party irrevocably agrees that the courts of England and Wales have exclusive jurisdiction to settle any dispute or claim (including non-contractual disputes or claims) arising out of or in connection with this Agreement or its subject matter or formation.</li>
+</ol>
+</section>
+
+<!-- SCHEDULE 1 -->
+<div class="sched-head" id="sch1"><div class="kick">Schedule 1</div><h2>Payment Rules — Network Operating Manual</h2></div>
+
+<section style="counter-reset:sec 1"><h2 class="sec"><span class="n">1</span>Introduction and Purpose</h2><p class="s1c"><span class="n">1.1</span><strong>Status.</strong> This Schedule 1 forms part of the Agreement and sets out the binding operational rules that every Network Member must observe. Capitalised terms have the meanings given in the Agreement or in Section 23 (Definitions). t-0 may amend this Schedule in accordance with Clause 21 of the Agreement.</p><p class="s1c"><span class="n">1.2</span><strong>Scope.</strong> These rules apply to all Members, in whichever of the Requestor and Provider roles they operate, and cover the full operational lifecycle: onboarding and due diligence, quoting, payment processing, settlement, compliance, fraud, refunds and disputes. Settlement between Members occurs exclusively in USDT on the Supported Blockchains.</p><p class="s1c"><span class="n">1.3</span><strong>Infrastructure neutrality.</strong> In processing and settling individual payments, t-0 operates purely as technical infrastructure: it does not touch the flow of funds of payments and takes no custody of any Member wallet, other than any Security Deposit held under Clause 8 of the Agreement. This neutrality is subject to, and does not limit, t-0's role as principal counterparty for Committed Flow and as Calculation Agent under Clause 7 of the Agreement.</p><p class="s1c"><span class="n">1.4</span><strong>Governing principles.</strong> The Network operates on the following principles:</p><ol class="sub"><li>No custody: each Member retains full custody and control of its own wallets and funds; the Network monitors settlement transactions but never holds or controls Member wallets, save for any Security Deposit held under the Agreement.</li><li>Bilateral trust: corridors are established through mutual KYB approval, and payments are never routed to a counterparty the sending Member has not pre-approved.</li><li>Regulatory responsibility: each Member is independently responsible for compliance with all laws and licensing requirements in its own operating jurisdictions.</li></ol></section>
+
+<section style="counter-reset:sec 2"><h2 class="sec"><span class="n">2</span>Roles</h2><p class="s1c"><span class="n">2.1</span><strong>Requestors and Providers.</strong> Every Member operates as a Requestor, a Provider, or both. A Requestor originates payment activity and holds the relationship with the End Customer; it requests a service from the Network. A Provider is the institution that executes that service locally. The Provider role carries the greater operational burden, because the Provider takes responsibility for receiving and acting on introduced flow. The Requestor role is intentionally light-touch.</p><p class="s1c"><span class="n">2.2</span>There are four role types, formed by the two directions of flow (Payout and Collection):</p><table class="calc"><tr><th>Role</th><th>What it does</th></tr><tr><td>Payout Requestor</td><td>Originates outbound payments and instructs a Payout Provider to disburse local currency to a beneficiary. Settles USDT to the Provider.</td></tr><tr><td>Payout Provider</td><td>A licensed institution that receives payout requests and disburses local currency to the beneficiary via domestic rails, in exchange for USDT settlement.</td></tr><tr><td>Collection Requestor</td><td>Originates collections by creating payment intents to collect fiat from a payer in a market, and receives USDT settlement.</td></tr><tr><td>Collection Provider</td><td>A licensed institution that collects local currency from the payer, confirms receipt, and settles the corresponding USDT to the Collection Requestor.</td></tr></table><p class="s1c"><span class="n">2.3</span><strong>Multiple roles.</strong> A single Member may hold more than one role (for example, a Payout Requestor in one corridor and a Payout Provider in another). All roles are accessed through the same API integration.</p><p class="s1c"><span class="n">2.4</span><strong>Single-leg transactions.</strong> Each Network transaction is a single leg between one Requestor and one Provider. The Network does not chain a Collection and a Payout into one end-to-end payment; a Member that requires both runs two separate transactions.</p></section>
+
+<section style="counter-reset:sec 3"><h2 class="sec"><span class="n">3</span>Membership and Eligibility</h2><p class="s1c"><span class="n">3.1</span><strong>Providers.</strong> Only licensed financial institutions may act as Providers. A Provider must hold and maintain all Licences required to execute local-currency payouts or collections in its market, and must evidence this during onboarding.</p><p class="s1c"><span class="n">3.2</span><strong>Requestors.</strong> A Requestor is not required to hold a financial-services licence. Every Requestor must nonetheless complete the Network standard KYB and due diligence with t-0 (Section 13), which Providers review before agreeing to execute its payment requests, and warrants on a continuing basis that it complies with all laws applicable to it, including anti-money-laundering, counter-terrorist-financing and sanctions laws, and that it performs due diligence on its own End Customers.</p><p class="s1c"><span class="n">3.3</span><strong>Onboarding.</strong> All prospective Members complete a pre-approval KYB and due diligence process through the t-0 Platform before being granted access, submitting company, ownership, regulatory and (for Providers) licensing information.</p><p class="s1c"><span class="n">3.4</span><strong>Corridor establishment.</strong> Before two Members exchange payments they must establish a corridor. Corridor approval requires mutual KYB review and explicit approval by each Member's compliance function through the t-0 dashboard. t-0 facilitates the introduction and documentation exchange but the approval decision rests solely with each Member. No payment is routed through a corridor that has not been bilaterally approved.</p></section>
+
+<section style="counter-reset:sec 4"><h2 class="sec"><span class="n">4</span>Requestor Operating Obligations</h2><p class="s1intro">The Requestor role is light-touch. A Requestor's operational duties are limited to originating clean, well-documented requests, meeting its compliance duties toward its own End Customers, and funding or receiving settlement. Its obligations are:</p><p class="s1c"><span class="n">4.1</span><strong>Common to all Requestors.</strong> </p><ol class="sub"><li>Complete and maintain Network KYB and due diligence with t-0, and keep its profile current (Section 13).</li><li>Perform KYC on its End Customers and attach complete Travel Rule data to every request (Section 12).</li><li>Where a Provider requires it in a corridor, complete the Provider's End Customer KYB and obtain approval before sending requests for that End Customer (Section 14).</li><li>Validate the network quote against its own benchmark before confirming, and confirm within the quote validity window.</li><li>Warrant compliance with all applicable AML, sanctions and local laws, and notify t-0 and the counterparty of any relevant compliance event.</li><li>Retain records of its requests, Travel Rule data and settlements for audit and regulatory purposes.</li></ol><p class="s1c"><span class="n">4.2</span><strong>Payout Requestor.</strong> </p><ol class="sub"><li>Originate payout requests with accurate beneficiary details and settle USDT to the Payout Provider under the agreed settlement model (Section 11).</li><li>Manage its own conversion of local currency to USDT and maintain adequate USDT balances or agreed credit.</li><li>Communicate payout outcomes to its End Customer.</li></ol><p class="s1c"><span class="n">4.3</span><strong>Collection Requestor.</strong> </p><ol class="sub"><li>Create payment intents specifying the currency, amount and Travel Rule data, and present the returned payment options to the payer.</li><li>Rely on the Network's settlement notification, not the payer's claim of payment, before releasing goods or services.</li><li>Manage credit exposure to its Collection Providers within agreed limits, since the Provider holds collected funds until USDT settlement.</li></ol></section>
+
+<section style="counter-reset:sec 5"><h2 class="sec"><span class="n">5</span>Provider Operating Obligations</h2><p class="s1intro">The Provider role requires high operational standards, compliance standards and service levels. A Provider's obligations are:</p><p class="s1c"><span class="n">5.1</span><strong>Common to all Providers.</strong> </p><ol class="sub"><li>Hold and maintain all required Licences and complete and maintain Network KYB and due diligence with t-0.</li><li>Stream live quotes to the Network and maintain uninterrupted quote streaming during operating hours (Section 7).</li><li>Screen all inbound Travel Rule data against applicable sanctions lists and perform transaction monitoring under its own compliance procedures.</li><li>Review the Requestor's Network KYB and due diligence, and where operated in the corridor, define and apply its own End Customer KYB requirements (Section 14) and run manual AML checks where required (Section 15).</li><li>Meet the applicable Service Level Agreements (Section 10) and manage USDT and local-currency liquidity to ensure continuous performance.</li><li>Maintain its designated settlement wallet in operational condition with appropriate custody and security.</li><li>Reject any request that does not meet its AML/CFT risk standards, communicating the rejection to the Network immediately.</li></ol><p class="s1c"><span class="n">5.2</span><strong>Payout Provider.</strong> </p><ol class="sub"><li>Accept or reject a payout request within 30 seconds of receipt.</li><li>On acceptance, the settlement amount is locked; submit the payout to the requested local payment rail within one hour of accepting the transaction.</li><li>Report payout completion to the Network with receipt details and transaction identifiers.</li><li>Prevent duplicate execution of the same instruction.</li></ol><p class="s1c"><span class="n">5.3</span><strong>Collection Provider.</strong> </p><ol class="sub"><li>Respond to a payment intent with payment details within 30 seconds.</li><li>Receive and verify the payer's fiat payment and confirm funds received to the Network promptly; the settlement rate is fixed at confirmation.</li><li>Settle the corresponding USDT to the Collection Requestor within one hour of receipt of the local currency, or under the agreed settlement model (Section 11).</li><li>Monitor for incoming payments against the reference details it provided.</li></ol></section>
+
+<section style="counter-reset:sec 6"><h2 class="sec"><span class="n">6</span>t-0 Responsibilities</h2><p class="s1c"><span class="n">6.1</span>Maintain the centralised order book of FX quotes and route each request to the best available quote, considering rate and settlement-limit capacity.</p><p class="s1c"><span class="n">6.2</span>Monitor the Supported Blockchains for settlement transactions between whitelisted wallets and maintain the internal ledger of obligations, settlements, net positions and fee accruals.</p><p class="s1c"><span class="n">6.3</span>Provide real-time payment status tracking and status callbacks to all parties.</p><p class="s1c"><span class="n">6.4</span>Facilitate KYB and due diligence exchange between prospective corridor partners and host the End Customer KYB form builder.</p><p class="s1c"><span class="n">6.5</span>Act as Calculation Agent for Committed Flow under the Agreement, determining realised volume, shortfall, deficit, timing and fees.</p><p class="s1c"><span class="n">6.6</span>Provide SDKs, documentation, sandbox and pre-go-live verification, and integration support.</p></section>
+
+<section style="counter-reset:sec 7"><h2 class="sec"><span class="n">7</span>Quote Management and FX Operations</h2><p class="s1c"><span class="n">7.1</span><strong>Quote streaming.</strong> Providers stream exchange-rate quotes to the Network at intervals of no less than every 5 seconds, covering the currencies, bands and directions they support. Streaming also serves as a liveness check: if a Provider stops streaming for 30 seconds, the Network treats this as downtime and removes the Provider from the order book until streaming resumes.</p><p class="s1c"><span class="n">7.2</span><strong>Quote bands.</strong> Quotes are structured across standard USD-equivalent volume bands (Band 1 $1,000; Band 2 $5,000; Band 3 $10,000; Band 4 $25,000; Band 5 $250,000; Band 6 $1,000,000). Band-differentiated pricing is recommended but not mandatory.</p><p class="s1c"><span class="n">7.3</span><strong>Quote validity.</strong> Quotes are valid for 30 seconds from submission. A Requestor has 30 seconds from receiving a quote to create a payment at the quoted rate.</p><p class="s1c"><span class="n">7.4</span><strong>Routing.</strong> On a request, the Network converts the amount to its USD equivalent, sorts applicable quotes by rate, and considers corridor connections and settlement limits. If the best-rate Provider has insufficient limit, the Network routes to the next best quote.</p><p class="s1c"><span class="n">7.5</span><strong>FX risk.</strong> Each Member manages its own exposure between local currency and USDT. Because payment can be initiated immediately against a live quote, each Member must operate a rate-validation control (human or automated) against a benchmark before confirming.</p></section>
+
+<section style="counter-reset:sec 8"><h2 class="sec"><span class="n">8</span>Payment Processing — Payouts</h2><p class="s1c"><span class="n">8.1</span>The Payout Requestor performs KYC on the sender and collects Travel Rule data.</p><p class="s1c"><span class="n">8.2</span>The Requestor requests a quote and confirms the payment within the 30-second validity window.</p><p class="s1c"><span class="n">8.3</span>The Network routes the instruction and Travel Rule data to the selected Payout Provider.</p><p class="s1c"><span class="n">8.4</span>The Provider screens the data and accepts or rejects within 30 seconds; on acceptance the settlement amount is locked.</p><p class="s1c"><span class="n">8.5</span>The Provider submits the payout to the local rail and disburses local currency to the beneficiary, then reports completion.</p><p class="s1c"><span class="n">8.6</span>The Network confirms payout to the Requestor and updates the ledger.</p></section>
+
+<section style="counter-reset:sec 9"><h2 class="sec"><span class="n">9</span>Payment Processing — Collections</h2><p class="s1c"><span class="n">9.1</span>The Collection Requestor creates a payment intent specifying currency, amount and Travel Rule (beneficiary) data.</p><p class="s1c"><span class="n">9.2</span>The Network requests payment details from available Collection Providers and returns the payment options to the Requestor.</p><p class="s1c"><span class="n">9.3</span>The Requestor presents the options to the payer, who sends fiat to the Provider outside the Network.</p><p class="s1c"><span class="n">9.4</span>On receipt, the Provider confirms funds received; the Network fixes the settlement rate from the Provider's current quote and creates ledger entries.</p><p class="s1c"><span class="n">9.5</span>The Network sends a settlement notification to the Requestor, after which it may safely release goods or services.</p><p class="s1c"><span class="n">9.6</span>The Provider settles USDT to the Requestor within one hour of receipt, or under the agreed settlement model; outstanding balances net and settle asynchronously on-chain.</p></section>
+
+<section style="counter-reset:sec 10"><h2 class="sec"><span class="n">10</span>Service Level Agreements</h2><p class="s1intro">The following SLAs bind all Members. Persistent failure may result in suspension from routing, mandatory remediation, or removal from the Network.</p><p class="s1c"><span class="n">10.1</span><strong>Payout SLAs.</strong> </p><table class="calc"><tr><th>Metric</th><th>Requirement</th><th>Consequence of breach</th></tr><tr><td>Payout acceptance / rejection</td><td>Within 30 seconds of receipt</td><td>Automatic timeout; re-routed to alternate Provider</td></tr><tr><td>Quote streaming frequency</td><td>Every 5 seconds</td><td>Provider removed from order book after 30 seconds of inactivity</td></tr><tr><td>Payout execution</td><td>Submit to the local payment rail within 1 hour of acceptance</td><td>Persistent failure is a material breach</td></tr><tr><td>Completion reporting</td><td>Within 15 minutes of local rail confirmation</td><td>Escalation and remediation</td></tr></table><p class="s1c"><span class="n">10.2</span><strong>Collection SLAs.</strong> </p><table class="calc"><tr><th>Metric</th><th>Requirement</th><th>Consequence of breach</th></tr><tr><td>Payment-intent response</td><td>Provide payment details within 30 seconds</td><td>Intent may be routed to alternate Provider</td></tr><tr><td>Quote streaming frequency</td><td>Every 5 seconds</td><td>Provider removed from order book after 30 seconds of inactivity</td></tr><tr><td>Confirm funds received</td><td>Promptly on receipt and verification of the payer's fiat</td><td>Delay in settlement notification to the Requestor</td></tr><tr><td>USDT settlement to Requestor</td><td>Within 1 hour of receipt of local currency</td><td>Persistent failure is a material breach</td></tr></table><p class="s1c"><span class="n">10.3</span><strong>AML processing.</strong> Where a payment requires manual AML review, the Provider completes it within 4 business hours during operating hours; reviews exceeding 24 hours require formal notification to the Requestor with a reason code. After clearance on a delayed payment, the quote is refreshed and re-confirmed before execution (Section 15).</p><p class="s1c"><span class="n">10.4</span><strong>Settlement.</strong> Under pre-settlement, USDT is transferred before execution; under post-settlement (credit-based), settlement occurs before the outstanding balance reaches the agreed credit limit, and at least once every 24 hours during active periods.</p><p class="s1c"><span class="n">10.5</span><strong>Availability.</strong> Providers must maintain 99.5% uptime during declared operating hours, give 24 hours' notice of planned maintenance (ceasing quote streaming during it), and report unplanned outages within 30 minutes.</p><p class="s1c"><span class="n">10.6</span><strong>Reporting.</strong> Completions are reported within 15 minutes of rail confirmation; rejections immediately; disputes acknowledged within 2 business hours and substantively answered within 5 business days.</p><p class="s1c"><span class="n">10.7</span><strong>Responsibilities matrix — Payouts.</strong> </p><table class="calc"><tr><th>Responsibility</th><th>Payout Requestor</th><th>Payout Provider</th></tr><tr><td>End Customer KYC and Travel Rule data</td><td>Owns</td><td>Screens data received</td></tr><tr><td>Sanctions screening of the payment</td><td>Screens sender</td><td>Screens beneficiary and payment</td></tr><tr><td>Local-currency execution</td><td>—</td><td>Owns</td></tr><tr><td>USDT settlement</td><td>Sends to Provider</td><td>Receives</td></tr><tr><td>Duplicate prevention</td><td>—</td><td>Owns</td></tr></table><p class="s1c"><span class="n">10.8</span><strong>Responsibilities matrix — Collections.</strong> </p><table class="calc"><tr><th>Responsibility</th><th>Collection Requestor</th><th>Collection Provider</th></tr><tr><td>End Customer KYC and Travel Rule data</td><td>Owns</td><td>Screens data received</td></tr><tr><td>Payment-method details to payer</td><td>Presents to payer</td><td>Provides details</td></tr><tr><td>Receipt and verification of fiat</td><td>—</td><td>Owns</td></tr><tr><td>Settlement rate</td><td>Accepts at confirmation</td><td>Fixes from live quote</td></tr><tr><td>USDT settlement</td><td>Receives</td><td>Sends to Requestor</td></tr></table></section>
+
+<section style="counter-reset:sec 11"><h2 class="sec"><span class="n">11</span>Settlement Operations</h2><p class="s1c"><span class="n">11.1</span><strong>Infrastructure.</strong> All inter-Member settlement occurs in USDT on the Supported Blockchains, directly between Members' whitelisted wallets, with no intermediary custody by t-0. Confirmations typically complete within 1–2 minutes.</p><p class="s1c"><span class="n">11.2</span><strong>Wallets.</strong> Each Member designates a single static wallet, whitelisted with the Network for automated monitoring. Custody remains with the Member; t-0 does not access, control or check balances of Member wallets, other than any Security Deposit held under the Agreement.</p><p class="s1c"><span class="n">11.3</span><strong>Settlement models — Payouts.</strong> Pre-settlement: the Requestor transfers USDT to the Provider before payout, bearing settlement risk. Post-settlement (credit-based): the Provider extends a credit line to the Requestor, enabling netting where flows are bidirectional. Hybrid: pre-settlement above an agreed credit threshold, credit-based below it.</p><p class="s1c"><span class="n">11.4</span><strong>Batching and netting.</strong> Settlement is not required per payment. Members may batch obligations into a single transfer, which the Network allocates across outstanding obligations. Where credit lines exist in both directions, obligations net automatically, reducing on-chain transfers.</p><p class="s1c"><span class="n">11.5</span><strong>Fees.</strong> The Network fees payable by Providers for introduced flow are set out in the t-0 Network Fee Schedule, published separately and updated by t-0 from time to time, on a per-currency basis, and may be varied for a specific flow by a Trade Confirmation. Requestor-side committed fees (the Minimum Access Fee and Shortfall Fees) and t-0's Deficit Fees are set out in the Agreement and the relevant Trade Confirmations. Fees accrue in USDT and are invoiced monthly. See Section 24.</p></section>
+
+<section style="counter-reset:sec 12"><h2 class="sec"><span class="n">12</span>Compliance, Travel Rule and AML</h2><p class="s1c"><span class="n">12.1</span><strong>Travel Rule.</strong> The Network follows the OpenVASP standard, with additional fields for correspondent payments. Every payment carries a complete set of Travel Rule information covering the sender, the Requestor, the Provider and the beneficiary.</p><p class="s1c"><span class="n">12.2</span><strong>Data requirements.</strong> The Requestor attaches sender identifiers and details, its own institution details, beneficiary details and account/routing information, and the purpose of payment; the Provider's details are populated on completion.</p><p class="s1c"><span class="n">12.3</span><strong>KYC responsibilities.</strong> The Requestor is solely responsible for KYC on its End Customer. The corridor-level KYB approval between Members means the Provider is not required to KYC the Requestor's End Customers, but performs transaction-level screening on the Travel Rule data of each payment.</p><p class="s1c"><span class="n">12.4</span><strong>Screening.</strong> The Provider screens all inbound Travel Rule data against applicable sanctions databases and monitors transactions under its own procedures, following the manual AML process (Section 15) where a payment is flagged, and rejecting any payment that does not meet its risk standards.</p><p class="s1c"><span class="n">12.5</span><strong>Source of funds (USDT).</strong> Members acquiring USDT assume responsibility for assessing its source, using blockchain analytics and conducting due diligence on their USDT liquidity providers.</p><p class="s1c"><span class="n">12.6</span><strong>Corridor-specific compliance.</strong> Travel Rule field requirements are set during corridor creation and may vary by jurisdiction. The Network passes data through as provided and does not transform or validate it.</p></section>
+
+<section style="counter-reset:sec 13"><h2 class="sec"><span class="n">13</span>Partner KYB / Due Diligence and Profile Sharing</h2><p class="s1c"><span class="n">13.1</span><strong>Network KYB and due diligence.</strong> Each Requestor and Provider undertakes the Network standard KYB and due diligence with t-0. The completed KYB and due diligence forms a key part of that Member's profile on the t-0 Network.</p><p class="s1c"><span class="n">13.2</span><strong>Requesting access.</strong> Through the dashboard, any Member (Requestor or Provider) may request access to another Member's KYB and due diligence profile.</p><p class="s1c"><span class="n">13.3</span><strong>Granting access.</strong> If a Member accepts a request, it grants the requesting Member access to the KYB and due diligence documents it has previously uploaded. Members control with whom their profiles are shared.</p><p class="s1c"><span class="n">13.4</span><strong>No liability.</strong> t-0 does not accept any liability for the sharing of KYB and due diligence profiles between Members, or for the use of that data by any Member or third party.</p></section>
+
+<section style="counter-reset:sec 14"><h2 class="sec"><span class="n">14</span>End Customer KYB / Due Diligence</h2><p class="s1c"><span class="n">14.1</span><strong>Optional feature.</strong> End Customer KYB is an optional feature in each corridor. Not all Providers require it; where a Provider does, the following applies before it accepts payment requests relating to a Requestor's End Customers.</p><p class="s1c"><span class="n">14.2</span><strong>Provider requirements.</strong> A Provider may establish its own End Customer KYB requirements by building a form in the t-0 Platform using t-0's KYB form builder, and may request sight of the KYB and due diligence documents the Requestor has collected on its End Customers.</p><p class="s1c"><span class="n">14.3</span><strong>Requestor submission.</strong> The Requestor completes the Provider's End Customer KYB form and shares the relevant documents with the Provider through t-0 for the Provider's approval.</p><p class="s1c"><span class="n">14.4</span><strong>Tracking.</strong> Requestors and Providers track End Customer KYB approvals and statuses in the t-0 Platform.</p><p class="s1c"><span class="n">14.5</span><strong>Approval and effect.</strong> Once a Provider has approved an End Customer, the Requestor may send payment requests to that Provider on behalf of that End Customer. Approval is specific to the approving Provider and does not carry to other Providers.</p><p class="s1c"><span class="n">14.6</span><strong>Interaction with AML.</strong> Approval of an End Customer does not remove the possibility of a manual AML check on an individual payment (Section 15), although such checks are significantly reduced for approved End Customers.</p></section>
+
+<section style="counter-reset:sec 15"><h2 class="sec"><span class="n">15</span>Manual AML Check</h2><p class="s1c"><span class="n">15.1</span><strong>Trigger.</strong> In place of accepting or rejecting a payment request within the response window, a Provider may respond that a manual AML check is required. The payment then enters a pending state.</p><p class="s1c"><span class="n">15.2</span><strong>Review.</strong> The Provider completes its review within the AML processing SLA (Section 10.3), recording the outcome as approved or rejected. Extended reviews require notification to the Requestor with a reason code.</p><p class="s1c"><span class="n">15.3</span><strong>Quote refresh.</strong> Because the original quote may have expired during review, on approval the Network determines the Provider's current quote and recalculates the settlement amount.</p><p class="s1c"><span class="n">15.4</span><strong>Last look.</strong> The Network sends the refreshed quote to the Requestor for approval. The Requestor approves or rejects: if approved, the Provider proceeds to execute at the confirmed rate; if rejected, the payment is cancelled with no settlement.</p><p class="s1c"><span class="n">15.5</span><strong>Completion.</strong> On execution the Provider reports completion and the Network updates the ledger. The Provider owns the AML decision and its timing; the Requestor owns the decision to proceed at the refreshed rate.</p></section>
+
+<section style="counter-reset:sec 16"><h2 class="sec"><span class="n">16</span>Fraud Prevention and Liability</h2><p class="s1c"><span class="n">16.1</span><strong>Shared responsibility.</strong> Each party is accountable for its own domain: the Requestor for verifying the sender and the authenticity of the instruction; the Provider for executing only to valid accounts and flagging anomalous patterns; and t-0 for the integrity of routing and settlement infrastructure.</p><p class="s1c"><span class="n">16.2</span><strong>Liability allocation.</strong> Liability for fraud is allocated by point of failure, as set out below. This allocation is operational and is subject to, and does not expand, the limitation of liability and indemnity provisions of the Agreement (Clause 14) and the third-party indemnities in Section 17.</p><table class="calc"><tr><th>Scenario</th><th>Primary liability</th></tr><tr><td>Sender fraud (impersonation, stolen credentials, social engineering)</td><td>Requestor (owns KYC and sender authentication)</td></tr><tr><td>Incorrect beneficiary details / misdirected payment</td><td>Requestor (provided the details)</td></tr><tr><td>Payout to a sanctioned party despite adequate Travel Rule data</td><td>Provider (owns sanctions screening)</td></tr><tr><td>Duplicate execution of the same instruction</td><td>Provider (must prevent duplicates)</td></tr><tr><td>Name mismatch flagged but executed regardless</td><td>Provider (chose to override)</td></tr><tr><td>Routing error or settlement-ledger discrepancy</td><td>t-0 (infrastructure integrity)</td></tr></table><p class="s1c"><span class="n">16.3</span><strong>Reporting.</strong> A Member that identifies or suspects fraud must immediately notify t-0 and the counterparty with the payment reference, the nature of the suspected fraud and supporting evidence, and must cooperate with investigations, providing records within 5 business days of request.</p></section>
+
+<section style="counter-reset:sec 17"><h2 class="sec"><span class="n">17</span>Refunds, Returns and Dispute Resolution</h2><p class="s1c"><span class="n">17.1</span><strong>Grounds.</strong> A refund may be initiated for incorrect beneficiary details causing a failed payout, duplicate submission, a compliance-mandated return, sender cancellation before execution, or confirmed fraud where recovery is possible.</p><p class="s1c"><span class="n">17.2</span><strong>By settlement model.</strong> Under pre-settlement, the Requestor may request return of the USDT (processed within 3 business days) or retry against the existing balance. Under post-settlement, the obligation is reversed in the ledger with no transfer. Post-execution returns depend on recovery from the beneficiary; the Provider is not liable where funds are irrecoverable and the Requestor must pursue legal channels.</p><p class="s1c"><span class="n">17.3</span><strong>Timelines.</strong> Indicative targets: failed payout 3 business days; duplicate 2 business days; pre-execution cancellation immediate (or within 24 hours after acceptance but before rail submission); post-execution return 10 business days (subject to beneficiary cooperation); USDT return under pre-settlement failure 3 business days.</p><p class="s1c"><span class="n">17.4</span><strong>Disputes.</strong> Disputes are resolved first directly between the two Members using Network ledger and settlement records as evidence, then by t-0 mediation, and finally under the dispute-resolution procedure in Clause 30 of the Agreement.</p><p class="s1c"><span class="n">17.5</span><strong>Third-party indemnities.</strong> Each Member undertakes, as an independent obligation, to indemnify each Correspondent Partner for the full value of: (a) any Pre-Settlement Payment it has received where the corresponding payout or collection has not been fulfilled; and (b) any unsettled credit usage or Negative Settlement Balance owed to that Correspondent Partner that is not repaid when due. These indemnities give Members direct recourse for those direct financial liabilities. They may be enforced directly by the Correspondent Partner under the Contracts (Rights of Third Parties) Act 1999, as if it were a party to the Agreement, and each Member may likewise enforce the corresponding indemnities given in its favour.</p></section>
+
+<section style="counter-reset:sec 18"><h2 class="sec"><span class="n">18</span>Security and Authentication</h2><p class="s1c"><span class="n">18.1</span>All requests to and from the Network are cryptographically signed (equivalent to Ethereum transaction signing) and verified; modified requests fail verification and are rejected.</p><p class="s1c"><span class="n">18.2</span>Requests carry signed timestamps and are valid for one minute, preventing replay while tolerating clock drift.</p><p class="s1c"><span class="n">18.3</span>Separate key pairs are maintained for sandbox and production; private keys are held in secure key-management systems and never hard-coded; suspected compromise is reported immediately and keys rotated.</p><p class="s1c"><span class="n">18.4</span>The t-0 SDK abstracts signing, timestamping and validation; application-layer authentication removes any need for IP whitelisting, though Members may add controls at their discretion.</p></section>
+
+<section style="counter-reset:sec 19"><h2 class="sec"><span class="n">19</span>Treasury and Liquidity Management</h2><p class="s1c"><span class="n">19.1</span><strong>USDT.</strong> Each Member manages its own conversion between local currency and USDT; the Network does not facilitate acquisition. Members maintain appropriate balances of both, with Requestors that primarily originate payouts holding more USDT and Providers holding more local currency.</p><p class="s1c"><span class="n">19.2</span><strong>Exposure.</strong> Each Member is exposed only to its own local currency plus USDT, not to any counterparty's local currency, and should operate automated rate validation against reference rates and hedge according to its risk appetite.</p></section>
+
+<section style="counter-reset:sec 20"><h2 class="sec"><span class="n">20</span>Operational Continuity and Incident Management</h2><p class="s1c"><span class="n">20.1</span>Planned maintenance affecting quoting or processing requires 24 hours' notice; the Member ceases quote streaming during it.</p><p class="s1c"><span class="n">20.2</span>Unplanned outages are reported within 30 minutes, with an estimated recovery time and updates every 60 minutes.</p><p class="s1c"><span class="n">20.3</span>A Provider that experiences an outage after accepting a request but before executing must complete on restoration; if not possible within 24 hours, the Network coordinates reversal and re-routing.</p><p class="s1c"><span class="n">20.4</span>Members using redundant architectures present a single integration to the Network, which treats the Member as one participant.</p></section>
+
+<section style="counter-reset:sec 21"><h2 class="sec"><span class="n">21</span>Committed Trades</h2><p class="s1c"><span class="n">21.1</span><strong>Cross-reference.</strong> The commercial terms of Committed Flow, including Committed Volumes, committed rates, ramps, tenors, Minimum Access Fees, Shortfall Fees and Deficit Fees, are set out in the Agreement (Clause 7) and in the relevant Trade Confirmations, not in this Schedule.</p><p class="s1c"><span class="n">21.2</span><strong>Operational effect.</strong> Operationally, corridors covered by a Trade Confirmation are processed under these Payment Rules in the ordinary way. t-0 tracks the aggregate committed position per corridor as Calculation Agent, and a Trade Confirmation may vary the applicable network fees or, where stated, specific operational terms for the flow it covers, in accordance with the order of precedence in Clause 3 of the Agreement.</p></section>
+
+<section style="counter-reset:sec 22"><h2 class="sec"><span class="n">22</span>Governance and Amendments</h2><p class="s1c"><span class="n">22.1</span><strong>Network Rules.</strong> These Payment Rules, together with the Agreement, establish the contractual relationship between Members; no additional bilateral agreement is required to begin working with a counterparty.</p><p class="s1c"><span class="n">22.2</span><strong>Counterparty and credit control.</strong> Each Member decides which counterparties it will deal with and the settlement model to apply, and sets its credit and pre-settlement limits, which are directional and may differ by direction.</p><p class="s1c"><span class="n">22.3</span><strong>Amendments.</strong> t-0 may amend this Schedule at any time on written notice to the Partner by email, in accordance with Clause 21 of the Agreement.</p></section>
+
+<section style="counter-reset:sec 23"><h2 class="sec"><span class="n">23</span>Definitions</h2><p class="s1c"><span class="n">23.1</span>The following definitions apply in this Schedule:</p><dl class="defs"><div><dt>Collection Account</dt><dd>the bank account, wallet or payment method used by a Collection Provider to receive fiat from a payer.</dd></div><div><dt>Collection Provider / Collection Requestor</dt><dd>have the meanings given in Section 2.</dd></div><div><dt>Correspondent Partner</dt><dd>a Requestor or Provider with whom a Member has established a Corridor on the t-0 Network.</dd></div><div><dt>Corridor</dt><dd>an approved payment relationship between two specific Members, established via the t-0 Network together with a Settlement Account; not merely a currency pair.</dd></div><div><dt>Designated Wallet</dt><dd>the wallet address on a Supported Blockchain notified to the t-0 Network by a Member for sending and receiving Settlement Payments.</dd></div><div><dt>End Customer</dt><dd>a customer of a Requestor on whose behalf cross-border payments are originated via the t-0 Network.</dd></div><div><dt>KYB</dt><dd>know-your-business due diligence on an institutional counterparty; and “KYC”, know-your-customer due diligence on an individual sender or End Customer.</dd></div><div><dt>Negative Settlement Balance</dt><dd>in respect of a Corridor, where a Member's Settlement Liabilities to a Correspondent Partner exceed the applicable Settlement Limit (that is, unsettled credit usage).</dd></div><div><dt>Order Book</dt><dd>the centralised order book maintained by t-0 of Payout and Collection quotes submitted by Providers.</dd></div><div><dt>Payout Provider / Payout Requestor</dt><dd>have the meanings given in Section 2.</dd></div><div><dt>Pre-Settlement Payment</dt><dd>a Settlement Payment made in advance of execution to create a Positive Settlement Balance.</dd></div><div><dt>Positive Settlement Balance</dt><dd>in respect of a Corridor, where a Member's Settlement Liabilities are less than the applicable Settlement Limit.</dd></div><div><dt>Settlement Balance</dt><dd>the Settlement Limit minus Settlement Liabilities from time to time, which may be negative where a Pre-Settlement Payment has been made.</dd></div><div><dt>Settlement Liabilities</dt><dd>amounts owed between Members for executed transactions not yet settled in the Settlement Currency.</dd></div><div><dt>Settlement Limit</dt><dd>the US Dollar value limit on Settlement Liabilities a Member is willing to allow outstanding to a Correspondent Partner.</dd></div><div><dt>Settlement Payment</dt><dd>a transfer of the Settlement Currency between Members' Designated Wallets.</dd></div><div><dt>Supported Blockchains</dt><dd>the blockchains supported by the t-0 Network for settlement in the Settlement Currency from time to time.</dd></div><div><dt>Supported Currency</dt><dd>any fiat currency, stablecoin or digital asset supported by the t-0 Network.</dd></div><div><dt>t-0 Network</dt><dd>the connections and communications protocols established between Members, facilitated by t-0's proprietary software and delivered via its APIs and SDKs published from time to time.</dd></div><div><dt>Travel Rule</dt><dd>the regulatory requirement to pass identifying information about senders and beneficiaries with payment instructions, followed on the Network using the OpenVASP standard.</dd></div></dl></section>
+
+<section style="counter-reset:sec 24"><h2 class="sec"><span class="n">24</span>Network Fee Schedule</h2><p class="s1c"><span class="n">24.1</span>Network fees charged to Providers for introduced flow are set out in the t-0 Network Fee Schedule, published separately at the link notified by t-0 and updated from time to time, on a per-currency basis. Those fees may be varied for a specific flow by a Trade Confirmation. Requestor-side Minimum Access Fees and Shortfall Fees, and t-0's Deficit Fees, are governed by the Agreement and the relevant Trade Confirmations. There are no membership or integration fees.</p></section>
+
+<section style="counter-reset:sec 25"><h2 class="sec"><span class="n">25</span>Contact and Escalation</h2><p class="s1c"><span class="n">25.1</span>Operational queries, incident reports, dispute notifications and refund requests are directed to the t-0 Network operations team through the established support channels, available throughout European business hours. This Schedule is the authoritative operational reference for all Members.</p></section>
+
+<!-- SCHEDULE 2 -->
+<div class="sched-head" id="sch2">
+  <div class="kick">Schedule 2</div>
+  <h2>Settlement calculations</h2>
+  <p class="sched-note">This schedule is illustrative and does not create legally binding terms.</p>
+</div>
+
+<section style="counter-reset:sec 1"><h2 class="sec"><span class="n">1</span>Post-transaction settlement</h2>
+<p style="margin:8px 0 0">Where a Payout Requestor and Payout Provider establish positive Settlement Limits with each other, payouts execute immediately on instruction and settlement happens after the transaction, once a Settlement Limit is reached.</p>
+<table class="calc">
+<tr><th>Step</th><th>Example</th></tr>
+<tr><td>Transaction 1</td><td>Payout Requestor A (Europe) instructs Payout Provider B (Brazil) to pay 100,000 BRL (≈ $18,000) to a recipient. Limit B set against A: $1,000,000. After payout, A owes $18,000; Settlement Balance $982,000.</td></tr>
+<tr><td>Transaction 2</td><td>Payout Requestor B instructs Payout Provider A to pay €1,000 (≈ $1,100). This nets off against the $18,000 A owes B, leaving $16,900 owed by A to B; Settlement Balance $983,100.</td></tr>
+</table>
+</section>
+
+<section style="counter-reset:sec 2"><h2 class="sec"><span class="n">2</span>Pre-settlement</h2>
+<p style="margin:8px 0 0">Where a Payout Provider does not approve a Settlement Limit, stablecoin settlement occurs before the payout executes.</p>
+<table class="calc">
+<tr><th>Step</th><th>Example</th></tr>
+<tr><td>Transaction 1A</td><td>Payout Requestor A transfers $18,000 USDT to Payout Provider B in pre-settlement. Limit $0; B owes $18,000 (received pre-settlement, not yet paid out); A Settlement Balance +$18,000.</td></tr>
+<tr><td>Transaction 1B</td><td>A submits the payout request; B pays 100,000 BRL to the recipient. Limit $0; Settlement Liabilities $0; A Settlement Balance $0.</td></tr>
+</table>
+</section>
+
+<footer>
+  <p>t-0 Network Services Agreement, Version 1.3. New Settlement Technologies Inc, a company incorporated in the State of Delaware, United States. Governed by the law of England and Wales.</p>
+</footer>
+
+</div>
+</body>
+</html>
