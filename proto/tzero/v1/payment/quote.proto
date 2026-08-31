@@ -1,0 +1,105 @@
+syntax = "proto3";
+
+package tzero.v1.payment;
+
+import "tzero/v1/common/common.proto";
+import "tzero/v1/common/payment_method.proto";
+import "google/protobuf/timestamp.proto";
+import "buf/validate/validate.proto";
+
+/**
+ * Network surface for browsing published pay-out quotes.
+ */
+service QuoteService {
+  /** Lists the active pay-out quotes the caller can transact against, grouped by currency, then
+   * payment method: for each, the payout providers it holds a credit line with, the caller's
+   * balance with each, and their tiered rate bands. Indicative — request a priced quote via
+   * GetQuote to act on one. */
+  rpc GetQuotes(GetQuotesRequest) returns (GetQuotesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message GetQuotesRequest {} // caller resolved from the signed identity; the browse is unfiltered
+
+message GetQuotesResponse {
+  // One entry per currency that has at least one quoting provider.
+  repeated CurrencyQuote quotes = 10; // no validation: any count is valid, including none
+
+  /** All pay-out quotes for one currency, grouped by payment method. */
+  message CurrencyQuote {
+    /** ISO 4217 pay-out currency code, e.g. EUR, GBP. */
+    string currency = 10 [(buf.validate.field).string = {len: 3, pattern: "^[A-Z]{3}$"}];
+
+    repeated PaymentMethodQuote payment_method_quotes = 20 [(buf.validate.field).repeated = {min_items: 1}];
+
+    /** All pay-out quotes for one payment method within the enclosing currency, across providers. */
+    message PaymentMethodQuote {
+      tzero.v1.common.PaymentMethodType payment_method = 10 [(buf.validate.field).enum = {
+        defined_only: true,
+        not_in: [0]
+      }];
+
+      // The payout providers quoting this currency and method that the caller holds a credit line with.
+      repeated ProviderQuote provider_quotes = 20 [(buf.validate.field).repeated = {min_items: 1}];
+
+      /** One payout provider's offering for the enclosing currency and method: the caller's balance
+       * with the provider plus its tiered rate bands. */
+      message ProviderQuote {
+        /** The payout provider that published these quotes (= KYB id). */
+        int32 provider_id = 10 [(buf.validate.field).int32.gt = 0];
+
+        /** The caller's credit standing with this provider (USD, currency-agnostic). */
+        ProviderBalance balance = 20 [(buf.validate.field).required = true];
+
+        // Tiered rate bands, ascending by max_amount.
+        repeated Quote quotes = 30 [(buf.validate.field).repeated = {min_items: 1}];
+
+        /** The caller's credit line with the provider, in USD. */
+        message ProviderBalance {
+          /** Total credit the provider extends to the caller. */
+          tzero.v1.common.Decimal credit_limit = 10 [
+            (buf.validate.field).required = true,
+            (buf.validate.field).cel = {
+              message: "credit_limit must be non-negative"
+              expression: "this.unscaled >= 0"
+            }
+          ];
+          /** Credit available to draw on now (credit_limit minus what is used); negative when the line is over-used. */
+          tzero.v1.common.Decimal available = 20 [(buf.validate.field).required = true];
+        }
+
+        /** One pricing band: the rate and fixed fee that apply for a pay-out amount up to max_amount. */
+        message Quote {
+          int64 quote_id = 10 [(buf.validate.field).int64.gt = 0];
+
+          /** USD ceiling this band applies up to. */
+          tzero.v1.common.Decimal max_amount = 20 [
+            (buf.validate.field).required = true,
+            (buf.validate.field).cel = {
+              message: "max_amount must be greater than zero"
+              expression: "this.unscaled > 0"
+            }
+          ];
+          /** Exchange rate, pay-out currency per USD. */
+          tzero.v1.common.Decimal rate = 30 [
+            (buf.validate.field).required = true,
+            (buf.validate.field).cel = {
+              message: "rate must be greater than zero"
+              expression: "this.unscaled > 0"
+            }
+          ];
+          /** Fixed charge in USD applied per transfer on top of the exchange rate. */
+          tzero.v1.common.Decimal fix = 40 [
+            (buf.validate.field).required = true,
+            (buf.validate.field).cel = {
+              message: "fix must be non-negative"
+              expression: "this.unscaled >= 0"
+            }
+          ];
+          google.protobuf.Timestamp expiration = 50 [(buf.validate.field).required = true];
+        }
+      }
+    }
+  }
+}

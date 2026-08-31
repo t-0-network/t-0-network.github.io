@@ -43,6 +43,7 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 | BLOCKCHAIN_UNSPECIFIED | 0 |  |
 | BLOCKCHAIN_BSC | 10 |  |
 | BLOCKCHAIN_ETH | 20 |  |
+| BLOCKCHAIN_POLYGON | 30 |  |
 | BLOCKCHAIN_TRON | 100 |  |
 
 
