@@ -262,7 +262,6 @@ Quotes were found for the requested currency/amount.
 
 ### GetQuoteResponse.Success.IndicativeQuote
 Represents an indicative quote from a pay-in provider.
-Contains the payment method, provider info, and indicative exchange rate.
 
 
 | Field | Type | Label | Description |
@@ -282,7 +281,6 @@ Contains the payment method, provider info, and indicative exchange rate.
 
 ### PaymentIntentPayInDetails
 Represents pay-in details for a payment intent option.
-Contains the payment method, provider info, payment details, and indicative exchange rate.
 
 
 | Field | Type | Label | Description |

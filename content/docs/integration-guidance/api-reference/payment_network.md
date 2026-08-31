@@ -18,7 +18,7 @@ All methods of this service are idempotent, meaning they are safe to retry and m
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Publishes pay-in and pay-out quotes (FX rates) into the network. Quotes carry tiered pricing bands and an expiration timestamp. |
+| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Publishes pay-in and pay-out quotes (FX rates) into the network. Quotes carry tiered pricing bands and an expiration timestamp. Full snapshot: omitted quotes are deleted. |
 | GetQuote | [GetQuoteRequest](#tzero-v1-payment-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment-GetQuoteResponse) | Request the best available quote for a payout in a specific currency, for a given amount. If the payout quote exists, but the credit limit is exceeded, this quote will not be considered. |
 | CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Submit a request to create a new payment for the specified pay-out currency. QuoteId is the optional parameter. If the quoteId is specified, it must be a valid quoteId previously returned by GetQuote. If the quoteId is not specified, a suitable quote is selected for the pay-out currency and amount, as GetQuote does. |
 | ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Informs the network that a payout has been completed, specifying the payment ID and payout ID from the original payout request. deprecated, use the FinalizePayout rpc instead. |
@@ -362,7 +362,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | success | [GetQuoteResponse.Success](#tzero-v1-payment-GetQuoteResponse-Success) |  | A suitable quote was found for the provided parameters, with available credit or pre-settlement option. Use the returned quoteId to call CreatePayment. |
 | failure | [GetQuoteResponse.Failure](#tzero-v1-payment-GetQuoteResponse-Failure) |  | Failure response - means the quote was not found for the specified parameters, or provider limits would exceed by processing the payment amount with the specified amount. |
-| all_quotes | [GetQuoteResponse.ProviderQuote](#tzero-v1-payment-GetQuoteResponse-ProviderQuote) | repeated | All best quotes from providers with credit lines. Each quote is the best rate for that provider for the requested amount. Each quote indicates whether it can be executed immediately. Always returned alongside success/failure - providers can compare alternatives or see options when no executable quote exists. |
+| all_quotes | [GetQuoteResponse.ProviderQuote](#tzero-v1-payment-GetQuoteResponse-ProviderQuote) | repeated | All best quotes from providers with credit lines. Each quote is that provider's best effective price for the requested amount: the lowest settlement amount, and on a tie the largest pay-out amount. Each quote indicates whether it can be executed immediately. Always returned alongside success/failure - providers can compare alternatives or see options when no executable quote exists. |
 
 
 
