@@ -204,10 +204,12 @@ message PaymentDetails {
   message Sepa {
     option (payment_method_type) = PAYMENT_METHOD_TYPE_SEPA;
 
+    // Check digits are 98 minus a MOD-97-10 remainder, so they always fall in
+    // 02-98. The BBAN that follows is 11 to 30 characters.
     string iban = 20 [(buf.validate.field).string = {
       min_len: 15,
       max_len: 34,
-      pattern: "^[A-Z]{2}[0-9]{2}[A-Z0-9]+$"
+      pattern: "^[A-Z]{2}(0[2-9]|[1-8][0-9]|9[0-8])[A-Z0-9]{11,30}$"
     }];
     string beneficiary_name = 30 [(buf.validate.field).string = {
       min_len: 1,
@@ -231,10 +233,14 @@ message PaymentDetails {
       max_len: 8,
       pattern: "^[0-9]{8}$"
     }];
+    // Name registered on the destination account. Capped at the width of the FPS
+    // scheme's beneficiary account name field.
     string beneficiary_name = 30 [(buf.validate.field).string = {
       min_len: 1,
-      max_len: 18
+      max_len: 40
     }];
+    // Capped at the width of the FPS scheme's reference information field, which is
+    // narrower than the beneficiary name field.
     string reference = 40 [(buf.validate.field).string = {
       max_len: 18
     }];
@@ -419,11 +425,12 @@ message PaymentDetails {
   message Swift {
     option (payment_method_type) = PAYMENT_METHOD_TYPE_SWIFT;
 
-    // Beneficiary's bank SWIFT/BIC code (8 or 11 characters)
+    // Beneficiary's bank SWIFT/BIC code (8 or 11 characters). The party prefix is
+    // alphanumeric; the location code rejects the two positions no BIC can occupy.
     string swift_code = 10 [(buf.validate.field).string = {
       min_len: 8,
       max_len: 11,
-      pattern: "^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$"
+      pattern: "^[A-Z0-9]{4}[A-Z]{2}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?$"
     }];
 
     // Beneficiary's account number (format varies by country)
@@ -474,7 +481,7 @@ message PaymentDetails {
       string swift_code = 1 [(buf.validate.field).string = {
         min_len: 8,
         max_len: 11,
-        pattern: "^[A-Z]{4}[A-Z]{2}[A-Z0-9]{2}([A-Z0-9]{3})?$"
+        pattern: "^[A-Z0-9]{4}[A-Z]{2}[A-Z2-9][A-NP-Z0-9]([A-Z0-9]{3})?$"
       }];
 
       string bank_name = 2 [(buf.validate.field).string = {
@@ -497,10 +504,12 @@ message PaymentDetails {
       pattern: "^[0-9]{9}$"
     }];
 
+    // The NACHA entry detail record defines the account number as alphanumeric;
+    // US account numbers containing letters are valid.
     string account_number = 20 [(buf.validate.field).string = {
       min_len: 1,
       max_len: 17,
-      pattern: "^[0-9]+$"
+      pattern: "^[A-Z0-9]+$"
     }];
 
     string account_holder_name = 30 [(buf.validate.field).string = {
@@ -549,9 +558,10 @@ message PaymentDetails {
       max_len: 34
     }];
 
+    // Capped at the width of the ISO 20022 creditor name element Fedwire carries.
     string beneficiary_name = 50 [(buf.validate.field).string = {
       min_len: 1,
-      max_len: 70
+      max_len: 140
     }];
 
     string beneficiary_address = 60 [(buf.validate.field).string = {
@@ -580,8 +590,11 @@ message PaymentDetails {
       max_len: 70
     }];
 
+    //Recipient account name: the name as registered on the account. Capped at the
+    //width of the ISO 20022 creditor name element PESONet carries.
     string recipient_account_name = 30 [(buf.validate.field).string = {
-      max_len: 18
+      min_len: 1,
+      max_len: 140
     }];
 
     // Purpose of Transfer (Optional/Mandatory depending on bank)
@@ -609,9 +622,11 @@ message PaymentDetails {
       min_len: 1,
       max_len: 70
     }];
-    //Recipient account name: the name as registered on the account or wallet (may be auto-displayed but is logically required for correct routing/confirmation).
+    //Recipient account name: the name as registered on the account or wallet. Capped
+    //at the width of the ISO 20022 creditor name element InstaPay carries.
     string recipient_account_name = 30 [(buf.validate.field).string = {
-      max_len: 50
+      min_len: 1,
+      max_len: 140
     }];
 
     //Purpose of Transfer (Optional/Mandatory depending on bank)
@@ -621,16 +636,15 @@ message PaymentDetails {
   }
 
   // Pakistan Bank Transfer - Domestic transfers using Pakistani IBAN
-  // Pakistan uses 24-character IBAN: PK + 2 check digits + 4-char bank code + 16-char account number
   message PakistanBankTransfer {
     option (payment_method_type) = PAYMENT_METHOD_TYPE_PAKISTAN_BANK_TRANSFER;
 
-    // Pakistani IBAN (24 characters: PK + 2 check digits + 4-char bank identifier + 16-char account)
+    // Pakistani IBAN (24 characters: PK + 2 check digits + 4-letter bank identifier + 16-char alphanumeric account)
     // Example: PK36SCBL0000001123456702
     string iban = 10 [(buf.validate.field).string = {
       min_len: 24,
       max_len: 24,
-      pattern: "^PK[0-9]{2}[A-Z]{4}[0-9]{16}$"
+      pattern: "^PK(0[2-9]|[1-8][0-9]|9[0-8])[A-Z]{4}[A-Z0-9]{16}$"
     }];
 
     // Beneficiary's full name
@@ -1176,7 +1190,7 @@ message PaymentDetails {
     // UAE IBAN (23 characters: AE + 2 check digits + 19 digits).
     string iban = 10 [(buf.validate.field).string = {
       len: 23,
-      pattern: "^AE[0-9]{21}$"
+      pattern: "^AE(0[2-9]|[1-8][0-9]|9[0-8])[0-9]{19}$"
     }];
 
     // Beneficiary's full name.
@@ -1274,10 +1288,11 @@ message PaymentDetails {
     oneof destination {
       option (buf.validate.oneof).required = true;
 
-      // Turkish IBAN (26 characters: TR + 24 digits).
+      // Turkish IBAN (26 characters: TR + 2 check digits + 5-digit bank code + 1 reserved digit
+      // + 16-char alphanumeric account).
       string iban = 10 [(buf.validate.field).string = {
         len: 26,
-        pattern: "^TR[0-9]{24}$"
+        pattern: "^TR(0[2-9]|[1-8][0-9]|9[0-8])[0-9]{6}[A-Z0-9]{16}$"
       }];
 
       // KOLAS proxy (mobile / email / national ID / passport).
