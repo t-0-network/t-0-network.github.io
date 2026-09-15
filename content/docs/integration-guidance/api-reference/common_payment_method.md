@@ -71,7 +71,7 @@ toc: true
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | routing_number | [string](../scalar/#string) |  |  |
-| account_number | [string](../scalar/#string) |  |  |
+| account_number | [string](../scalar/#string) |  | The NACHA entry detail record defines the account number as alphanumeric; US account numbers containing letters are valid. |
 | account_holder_name | [string](../scalar/#string) |  |  |
 | account_type | [PaymentDetails.Ach.AchAccountType](#tzero-v1-common-PaymentDetails-Ach-AchAccountType) |  |  |
 | payment_reference | [string](../scalar/#string) |  | Payment reference/description (optional) |
@@ -249,7 +249,7 @@ Same fields as ColombianAch except no phone_number.
 | bank_address | [string](../scalar/#string) |  |  |
 | routing_number | [string](../scalar/#string) |  | ABA routing number (9 digits) |
 | account_number | [string](../scalar/#string) |  |  |
-| beneficiary_name | [string](../scalar/#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  | Capped at the width of the ISO 20022 creditor name element Fedwire carries. |
 | beneficiary_address | [string](../scalar/#string) |  |  |
 | wire_reference | [string](../scalar/#string) |  |  |
 
@@ -267,7 +267,7 @@ FAST - Turkish instant payment system. Addressed by IBAN or a KOLAS proxy.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| iban | [string](../scalar/#string) |  | Turkish IBAN (26 characters: TR + 24 digits). |
+| iban | [string](../scalar/#string) |  | Turkish IBAN (26 characters: TR + 2 check digits + 5-digit bank code + 1 reserved digit + 16-char alphanumeric account). |
 | proxy | [PaymentDetails.Fast.Proxy](#tzero-v1-common-PaymentDetails-Fast-Proxy) |  | KOLAS proxy (mobile / email / national ID / passport). |
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
 | payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
@@ -305,8 +305,8 @@ FAST - Turkish instant payment system. Addressed by IBAN or a KOLAS proxy.
 | ----- | ---- | ----- | ----------- |
 | sort_code | [string](../scalar/#string) |  |  |
 | account_number | [string](../scalar/#string) |  |  |
-| beneficiary_name | [string](../scalar/#string) |  |  |
-| reference | [string](../scalar/#string) |  |  |
+| beneficiary_name | [string](../scalar/#string) |  | Name registered on the destination account. Capped at the width of the FPS scheme's beneficiary account name field. |
+| reference | [string](../scalar/#string) |  | Capped at the width of the FPS scheme's reference information field, which is narrower than the beneficiary name field. |
 
 
 
@@ -473,7 +473,7 @@ Indonesian e-wallet transfer (GoPay, OVO, DANA, ShopeePay, LinkAja, etc.).
 | ----- | ---- | ----- | ----------- |
 | recipient_institution | [string](../scalar/#string) |  | Recipient institution: receiving bank or e‑money issuer selected from an InstaPay list. |
 | recipient_identifier | [string](../scalar/#string) |  | Recipient identifier (one of): Account number, or Mobile number, or Email address, or QR code (scanned/uploaded “InstaPay QR”). |
-| recipient_account_name | [string](../scalar/#string) |  | Recipient account name: the name as registered on the account or wallet (may be auto-displayed but is logically required for correct routing/confirmation). |
+| recipient_account_name | [string](../scalar/#string) |  | Recipient account name: the name as registered on the account or wallet. Capped at the width of the ISO 20022 creditor name element InstaPay carries. |
 | purpose_of_transfer | [string](../scalar/#string) | optional | Purpose of Transfer (Optional/Mandatory depending on bank) |
 
 
@@ -563,12 +563,11 @@ Transfers are made using bank code and account number (NUBAN)
 
 ### PaymentDetails.PakistanBankTransfer
 Pakistan Bank Transfer - Domestic transfers using Pakistani IBAN
-Pakistan uses 24-character IBAN: PK + 2 check digits + 4-char bank code + 16-char account number
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| iban | [string](../scalar/#string) |  | Pakistani IBAN (24 characters: PK + 2 check digits + 4-char bank identifier + 16-char account) Example: PK36SCBL0000001123456702 |
+| iban | [string](../scalar/#string) |  | Pakistani IBAN (24 characters: PK + 2 check digits + 4-letter bank identifier + 16-char alphanumeric account) Example: PK36SCBL0000001123456702 |
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name |
 | beneficiary_cnic | [string](../scalar/#string) | optional | (Optional) Beneficiary CNIC (13 digits, no dashes) — sometimes required by receiving banks |
 | payment_reference | [string](../scalar/#string) |  | Payment reference/description |
@@ -630,7 +629,7 @@ Peruvian domestic bank transfer (PEN, USD-PE)
 | ----- | ---- | ----- | ----------- |
 | recipient_financial_institution | [string](../scalar/#string) |  | Recipient institution: receiving bank or participating non‑bank chosen from a PESONet list. |
 | recipient_identifier | [string](../scalar/#string) |  | Recipient identifier: Account number (some banks also allow email/mobile). |
-| recipient_account_name | [string](../scalar/#string) |  |  |
+| recipient_account_name | [string](../scalar/#string) |  | Recipient account name: the name as registered on the account. Capped at the width of the ISO 20022 creditor name element PESONet carries. |
 | purpose_of_transfer | [string](../scalar/#string) | optional | Purpose of Transfer (Optional/Mandatory depending on bank) |
 | recipient_address_email | [string](../scalar/#string) | optional | Recipient's Address/Email (Optional/Mandatory depending on bank) |
 
@@ -730,7 +729,7 @@ Real-time bank-to-bank transfers using routing and account numbers
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| iban | [string](../scalar/#string) |  |  |
+| iban | [string](../scalar/#string) |  | Check digits are 98 minus a MOD-97-10 remainder, so they always fall in 02-98. The BBAN that follows is 11 to 30 characters. |
 | beneficiary_name | [string](../scalar/#string) |  |  |
 | payment_reference | [string](../scalar/#string) |  |  |
 
@@ -748,7 +747,7 @@ Real-time bank-to-bank transfers using routing and account numbers
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| swift_code | [string](../scalar/#string) |  | Beneficiary's bank SWIFT/BIC code (8 or 11 characters) |
+| swift_code | [string](../scalar/#string) |  | Beneficiary's bank SWIFT/BIC code (8 or 11 characters). The party prefix is alphanumeric; the location code rejects the two positions no BIC can occupy. |
 | account_number | [string](../scalar/#string) |  | Beneficiary's account number (format varies by country) Could be IBAN, account number, or other format |
 | beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name |
 | beneficiary_address | [string](../scalar/#string) |  | Beneficiary's address |

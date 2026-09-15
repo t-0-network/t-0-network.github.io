@@ -95,6 +95,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | fee_settlement_id | [uint64](../scalar/#uint64) |  |  |
+| amount_usd | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fee settlement amount in USD, truncated to cents. Equals the SETTLEMENT_OUT credit this fee produces. The fee always flows to the network from the provider receiving this callback, so the descriptor carries no provider_id. |
 
 
 
@@ -146,12 +147,22 @@ fields may be zero-valued.
 <a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-ProviderSettlement"></a>
 
 ### AppendLedgerEntriesRequest.Transaction.ProviderSettlement
-
+An on-chain settlement between two providers. The on-chain fields let the
+counterparty reconcile the settlement against the USDT transfer actually
+sent. The settlement participants and USD amount below are authoritative;
+the ledger entries remain authoritative for the resulting account balances.
+Each recipient's counterparty is whichever provider id is not its own.
 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | settlement_id | [uint64](../scalar/#uint64) |  |  |
+| blockchain | [tzero.v1.common.Blockchain](../common_common/#tzero-v1-common-Blockchain) |  | no validation: observed settlement chain; informational reconciliation descriptor. defined_only intentionally omitted: this flows network->provider and the receiving provider may lag common.Blockchain, so defined_only would reject an append carrying a newly-added chain. |
+| tx_hash | [string](../scalar/#string) |  | no validation: observed on-chain transaction hash; informational descriptor for reconciliation, not a gating constraint |
+| on_chain_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Observed on-chain (USDT) amount; differs from the settlement amount the ledger entries encode (full precision vs. truncated to cents). |
+| sender_provider_id | [uint32](../scalar/#uint32) |  | Provider whose ledger records this settlement as SETTLEMENT_OUT (the sender). |
+| receiver_provider_id | [uint32](../scalar/#uint32) |  | Provider whose ledger records this settlement as SETTLEMENT_IN (the receiver). |
+| amount_usd | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Settlement amount in USD, truncated to cents. Differs from on_chain_amount (full-precision USDT); equals the settlement ledger leg's credit/debit. |
 
 
 
@@ -180,11 +191,11 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](../scalar/#uint64) |  |  |
-| pay_out_quote_id | [int64](../scalar/#int64) |  |  |
-| pay_out_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
-| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
-| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  |  |
+| payment_id | [uint64](../scalar/#uint64) |  | Payment id assigned by the network, identifying the payment being re-priced. |
+| pay_out_quote_id | [int64](../scalar/#int64) |  | Updated pay-out quote id the approval applies to. |
+| pay_out_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Exchange rate the network applied to this payout, pay-out currency per USD. |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Updated payout amount in the pay-out currency. |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Updated settlement amount in USD. |
 | pay_out_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed charge in USD included in the settlement amount for this payout. |
 
 
@@ -364,8 +375,8 @@ All the amounts are in USD
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | version | [int64](../scalar/#int64) |  | Incrementally growing for the provider - same as in Ledger. |
-| counterpart_id | [int32](../scalar/#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
-| payout_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage - reserve, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
+| counterpart_id | [int32](../scalar/#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider.  * payout_limit = credit_limit - credit_usage - reserve, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit |
+| payout_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Amounts are mirrored verbatim: required enforces presence, sign is not re-validated (payout_limit and credit_usage are signed by design). |
 | credit_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
 | credit_usage | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than made payouts. |
 | reserve | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This indicates how much is reserved for the pending payments (not yet finalized) |
@@ -397,7 +408,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_id | [uint64](../scalar/#uint64) |  | payment_id is a payment id in the T-0 network. |
+| payment_id | [uint64](../scalar/#uint64) |  | payment_id is a payment id in the T-0 network. The upper bound is the largest value the network assigns, so a provider can store it in a signed 64-bit column. |
 | payment_client_id | [string](../scalar/#string) |  | payment_client_id is a payment id assigned by the client, this is the same id that was provided in the CreatePaymentRequest. |
 | accepted | [UpdatePaymentRequest.Accepted](#tzero-v1-payment-UpdatePaymentRequest-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
 | failed | [UpdatePaymentRequest.Failed](#tzero-v1-payment-UpdatePaymentRequest-Failed) |  | Payment failed and would not be retried. |
@@ -420,6 +431,9 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | payout_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout |
 | travel_rule_data | [UpdatePaymentRequest.Accepted.TravelRuleData](#tzero-v1-payment-UpdatePaymentRequest-Accepted-TravelRuleData) |  |  |
+| rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Exchange rate the network applied to this payout, pay-out currency per USD. |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed USD markup the network applied to this payout. |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Final USD obligation persisted by the network for this accepted payout. |
 
 
 
@@ -451,7 +465,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| paid_out_at | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | time of the payout |
+| paid_out_at | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | Time of the payout. No validation: the field is absent when the exact payout time is not known, so treat absence as unknown and fall back to the provider's own recorded time for this update rather than rejecting the callback. |
 | receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
 
 
