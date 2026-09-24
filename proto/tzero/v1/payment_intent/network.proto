@@ -194,7 +194,6 @@ message GetQuoteResponse {
 
     /**
      * Represents an indicative quote from a pay-in provider.
-     * Contains the payment method, provider info, and indicative exchange rate.
      */
     message IndicativeQuote {
       /**
@@ -246,7 +245,6 @@ message GetQuoteResponse {
 
 /**
  * Represents pay-in details for a payment intent option.
- * Contains the payment method, provider info, payment details, and indicative exchange rate.
  */
 message PaymentIntentPayInDetails {
   /**
