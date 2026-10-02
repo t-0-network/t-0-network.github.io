@@ -64,6 +64,7 @@ Notification that funds were received from the payer by pay-in provider.
 | transaction_reference | [string](../scalar/#string) |  | Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id), forwarded from ConfirmFundsReceived. Reconcile against the beneficiary's records; serves as the anchor for dispute resolution. |
 | travel_rule_data | [PaymentIntentUpdateRequest.FundsReceived.TravelRuleData](#tzero-v1-payment_intent-PaymentIntentUpdateRequest-FundsReceived-TravelRuleData) |  | Travel rule data of the pay-in provider's legal entity that received the funds. Present when the pay-in provider has registered travel rule data. |
 | fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Flat USD surcharge retained by the pay-in provider per transfer. Already subtracted from settlement_amount. Settlement is computed as (payment_amount / rate) - fix. |
+| pay_in_provider_id | [uint32](../scalar/#uint32) |  | The pay-in provider that collected the funds — the counterparty whose balance moved against this intent. Distinguishes providers that share a payment method. |
 
 
 
