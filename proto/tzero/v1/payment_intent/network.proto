@@ -39,6 +39,13 @@ service PaymentIntentService {
     option idempotency_level = IDEMPOTENT;
   }
 
+  /** Lists the active pay-in quotes the caller can collect against, grouped by currency, then
+   * payment method: for each, the pay-in providers permitted to the caller and their tiered rate
+   * bands. Indicative — request a priced quote via GetQuote to act on one. */
+  rpc GetQuotes(GetQuotesRequest) returns (GetQuotesResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
   /**
    * CreatePaymentIntent initiates a new payment intent.
    *
@@ -241,6 +248,88 @@ message GetQuoteResponse {
    * No providers have active quotes for the requested currency/amount.
    */
   message QuoteNotFound {}
+}
+
+/**
+ * Request to browse the pay-in quotes available to the calling beneficiary.
+ */
+message GetQuotesRequest {} // caller resolved from the signed identity; the browse is unfiltered
+
+/**
+ * The pay-in quotes the caller can collect against, grouped by currency.
+ */
+message GetQuotesResponse {
+  /** One entry per pay-in currency with at least one quoting permitted provider. */
+  repeated CurrencyQuote quotes = 10; // no validation: any count is valid, including none
+
+  /** All pay-in quotes for one currency, grouped by payment method. */
+  message CurrencyQuote {
+    /** ISO 4217 pay-in currency code, e.g. EUR, GBP. */
+    string currency = 10 [(buf.validate.field).string = {
+      len: 3
+      pattern: "^[A-Z]{3}$"
+    }];
+
+    /** The payment methods this currency can be collected through. */
+    repeated PaymentMethodQuote payment_method_quotes = 20 [(buf.validate.field).repeated = {min_items: 1}];
+
+    /** All pay-in quotes for one payment method within the enclosing currency, across providers. */
+    message PaymentMethodQuote {
+      tzero.v1.common.PaymentMethodType payment_method = 10 [(buf.validate.field).enum = {
+        defined_only: true
+        not_in: [0]
+      }];
+
+      /** The permitted pay-in providers quoting this currency and payment method. */
+      repeated ProviderQuote provider_quotes = 20 [(buf.validate.field).repeated = {min_items: 1}];
+
+      /** One pay-in provider's offering for the enclosing currency and payment method. */
+      message ProviderQuote {
+        /** The T-0 provider ID of the pay-in provider that published these bands. */
+        uint32 provider_id = 10;
+
+        /** Tiered rate bands, ascending by max_amount. */
+        repeated Quote quotes = 20 [(buf.validate.field).repeated = {min_items: 1}];
+
+        /** One pricing band: the rate and fixed charge that apply up to max_amount. */
+        message Quote {
+          /**
+           * USD ceiling this band applies up to. A pay-in amount falls in this band when
+           * amount / rate is at or below the ceiling — the ceiling is in USD, not in the
+           * pay-in currency.
+           */
+          tzero.v1.common.Decimal max_amount = 10 [
+            (buf.validate.field).required = true,
+            (buf.validate.field).cel = {
+              message: "max_amount must be greater than zero"
+              expression: "this.unscaled > 0"
+            }
+          ];
+
+          /** Indicative exchange rate, pay-in currency per USD. */
+          tzero.v1.common.Decimal rate = 20 [
+            (buf.validate.field).required = true,
+            (buf.validate.field).cel = {
+              message: "rate must be greater than zero"
+              expression: "this.unscaled > 0"
+            }
+          ];
+
+          /** Fixed charge in USD retained by the pay-in provider per transfer. */
+          tzero.v1.common.Decimal fix = 30 [
+            (buf.validate.field).required = true,
+            (buf.validate.field).cel = {
+              message: "fix must be non-negative"
+              expression: "this.unscaled >= 0"
+            }
+          ];
+
+          /** When these terms stop being offered. */
+          google.protobuf.Timestamp expires_at = 40 [(buf.validate.field).required = true];
+        }
+      }
+    }
+  }
 }
 
 /**
