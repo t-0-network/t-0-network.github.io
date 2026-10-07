@@ -67,6 +67,8 @@ enum PaymentMethodType {
   // provider and agreed with the requester off-network. The payload is opaque and
   // forwarded to the provider without interpretation.
   PAYMENT_METHOD_TYPE_PROVIDER_DEFINED = 350;
+  // SPTR - Angolan real-time gross settlement system (Angola)
+  PAYMENT_METHOD_TYPE_SPTR = 360;
 }
 
 message PaymentDetails {
@@ -200,6 +202,10 @@ message PaymentDetails {
 
     // Provider-defined opaque envelope - format agreed off-network
     ProviderDefined provider_defined = 350;
+
+    // SPTR - real-time gross settlement system
+    // Angola
+    Sptr sptr = 360;
   };
 
   message Sepa {
@@ -1541,6 +1547,40 @@ message PaymentDetails {
     bytes payload = 10 [(buf.validate.field).bytes = {
       min_len: 1,
       max_len: 10240
+    }];
+  }
+
+  /**
+   * SPTR - Angolan real-time gross settlement system. Kwanza (AOA) transfers
+   * addressed by IBAN.
+   */
+  message Sptr {
+    option (payment_method_type) = PAYMENT_METHOD_TYPE_SPTR;
+
+    /**
+     * Angolan IBAN without spaces (25 characters: AO + 2 check digits + the
+     * 21-digit NBA account number).
+     */
+    string iban = 10 [(buf.validate.field).string = {
+      len: 25,
+      pattern: "^AO[0-9]{23}$"
+    }];
+
+    /** Beneficiary's full name. */
+    string beneficiary_name = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    /** Name of the bank that holds the beneficiary account. */
+    string bank_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 140
+    }];
+
+    /** Payment reference/description (optional). */
+    optional string payment_reference = 40 [(buf.validate.field).string = {
+      max_len: 140
     }];
   }
 }

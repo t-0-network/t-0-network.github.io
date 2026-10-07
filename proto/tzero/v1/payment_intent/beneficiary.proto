@@ -105,6 +105,12 @@ message PaymentIntentUpdateRequest {
       expression: "this.unscaled >= 0"
     }];
 
+    /**
+     * The pay-in provider that collected the funds — the counterparty whose balance moved
+     * against this intent. Distinguishes providers that share a payment method.
+     */
+    uint32 pay_in_provider_id = 80 [(buf.validate.field).uint32 = {gt: 0, lte: 2147483647}];
+
     message TravelRuleData {
       /**
        * IVMS101 legal person data of the originating provider's legal entity.

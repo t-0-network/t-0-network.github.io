@@ -55,6 +55,7 @@ toc: true
 | indonesian_bank_transfer | [PaymentDetails.IndonesianBankTransfer](#tzero-v1-common-PaymentDetails-IndonesianBankTransfer) |  | Indonesian domestic bank transfer (BI-FAST and other rails) Indonesia |
 | indonesian_e_wallet | [PaymentDetails.IndonesianEWallet](#tzero-v1-common-PaymentDetails-IndonesianEWallet) |  | Indonesian e-wallet Indonesia |
 | provider_defined | [PaymentDetails.ProviderDefined](#tzero-v1-common-PaymentDetails-ProviderDefined) |  | Provider-defined opaque envelope - format agreed off-network |
+| sptr | [PaymentDetails.Sptr](#tzero-v1-common-PaymentDetails-Sptr) |  | SPTR - real-time gross settlement system Angola |
 
 
 
@@ -740,6 +741,26 @@ Real-time bank-to-bank transfers using routing and account numbers
 
 
 
+<a name="tzero-v1-common-PaymentDetails-Sptr"></a>
+
+### PaymentDetails.Sptr
+SPTR - Angolan real-time gross settlement system. Kwanza (AOA) transfers
+addressed by IBAN.
+
+
+| Field | Type | Label | Description |
+| ----- | ---- | ----- | ----------- |
+| iban | [string](../scalar/#string) |  | Angolan IBAN without spaces (25 characters: AO + 2 check digits + the 21-digit NBA account number). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary's full name. |
+| bank_name | [string](../scalar/#string) |  | Name of the bank that holds the beneficiary account. |
+| payment_reference | [string](../scalar/#string) | optional | Payment reference/description (optional). |
+
+
+
+
+
+
+
 <a name="tzero-v1-common-PaymentDetails-Swift"></a>
 
 ### PaymentDetails.Swift
@@ -1101,6 +1122,7 @@ VietQR - Vietnamese bank transfer addressed by a resolved QR code.
 | PAYMENT_METHOD_TYPE_INDONESIAN_BANK_TRANSFER | 330 | Indonesian domestic bank transfer - BI-FAST and other rails (Indonesia) |
 | PAYMENT_METHOD_TYPE_INDONESIAN_E_WALLET | 340 | Indonesian e-wallet - GoPay, OVO, DANA, ShopeePay, LinkAja, etc. (Indonesia) |
 | PAYMENT_METHOD_TYPE_PROVIDER_DEFINED | 350 | Provider-defined envelope: payment details whose structure is defined by the provider and agreed with the requester off-network. The payload is opaque and forwarded to the provider without interpretation. |
+| PAYMENT_METHOD_TYPE_SPTR | 360 | SPTR - Angolan real-time gross settlement system (Angola) |
 
 
  <!-- end enums -->
