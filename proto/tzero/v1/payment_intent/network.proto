@@ -29,7 +29,8 @@ service PaymentIntentService {
   /**
    * GetQuote returns available quotes for a given currency and amount.
    *
-   * Use this to check indicative rates before creating a payment intent.
+   * Use this to check indicative rates before creating a payment intent, and for the
+   * current rates of a created payment intent's options.
    * The returned quotes show which providers can accept pay-ins and their current rates.
    *
    * Note: Quotes are indicative only. The actual rate used for settlement is determined
@@ -49,7 +50,8 @@ service PaymentIntentService {
   /**
    * CreatePaymentIntent initiates a new payment intent.
    *
-   * Returns the available payment options to present to the end-user.
+   * Returns the available payment options to present to the end-user. Rates are
+   * not part of the result: call GetQuote for the current indicative rates.
    *
    * The returned payment_intent_id must be stored by the beneficiary provider
    * to correlate with the PaymentIntentUpdate notification received later.
@@ -334,8 +336,16 @@ message GetQuotesResponse {
 
 /**
  * Represents pay-in details for a payment intent option.
+ *
+ * Carries no rate: for the current indicative rate and fix of an option, call
+ * GetQuote with the intent's currency and amount and pay_in_provider_ids set to
+ * its provider_id, and match the returned quote on payment_method.
  */
 message PaymentIntentPayInDetails {
+  reserved 40; // was: tzero.v1.common.Decimal indicative_rate
+  reserved 50; // was: tzero.v1.common.Decimal indicative_fix
+  reserved "indicative_rate", "indicative_fix";
+
   /**
    * The payment method type (e.g., SEPA, SWIFT, mobile money).
    * Determines which payment details format is provided.
@@ -346,7 +356,7 @@ message PaymentIntentPayInDetails {
   }];
 
   /**
-   * The T-0 provider ID of the pay-in provider offering this quote.
+   * The T-0 provider ID of the pay-in provider offering this option.
    */
   uint32 provider_id = 20;
 
@@ -356,37 +366,6 @@ message PaymentIntentPayInDetails {
    * This should be displayed to the end-user to complete their payment.
    */
   tzero.v1.common.PaymentDetails payment_details = 30 [(buf.validate.field).required = true];
-
-  /**
-   * Indicative exchange rate USD/XXX (base currency is always USD).
-   *
-   * Reflects the current quote on every call,
-   * including idempotent retries. The binding rate is locked in at
-   * ConfirmFundsReceived and may differ.
-   */
-  tzero.v1.common.Decimal indicative_rate = 40 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).cel = {
-      message: "indicative_rate must be greater than zero"
-      expression: "this.unscaled > 0"
-    }
-  ];
-
-  /**
-   * Indicative fixed charge in USD retained by the pay-in provider per transfer.
-   * Settlement is calculated as (amount / indicative_rate) - indicative_fix.
-   *
-   * Reflects the current quote on every call,
-   * including idempotent retries. The binding fix is locked in at
-   * ConfirmFundsReceived and may differ.
-   */
-  tzero.v1.common.Decimal indicative_fix = 50 [
-    (buf.validate.field).required = true,
-    (buf.validate.field).cel = {
-      message: "indicative_fix must be non-negative"
-      expression: "this.unscaled >= 0"
-    }
-  ];
 }
 
 /**
@@ -485,9 +464,8 @@ message CreatePaymentIntentResponse {
      * Present these options to the end-user so they can choose how to pay.
      * Each entry contains the payment details needed to complete the payment.
      *
-     * Indicative rate/fix are resolved live on every call, including idempotent
-     * retries. The set of options is fixed at first call; individual options
-     * whose underlying quote has lapsed are omitted on retry.
+     * The set of options is fixed at first call and returned unchanged on every
+     * idempotent retry, whether or not a live quote still covers it.
      */
     repeated PaymentIntentPayInDetails pay_in_details = 20;
   }
@@ -504,10 +482,8 @@ message CreatePaymentIntentResponse {
     enum Reason {
       FAILURE_REASON_UNSPECIFIED = 0;
       /**
-       * No live quote covers the requested currency/amount. On first call this
-       * means the intent was never created. On an idempotent retry this means
-       * every stored offer has since lost its live quote; a subsequent retry
-       * may succeed once providers republish.
+       * No live quote covers the requested currency/amount, so the payment
+       * intent is not created. Final for this external_reference.
        */
       FAILURE_REASON_QUOTE_NOT_FOUND = 10;
       /**
