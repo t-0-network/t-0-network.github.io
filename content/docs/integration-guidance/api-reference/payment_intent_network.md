@@ -23,9 +23,9 @@ Payment Intent is a flow where:
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment_intent-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment_intent-UpdateQuoteResponse) | Atomically replaces the calling provider's full pay-in quote set. An empty payment_intent_quotes withdraws all of this provider's quotes. |
-| GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-GetQuoteResponse) | GetQuote returns available quotes for a given currency and amount.  Use this to check indicative rates before creating a payment intent. The returned quotes show which providers can accept pay-ins and their current rates.  Note: Quotes are indicative only. The actual rate used for settlement is determined at the time of ConfirmFundsReceived. |
+| GetQuote | [GetQuoteRequest](#tzero-v1-payment_intent-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment_intent-GetQuoteResponse) | GetQuote returns available quotes for a given currency and amount.  Use this to check indicative rates before creating a payment intent, and for the current rates of a created payment intent's options. The returned quotes show which providers can accept pay-ins and their current rates.  Note: Quotes are indicative only. The actual rate used for settlement is determined at the time of ConfirmFundsReceived. |
 | GetQuotes | [GetQuotesRequest](#tzero-v1-payment_intent-GetQuotesRequest) | [GetQuotesResponse](#tzero-v1-payment_intent-GetQuotesResponse) | Lists the active pay-in quotes the caller can collect against, grouped by currency, then payment method: for each, the pay-in providers permitted to the caller and their tiered rate bands. Indicative — request a priced quote via GetQuote to act on one. |
-| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-CreatePaymentIntentResponse) | CreatePaymentIntent initiates a new payment intent.  Returns the available payment options to present to the end-user.  The returned payment_intent_id must be stored by the beneficiary provider to correlate with the PaymentIntentUpdate notification received later.  Idempotency: Multiple calls with the same external_reference return the same payment_intent_id. |
+| CreatePaymentIntent | [CreatePaymentIntentRequest](#tzero-v1-payment_intent-CreatePaymentIntentRequest) | [CreatePaymentIntentResponse](#tzero-v1-payment_intent-CreatePaymentIntentResponse) | CreatePaymentIntent initiates a new payment intent.  Returns the available payment options to present to the end-user. Rates are not part of the result: call GetQuote for the current indicative rates.  The returned payment_intent_id must be stored by the beneficiary provider to correlate with the PaymentIntentUpdate notification received later.  Idempotency: Multiple calls with the same external_reference return the same payment_intent_id. |
 | ConfirmFundsReceived | [ConfirmFundsReceivedRequest](#tzero-v1-payment_intent-ConfirmFundsReceivedRequest) | [ConfirmFundsReceivedResponse](#tzero-v1-payment_intent-ConfirmFundsReceivedResponse) | Confirms funds landed for a payment intent and locks the binding settlement rate. Business failures return a typed Reject.Reason rather than a Connect transport error. |
 
  <!-- end services -->
@@ -186,7 +186,7 @@ Payment intent created successfully.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_intent_id | [uint64](../scalar/#uint64) |  | Unique identifier for this payment intent. Store this ID to correlate with: - PaymentIntentUpdate notifications delivered later |
-| pay_in_details | [PaymentIntentPayInDetails](#tzero-v1-payment_intent-PaymentIntentPayInDetails) | repeated | Available payment options for the end-user. Present these options to the end-user so they can choose how to pay. Each entry contains the payment details needed to complete the payment.  Indicative rate/fix are resolved live on every call, including idempotent retries. The set of options is fixed at first call; individual options whose underlying quote has lapsed are omitted on retry. |
+| pay_in_details | [PaymentIntentPayInDetails](#tzero-v1-payment_intent-PaymentIntentPayInDetails) | repeated | Available payment options for the end-user. Present these options to the end-user so they can choose how to pay. Each entry contains the payment details needed to complete the payment.  The set of options is fixed at first call and returned unchanged on every idempotent retry, whether or not a live quote still covers it. |
 
 
 
@@ -382,14 +382,16 @@ One pricing band: the rate and fixed charge that apply up to max_amount.
 ### PaymentIntentPayInDetails
 Represents pay-in details for a payment intent option.
 
+Carries no rate: for the current indicative rate and fix of an option, call
+GetQuote with the intent's currency and amount and pay_in_provider_ids set to
+its provider_id, and match the returned quote on payment_method.
+
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | The payment method type (e.g., SEPA, SWIFT, mobile money). Determines which payment details format is provided. |
-| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this quote. |
+| provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the pay-in provider offering this option. |
 | payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | Payment details for the end-user to make the payment. Contains bank account info, mobile money details, etc. based on payment_method. This should be displayed to the end-user to complete their payment. |
-| indicative_rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative exchange rate USD/XXX (base currency is always USD).  Reflects the current quote on every call, including idempotent retries. The binding rate is locked in at ConfirmFundsReceived and may differ. |
-| indicative_fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Indicative fixed charge in USD retained by the pay-in provider per transfer. Settlement is calculated as (amount / indicative_rate) - indicative_fix.  Reflects the current quote on every call, including idempotent retries. The binding fix is locked in at ConfirmFundsReceived and may differ. |
 
 
 
@@ -496,7 +498,7 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | FAILURE_REASON_UNSPECIFIED | 0 |  |
-| FAILURE_REASON_QUOTE_NOT_FOUND | 10 | No live quote covers the requested currency/amount. On first call this means the intent was never created. On an idempotent retry this means every stored offer has since lost its live quote; a subsequent retry may succeed once providers republish. |
+| FAILURE_REASON_QUOTE_NOT_FOUND | 10 | No live quote covers the requested currency/amount, so the payment intent is not created. Final for this external_reference. |
 | FAILURE_REASON_REJECTED | 20 | Payment intent rejected. |
 
 
