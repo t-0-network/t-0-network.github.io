@@ -113,7 +113,7 @@ Response containing payment details for the requested methods.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| reason | [string](../scalar/#string) |  |  |
+| reason | [string](../scalar/#string) |  | Why the provider rejects the intent; at most 1024 characters. |
 
 
 
