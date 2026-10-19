@@ -129,10 +129,10 @@ Uses RUT (national taxpayer ID) as the beneficiary identifier.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | document_number | [string](../scalar/#string) |  | RUT of the beneficiary - 7-9 digits + check digit (K or 0-9). Example: "12345678-9", "1234567-K". |
-| beneficiary_name | [string](../scalar/#string) |  | Beneficiary full name (max 45 chars; provider truncates if longer). |
+| beneficiary_name | [string](../scalar/#string) |  | Beneficiary full name (max 45 chars). |
 | bank_code | [string](../scalar/#string) |  | Destination bank code - 3 digits (e.g. "012" for BCI). |
 | account_number | [string](../scalar/#string) |  | Destination account number - up to 18 digits (zero-padded by the provider if needed). |
-| account_type | [PaymentDetails.ChileanBankTransfer.AccountType](#tzero-v1-common-PaymentDetails-ChileanBankTransfer-AccountType) | optional | Account type. Optional - required by some provider fallbacks (e.g. Itau), ignored by others (e.g. BCI). |
+| account_type | [PaymentDetails.ChileanBankTransfer.AccountType](#tzero-v1-common-PaymentDetails-ChileanBankTransfer-AccountType) | optional | Account type. Optional, but some payout routes require it; send it when known. |
 
 
 
@@ -208,7 +208,7 @@ Colombian ACH (Automated Clearing House) bank transfer.
 | account_number | [string](../scalar/#string) |  |  |
 | account_type | [PaymentDetails.ColombianAch.AccountType](#tzero-v1-common-PaymentDetails-ColombianAch-AccountType) |  |  |
 | beneficiary_name | [string](../scalar/#string) |  |  |
-| phone_number | [string](../scalar/#string) | optional | Beneficiary phone number. Optional - required only for Row provider; Mono/Cobre use a default when omitted. |
+| phone_number | [string](../scalar/#string) | optional | Beneficiary phone number. Optional, but some payout routes require it; send it when known. |
 
 
 
