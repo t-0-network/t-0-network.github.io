@@ -69,9 +69,8 @@ service PaymentIntentService {
 message UpdateQuoteRequest {
   /**
    * Zero or more quotes for pay-in operations, each quote must have a unique currency, and one or more bands, with the
-   * unique client_quote_id for each band.
+   * unique client_quote_id for each band. An empty list withdraws all quotes.
    */
-  // no validation: zero items is valid — empty list withdraws all quotes for this provider
   repeated Quote payment_intent_quotes = 10;
 
   message Quote {
@@ -418,7 +417,6 @@ message CreatePaymentIntentRequest {
     /**
      * Optional travel rule data of the payer
      */
-    // no validation: ivms101.Person opaque to protovalidate; structural checks delegated to travel-rule layer
     optional ivms101.Person payer = 40;
   }
 }

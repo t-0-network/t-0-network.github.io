@@ -445,10 +445,8 @@ message UpdateLimitRequest {
     int32 counterpart_id = 15 [(buf.validate.field).int32.gt = 0];
     /**
      * payout_limit = credit_limit - credit_usage - reserve, negative value means credit limit is exceeded,
-     * e.g. if counterparty decreased credit limit
+     * e.g. if counterparty decreased credit limit. no validation: any sign is valid.
      */
-    // Amounts are mirrored verbatim: required enforces presence, sign is not re-validated
-    // (payout_limit and credit_usage are signed by design).
     tzero.v1.common.Decimal payout_limit = 20 [(buf.validate.field).required = true];
     /**
      * This is the credit limit that the counterparty is willing to extend to the provider.
