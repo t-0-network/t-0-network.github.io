@@ -945,7 +945,7 @@ message PaymentDetails {
       pattern: "^[0-9]{7,9}-[0-9Kk]$"
     }];
 
-    // Beneficiary full name (max 45 chars; provider truncates if longer).
+    // Beneficiary full name (max 45 chars).
     string beneficiary_name = 20 [(buf.validate.field).string = {
       min_len: 1,
       max_len: 45
@@ -965,8 +965,7 @@ message PaymentDetails {
       pattern: "^[0-9]{1,18}$"
     }];
 
-    // Account type. Optional - required by some provider fallbacks (e.g. Itau),
-    // ignored by others (e.g. BCI).
+    // Account type. Optional, but some payout routes require it; send it when known.
     optional AccountType account_type = 50 [(buf.validate.field).enum = {
       not_in: [0]
     }];
@@ -1104,8 +1103,7 @@ message PaymentDetails {
       max_len: 140
     }];
 
-    // Beneficiary phone number. Optional - required only for Row provider;
-    // Mono/Cobre use a default when omitted.
+    // Beneficiary phone number. Optional, but some payout routes require it; send it when known.
     optional string phone_number = 70 [(buf.validate.field).string = {
       min_len: 7,
       max_len: 20,

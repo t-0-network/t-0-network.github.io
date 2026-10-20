@@ -46,7 +46,7 @@ message GetQuotesResponse {
       /** One payout provider's offering for the enclosing currency and method: the caller's balance
        * with the provider plus its tiered rate bands. */
       message ProviderQuote {
-        /** The payout provider that published these quotes (= KYB id). */
+        /** The payout provider that published these quotes. */
         int32 provider_id = 10 [(buf.validate.field).int32.gt = 0];
 
         /** The caller's credit standing with this provider (USD, currency-agnostic). */

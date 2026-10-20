@@ -107,7 +107,6 @@ message GetPaymentDetailsRequest {
     /**
      * Optional travel rule data of the payer
      */
-    // no validation: ivms101.Person opaque to protovalidate; structural checks delegated to travel-rule layer
     optional ivms101.Person payer = 40;
   }
 }
