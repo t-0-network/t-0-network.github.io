@@ -29,3 +29,7 @@ title = 't-0 Network'
         breadcrumbs = false
     [params.footer]
         copyright = "© 2026 New Settlement Technologies Inc."
+    # CI replaces these with the EGRESS_IP_* repository variables (see hugo.yaml).
+    [params.egress.ip]
+        sandbox = "EGRESS_IP_SANDBOX_PLACEHOLDER"
+        production = "EGRESS_IP_PRODUCTION_PLACEHOLDER"
