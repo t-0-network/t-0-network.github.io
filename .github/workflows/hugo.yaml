@@ -55,6 +55,8 @@ jobs:
       - name: Build with Hugo
         env:
           HUGO_CACHEDIR: /tmp/hugo_cache
+          HUGO_PARAMS_EGRESS_IP_SANDBOX: ${{ vars.EGRESS_IP_SANDBOX }}
+          HUGO_PARAMS_EGRESS_IP_PRODUCTION: ${{ vars.EGRESS_IP_PRODUCTION }}
         run: |
           hugo \
             --gc \

@@ -22,6 +22,14 @@ You can run a single command to scaffold a pre-configured project, ready to depl
 * Production: `https://api.t-0.network`
 * Sandbox: `https://api-sandbox.t-0.network`
 
+### Egress IP Addresses
+The network calls your provider endpoints from these IP addresses:
+
+* Production: `{{< param "egress.ip.production" >}}`
+* Sandbox: `{{< param "egress.ip.sandbox" >}}`
+
+You decide whether to add them to your firewall allowlist. You must verify the signature of every request from the network. See sections 18.1 and 18.4 of [Schedule 1 of the Network Services Agreement](/network-services-agreement/#sch1).
+
 ## Idempotency and Request Safety
 All network methods specify idempotency levels for safe retry behavior and duplicate prevention. See [Idempotency](idempotency) for the full reliability contract and provider implementation requirements.
 
