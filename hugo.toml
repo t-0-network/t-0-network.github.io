@@ -33,3 +33,7 @@ title = 't-0 Network'
     [params.egress.ip]
         sandbox = "EGRESS_IP_SANDBOX_PLACEHOLDER"
         production = "EGRESS_IP_PRODUCTION_PLACEHOLDER"
+    # CI replaces these with the API_DOMAIN_* repository variables (see hugo.yaml).
+    [params.api.domain]
+        sandbox = "API_DOMAIN_SANDBOX_PLACEHOLDER"
+        production = "API_DOMAIN_PRODUCTION_PLACEHOLDER"
