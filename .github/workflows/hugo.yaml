@@ -24,6 +24,24 @@ jobs:
       # (502s), which protoc-gen-doc's legacy deps still resolve from.
       GOPROXY: https://proxy.golang.org,direct
     steps:
+      # Pulumi writes these from the backend stacks. Without them the site
+      # ships the hugo.toml placeholders.
+      - name: Check required variables
+        env:
+          API_DOMAIN_SANDBOX: ${{ vars.API_DOMAIN_SANDBOX }}
+          API_DOMAIN_PRODUCTION: ${{ vars.API_DOMAIN_PRODUCTION }}
+          EGRESS_IP_SANDBOX: ${{ vars.EGRESS_IP_SANDBOX }}
+          EGRESS_IP_PRODUCTION: ${{ vars.EGRESS_IP_PRODUCTION }}
+        run: |
+          missing=0
+          for name in API_DOMAIN_SANDBOX API_DOMAIN_PRODUCTION EGRESS_IP_SANDBOX EGRESS_IP_PRODUCTION; do
+            if [ -z "${!name}" ]; then
+              echo "::error::Repository variable $name is empty. Run pulumi up on the matching backend stack."
+              missing=1
+            fi
+          done
+          exit "$missing"
+
       - name: Install Hugo CLI
         run: |
           wget -q -O "${{ runner.temp }}/hugo.deb" \
@@ -57,6 +75,8 @@ jobs:
           HUGO_CACHEDIR: /tmp/hugo_cache
           HUGO_PARAMS_EGRESS_IP_SANDBOX: ${{ vars.EGRESS_IP_SANDBOX }}
           HUGO_PARAMS_EGRESS_IP_PRODUCTION: ${{ vars.EGRESS_IP_PRODUCTION }}
+          HUGO_PARAMS_API_DOMAIN_SANDBOX: ${{ vars.API_DOMAIN_SANDBOX }}
+          HUGO_PARAMS_API_DOMAIN_PRODUCTION: ${{ vars.API_DOMAIN_PRODUCTION }}
         run: |
           hugo \
             --gc \

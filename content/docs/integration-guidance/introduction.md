@@ -19,8 +19,8 @@ We recommend running it inside a standalone adapter service that sits between yo
 You can run a single command to scaffold a pre-configured project, ready to deploy. Available for Go, TypeScript, Python, Java, and C# on [GitHub](https://github.com/t-0-network/provider-sdk), along with per-language documentation.
 
 ## API Endpoints
-* Production: `https://api.t-0.network`
-* Sandbox: `https://api-sandbox.t-0.network`
+* Production: `https://{{< param "api.domain.production" >}}`
+* Sandbox: `https://{{< param "api.domain.sandbox" >}}`
 
 ### Egress IP Addresses
 The network calls your provider endpoints from these IP addresses:
