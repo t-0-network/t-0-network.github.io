@@ -12,13 +12,13 @@ import "buf/validate/validate.proto";
 /**
  * Provider surface for executing payouts and receiving payment, limit, and ledger updates.
  *
- * All methods of this service must be idempotent, meaning they are safe to retry and multiple calls with the same parameters must not have additional effect.
+ * All methods of this service must be idempotent, meaning they are safe to retry and multiple calls with the same idempotency key must not have additional effect.
  */
 service ProviderService {
 
   /**
     * Execute a payout to the recipient.
-    * This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect.
+    * This method should be idempotent, meaning that multiple calls with the same idempotency key will have no additional effect.
    */
   rpc PayOut(PayoutRequest) returns (PayoutResponse) {
     option idempotency_level = IDEMPOTENT;
@@ -26,7 +26,7 @@ service ProviderService {
 
   /**
     * Reports the current status of a payment — either a success or a failure.
-    * This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect.
+    * This method should be idempotent, meaning that multiple calls with the same idempotency key will have no additional effect.
    */
   rpc UpdatePayment(UpdatePaymentRequest) returns (UpdatePaymentResponse) {
     option idempotency_level = IDEMPOTENT;

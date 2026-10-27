@@ -1,0 +1,139 @@
+syntax = "proto3";
+
+package tzero.v1.manage.kyc_sharing;
+
+import "buf/validate/validate.proto";
+
+/**
+ * File storage for KYB/KYC sharing forms: a Payout Requester uploads a file (a
+ * PDF or image) for one of its customers against a Payout Provider's form and
+ * receives a stable file id to reference it; both sides can download it later.
+ */
+service KycFileService {
+  /**
+   * Client-streaming upload (first message Metadata, then Chunks) that stores the
+   * file and returns its id. A retry with the same optional Metadata.upload_id
+   * returns the originally stored file; without it, each call stores a new file.
+   */
+  rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
+
+  /**
+   * Server-streaming download of a previously uploaded file. The first response
+   * message carries Metadata (content type, advisory original name); the rest are
+   * Chunks of the file bytes. The file is identified by its id plus the (Payout
+   * Requester, Payout Provider, client) tuple it must belong to; access is granted
+   * to the owning requester (any state) and to the provider once the matching
+   * application is past draft.
+   */
+  rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+message UploadFileRequest {
+  oneof payload {
+    option (buf.validate.oneof).required = true;
+
+    // Exactly the first stream message.
+    Metadata metadata = 10;
+
+    // Every message after the first.
+    Chunk chunk = 20;
+  }
+
+  message Metadata {
+    // The Payout Provider that owns the form this file is uploaded against.
+    uint32 payout_provider_id = 10 [(buf.validate.field).uint32 = {gt: 0}];
+
+    // The Payout Requester's own reference for the end client (applicant),
+    // the same value as the applicant's client_id.
+    string client_id = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 64
+    }];
+
+    // Original uploaded filename, advisory only. Optional — API clients may omit it.
+    optional string file_name = 30 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 255
+    }];
+
+    // Advisory only; the effective content type is determined server-side.
+    optional string declared_content_type = 40 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 128
+    }];
+
+    // Optional client-generated idempotency key (e.g. a UUID). When set, a retry
+    // with the same key (scoped to the authenticated Payout Requester) returns the
+    // originally stored file instead of creating a new one.
+    optional string upload_id = 50 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 64
+    }];
+  }
+
+  message Chunk {
+    bytes data = 10 [(buf.validate.field).bytes = {
+      min_len: 1,
+      max_len: 1048576
+    }];
+  }
+}
+
+message UploadFileResponse {
+  // Stable identifier for the stored file.
+  int64 file_id = 10 [(buf.validate.field).int64 = {gt: 0}];
+}
+
+message DownloadFileRequest {
+  // Stable id of the file to download.
+  int64 file_id = 10 [(buf.validate.field).int64 = {gt: 0}];
+
+  // The Payout Requester that owns the file (its originator).
+  uint32 payout_requester_id = 20 [(buf.validate.field).uint32 = {gt: 0}];
+
+  // The Payout Provider whose form the file was uploaded against.
+  uint32 payout_provider_id = 30 [(buf.validate.field).uint32 = {gt: 0}];
+
+  // The Payout Requester's own reference for the end client (applicant),
+  // the same value as the applicant's client_id.
+  string client_id = 40 [(buf.validate.field).string = {
+    min_len: 1,
+    max_len: 64
+  }];
+}
+
+message DownloadFileResponse {
+  oneof payload {
+    option (buf.validate.oneof).required = true;
+
+    // Exactly the first stream message.
+    Metadata metadata = 10;
+
+    // Every message after the first.
+    Chunk chunk = 20;
+  }
+
+  message Metadata {
+    // The effective content type of the stored file, determined server-side at
+    // upload time (e.g. application/pdf, image/png, image/jpeg).
+    string content_type = 10 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 128
+    }];
+
+    // The original uploaded filename, advisory only. Optional — may be absent.
+    optional string file_name = 20 [(buf.validate.field).string = {
+      min_len: 1,
+      max_len: 255
+    }];
+  }
+
+  message Chunk {
+    bytes data = 10 [(buf.validate.field).bytes = {
+      min_len: 1,
+      max_len: 1048576
+    }];
+  }
+}
