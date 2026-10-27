@@ -40,7 +40,7 @@ Request for payment details.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_intent_id | [uint64](../scalar/#uint64) |  | The payment intent ID this request relates to. |
+| payment_intent_id | [uint64](../scalar/#uint64) |  | The payment intent ID this request relates to. Requests for one payment intent creation can arrive with different payment_intent_id and confirmation_code values. Only one of these ids becomes a payment intent whose payment details reach the end-user; ConfirmFundsReceived for any other id answers NotFound. |
 | confirmation_code | [string](../scalar/#string) |  | This is the confirmation code to be used later with ConfirmFundsReceived endpoint to prevent accidental confirmation of the wrong payment intent |
 | payment_methods | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) | repeated | Payment methods to return PaymentDetails for. Each is drawn from a previously submitted quote. |
 | currency | [string](../scalar/#string) |  | The currency for the pay-in. ISO 4217 currency code (e.g., "EUR", "GBP", "KES"). |
