@@ -120,6 +120,13 @@ gen_page() {
     sed -i.bak -f "$fileref_sed_script" "$out_path" && rm -f "${out_path}.bak"
     rm -f "$fileref_sed_script"
 
+    # Post-process: mark enum values that carry (network_mandatory) = true.
+    # protoc-gen-doc does not pass custom options to the template, so read them from the proto.
+    local value
+    for value in $( { grep -oE '^[[:space:]]*[A-Z][A-Z0-9_]* = [0-9]+ \[[^]]*\(network_mandatory\) = true' "$PROTO_DIR/$active_file" || true; } | awk '{print $1}'); do
+        sed -i.bak "s/^| ${value} | \([0-9][0-9]*\) | /| ${value} | \1 | **Network mandatory.** /" "$out_path" && rm -f "${out_path}.bak"
+    done
+
 }
 
 # Generate all pages

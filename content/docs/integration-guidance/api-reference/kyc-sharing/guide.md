@@ -76,7 +76,7 @@ Reads and saves return the applicant's `version`. `SubmitApplicant`, `WithdrawAp
 
 Read the fields to fill from the `form` in a `Get` response.
 
-- **Network-mandatory standard fields** carry `(network_mandatory) = true` in the field catalogue. `form.standard_fields` omits them, so add them to your form as required fields.
+- **Network-mandatory standard fields** carry the **Network mandatory** mark in the field catalogues [`StandardKybFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKybFieldType), [`StandardUboFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardUboFieldType), and [`StandardKycFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKycFieldType). `form.standard_fields` omits them, so add them to your form as required fields.
 - **Optional standard fields** appear in `form.standard_fields` when the provider chooses them, each with a `required` flag.
 - **Custom fields** come from the provider, with their full definitions in `form.custom_fields`.
 
