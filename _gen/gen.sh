@@ -30,7 +30,8 @@ escape_sed() {
     printf '%s' "$1" | sed 's/[&|\\]/\\&/g'
 }
 
-# Pages to generate: "proto_file|title|weight"
+# Pages to generate: "proto_file|title|weight|subdir"
+# subdir is optional: it puts the page in a sub-section of OUT_DIR
 PAGES=(
     "tzero/v1/common/common.proto|Common|338"
     "tzero/v1/common/payment_method.proto|Payment Method|337"
@@ -42,35 +43,53 @@ PAGES=(
     "tzero/v1/payment_intent/pay_in_provider.proto|Payment Intent Pay-In Provider|335"
     "ivms101/v1/ivms/ivms101.proto|Travel Rule Data|340"
     "ivms101/v1/ivms/enum.proto|Travel Rule Enums|341"
+    "tzero/v1/manage/kyc_sharing/applicant_requester.proto|Requester|344|kyc-sharing"
+    "tzero/v1/manage/kyc_sharing/applicant_provider.proto|Provider|345|kyc-sharing"
+    "tzero/v1/manage/kyc_sharing/file.proto|Files|346|kyc-sharing"
+    "tzero/v1/manage/kyc_sharing/form.proto|Form|347|kyc-sharing"
+    "tzero/v1/manage/kyc_sharing/common.proto|Common|348|kyc-sharing"
 )
 
 # Derive ALL_PROTOS from PAGES (single source of truth)
 ALL_PROTOS=()
 for page in "${PAGES[@]}"; do
-    IFS='|' read -r proto _ _ <<< "$page"
+    IFS='|' read -r proto _ _ _ <<< "$page"
     ALL_PROTOS+=("$proto")
 done
 
-# Build FILEREF sed script: maps anchor(file.Name) -> ../slug/
-FILEREF_SED_SCRIPT=$(mktemp)
-for proto in "${ALL_PROTOS[@]}"; do
-    file_anchor=$(anchor_filter "$proto")
-    slug=$(proto_to_slug "$proto")
-    echo "s|%%FILEREF:${file_anchor}%%|../${slug}/|g" >> "$FILEREF_SED_SCRIPT"
-done
-# Also resolve scalar marker
-echo "s|%%SCALAR%%|../scalar/|g" >> "$FILEREF_SED_SCRIPT"
+# Print the FILEREF sed script for a page in sub-section $1 ("" for OUT_DIR itself):
+# maps anchor(file.Name) -> relative URL of the page for that file, e.g. ../slug/ or ../../slug/
+build_fileref_sed() {
+    local from_dir="$1"
+    local up="../"
+    local parts part page proto dir
+    if [[ -n "$from_dir" ]]; then
+        IFS='/' read -ra parts <<< "$from_dir"
+        for part in "${parts[@]}"; do
+            up+="../"
+        done
+    fi
+    for page in "${PAGES[@]}"; do
+        IFS='|' read -r proto _ _ dir <<< "$page"
+        echo "s|%%FILEREF:$(anchor_filter "$proto")%%|${up}${dir:+${dir}/}$(proto_to_slug "$proto")/|g"
+    done
+    # Also resolve scalar marker
+    echo "s|%%SCALAR%%|${up}scalar/|g"
+}
 
 gen_page() {
     local active_file="$1"
     local title="$2"
     local weight="$3"
+    local subdir="$4"
     local slug
     slug=$(proto_to_slug "$active_file")
     local out_file="${slug}.md"
-    local out_path="$PROJECT_DIR/content/docs/${OUT_DIR}/${out_file}"
+    local out_dir="$PROJECT_DIR/content/docs/${OUT_DIR}${subdir:+/${subdir}}"
+    local out_path="${out_dir}/${out_file}"
 
-    echo "Generating ${out_file} from ${active_file}..."
+    echo "Generating ${subdir:+${subdir}/}${out_file} from ${active_file}..."
+    mkdir -p "$out_dir"
 
     # Pre-process template: inject active file name
     local tmp_template
@@ -79,7 +98,7 @@ gen_page() {
 
     # Run protoc-gen-doc with ALL protos for full type resolution
     protoc \
-        --doc_out="$PROJECT_DIR/content/docs/${OUT_DIR}" \
+        --doc_out="$out_dir" \
         --doc_opt="$tmp_template,${out_file}" \
         --proto_path="$PROTO_DIR" \
         "${ALL_PROTOS[@]}"
@@ -95,16 +114,18 @@ gen_page() {
         "$out_path" && rm -f "${out_path}.bak"
 
     # Post-process: resolve %%FILEREF:xxx%% and %%SCALAR%% markers
-    sed -i.bak -f "$FILEREF_SED_SCRIPT" "$out_path" && rm -f "${out_path}.bak"
+    local fileref_sed_script
+    fileref_sed_script=$(mktemp)
+    build_fileref_sed "$subdir" > "$fileref_sed_script"
+    sed -i.bak -f "$fileref_sed_script" "$out_path" && rm -f "${out_path}.bak"
+    rm -f "$fileref_sed_script"
 
 }
 
 # Generate all pages
 for page in "${PAGES[@]}"; do
-    IFS='|' read -r proto title weight <<< "$page"
-    gen_page "$proto" "$title" "$weight"
+    IFS='|' read -r proto title weight subdir <<< "$page"
+    gen_page "$proto" "$title" "$weight" "$subdir"
 done
-
-rm -f "$FILEREF_SED_SCRIPT"
 
 echo "Done. Generated ${#PAGES[@]} pages."

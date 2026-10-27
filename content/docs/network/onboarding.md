@@ -13,7 +13,7 @@ Payment providers join the T-0 Network through a comprehensive onboarding proces
 
 Following successful KYB approval, providers must complete several technical integration steps. Each provider generates an ECDSA private key for cryptographic operations within the network, then registers their corresponding public key, webhook URL, and Ethereum-compatible blockchain address with the network. This registration establishes the provider's digital identity and enables secure communication and settlement operations.
 
-To call the KYB API, generate a second ECDSA key pair and send its public key to T-0. T-0 registers the key on the KYB API. After a key replacement, allow up to 5 minutes before every KYB API instance accepts the new key.
+For [KYC sharing](/docs/integration-guidance/api-reference/kyc-sharing/guide/), you need a second key pair for the KYB API. Generate an ECDSA key pair and send the public key to T-0 for registration. After you replace the KYB key, T-0 needs up to 5 minutes to activate the new one on all KYB API instances.
 
 Credit relationships form the foundation of network liquidity, and providers must establish bilateral credit limits with counterparties before beginning payment operations. These credit limits define the maximum amount each provider is willing to extend to counterparties before requiring settlement, creating a distributed liquidity pool that enables efficient payment routing.
 

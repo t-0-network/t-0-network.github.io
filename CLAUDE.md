@@ -11,6 +11,7 @@ Hugo-based documentation site for t-0 network. API reference docs are auto-gener
 - Requires `protoc` (latest) and `protoc-gen-doc` (pinned in `go.mod` via `tool` directive)
 - **Important**: `protoc-gen-doc` pre-built release binaries are incompatible with protoc v28+. Always build from source with `go install`
 - The `PAGES` array in `gen.sh` is the single source of truth for which proto files to document. `ALL_PROTOS` is derived from it.
+- A `PAGES` entry is `proto|title|weight|subdir`. The optional `subdir` puts the page in a sub-section of the API reference (e.g. `kyc-sharing`), which needs its own hand-written `_index.md`.
 - CI workflow (`.github/workflows/generate.yaml`) auto-generates docs on PRs that touch `proto/` or `content/docs/`
 
 ### Cross-file type links
@@ -25,7 +26,7 @@ The mechanism uses placeholder markers in the template that get resolved by `gen
 2. For each type reference, the template scans all files to find where it's defined
 3. Cross-file refs emit `%%FILEREF:<file_anchor>%%` markers, scalar refs emit `%%SCALAR%%`
 4. `gen.sh` post-processes with sed to replace markers with relative Hugo URLs (`../slug/`)
-5. The FILEREF sed script is built from the same `PAGES` array, mapping `anchor(proto_path)` -> `../slug/`
+5. `gen.sh` builds the FILEREF sed script per page from the same `PAGES` array, mapping `anchor(proto_path)` -> `../slug/`. A page in a sub-section climbs one more level per path part, so it links `../../slug/` and `../../scalar/`, and a target in a sub-section adds `subdir/` before its slug.
 
 ## Writing Style
 

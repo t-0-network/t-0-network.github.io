@@ -20,7 +20,7 @@ The `X-Public-Key` header contains the hex-encoded public key corresponding to t
 The `X-Signature-Timestamp` header contains the **Unix timestamp in milliseconds** used as the suffix during signature generation. The network validates that this timestamp is within one minute of the current time, rejecting requests with timestamps outside this window to prevent replay attacks.
 
 ## KYB API
-Requests to the KYB API use the same headers and signing algorithm, with a separate KYB key pair. A Network key does not work on the KYB API. See [Onboarding](/docs/network/onboarding/) for KYB key registration and the [KYC Sharing Guide](/docs/integration-guidance/api-reference/kyc-sharing/) for the KYB API rules.
+[KYC sharing](/docs/integration-guidance/api-reference/kyc-sharing/guide/) runs on the KYB API. Sign its requests with the headers and algorithm above, using a separate KYB key pair. Requests signed with your Network key fail there. To register the KYB key, send its public key to T-0 (see [Onboarding](/docs/network/onboarding/)).
 
 ## Signature Verification
 Providers must implement the corresponding signature verification logic for incoming network requests. The network signs all requests using its private key, with the public key available to all network participants for verification purposes.
