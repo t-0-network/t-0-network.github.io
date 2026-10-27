@@ -14,12 +14,12 @@ toc: true
 ## ProviderService
 Provider surface for executing payouts and receiving payment, limit, and ledger updates.
 
-All methods of this service must be idempotent, meaning they are safe to retry and multiple calls with the same parameters must not have additional effect.
+All methods of this service must be idempotent, meaning they are safe to retry and multiple calls with the same idempotency key must not have additional effect.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| PayOut | [PayoutRequest](#tzero-v1-payment-PayoutRequest) | [PayoutResponse](#tzero-v1-payment-PayoutResponse) | Execute a payout to the recipient. This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
-| UpdatePayment | [UpdatePaymentRequest](#tzero-v1-payment-UpdatePaymentRequest) | [UpdatePaymentResponse](#tzero-v1-payment-UpdatePaymentResponse) | Reports the current status of a payment — either a success or a failure. This method should be idempotent, meaning that multiple calls with the same parameters will have no additional effect. |
+| PayOut | [PayoutRequest](#tzero-v1-payment-PayoutRequest) | [PayoutResponse](#tzero-v1-payment-PayoutResponse) | Execute a payout to the recipient. This method should be idempotent, meaning that multiple calls with the same idempotency key will have no additional effect. |
+| UpdatePayment | [UpdatePaymentRequest](#tzero-v1-payment-UpdatePaymentRequest) | [UpdatePaymentResponse](#tzero-v1-payment-UpdatePaymentResponse) | Reports the current status of a payment — either a success or a failure. This method should be idempotent, meaning that multiple calls with the same idempotency key will have no additional effect. |
 | UpdateLimit | [UpdateLimitRequest](#tzero-v1-payment-UpdateLimitRequest) | [UpdateLimitResponse](#tzero-v1-payment-UpdateLimitResponse) | Delivers updated credit limit and credit usage. |
 | AppendLedgerEntries | [AppendLedgerEntriesRequest](#tzero-v1-payment-AppendLedgerEntriesRequest) | [AppendLedgerEntriesResponse](#tzero-v1-payment-AppendLedgerEntriesResponse) | Carries ledger-entry updates for the provider's accounts. It can be used to keep track of the provider's exposure to other participants and other important financial events. (see the list in the message below) |
 | ApprovePaymentQuotes | [ApprovePaymentQuoteRequest](#tzero-v1-payment-ApprovePaymentQuoteRequest) | [ApprovePaymentQuoteResponse](#tzero-v1-payment-ApprovePaymentQuoteResponse) | Approves the final pay-out quotes — the "Last Look" before payment executes. Applies after a manual AML check completes, when one was required. |

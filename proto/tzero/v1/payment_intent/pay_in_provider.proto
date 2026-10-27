@@ -34,7 +34,10 @@ service PayInProviderService {
  */
 message GetPaymentDetailsRequest {
   /**
-   * The payment intent ID this request relates to.
+   * The payment intent ID this request relates to. Requests for one payment intent
+   * creation can arrive with different payment_intent_id and confirmation_code values.
+   * Only one of these ids becomes a payment intent whose payment details reach the
+   * end-user; ConfirmFundsReceived for any other id answers NotFound.
    */
   uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
 

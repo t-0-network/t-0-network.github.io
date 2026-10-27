@@ -1,0 +1,161 @@
+syntax = "proto3";
+
+package tzero.v1.manage.kyc_sharing;
+
+import "buf/validate/validate.proto";
+import "tzero/v1/manage/kyc_sharing/common.proto";
+import "tzero/v1/manage/kyc_sharing/form.proto";
+
+/**
+ * Payout-Provider-facing applicant review: read a submitted Applicant, decide on it
+ * (approve/reject), and list submitted Applicants.
+ */
+service KycApplicantProviderService {
+  /** Returns a submitted KYB Applicant for review — the bound form, the submitted values and beneficial owners, the form version, and current lifecycle state. Fails with FailedPrecondition for a draft or missing Applicant, and with InvalidArgument when the `client_id` has a KYC applicant. */
+  rpc GetProviderKybApplicant(GetProviderKybApplicantRequest) returns (GetProviderKybApplicantResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  /** Returns a submitted KYC Applicant for review — the bound form, the submitted values, the form version, and current lifecycle state. Fails with FailedPrecondition for a draft or missing Applicant, and with InvalidArgument when the `client_id` has a KYB applicant. */
+  rpc GetProviderKycApplicant(GetProviderKycApplicantRequest) returns (GetProviderKycApplicantResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  /**
+   * Approves a `requested` or `rejected` Applicant, moving it to `approved` (approve-from-rejected
+   * reverses an earlier rejection and clears its reason). Approving an already-`approved` Applicant
+   * is the idempotent no-op; `draft` is rejected as a failed precondition, since it was never submitted.
+   */
+  rpc ApproveApplicant(ApproveApplicantRequest) returns (ApproveApplicantResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+
+  /**
+   * Rejects a `requested`, `approved`, or already-`rejected` Applicant with a mandatory free-text
+   * reason, moving it to `rejected`. Re-rejecting an already-`rejected` Applicant overwrites the
+   * stored reason; `draft` is rejected as a failed precondition, since the Applicant was never
+   * submitted for review.
+   */
+  rpc RejectApplicant(RejectApplicantRequest) returns (RejectApplicantResponse);
+
+  /** Lists applicants submitted to the calling Payout Provider (always past `draft`), optionally filtered by form type (KYB or KYC), Payout Requester, and/or lifecycle state. Paged: one page per call (default size 10), with `page_info.has_next` telling the caller whether to ask for the next one. */
+  rpc ListProviderApplicants(ListProviderApplicantsRequest) returns (ListProviderApplicantsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+}
+
+/** Identifies the submitted Applicant the Payout Provider reads, by payout requester and end-client reference. */
+message GetProviderKybApplicantRequest {
+  uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+}
+
+/** The submitted KYB Applicant: the bound form, the submitted main-form values and beneficial owners, the form version, and current lifecycle state. */
+message GetProviderKybApplicantResponse {
+  KybForm form = 10 [(buf.validate.field).required = true];
+  // The submitted main-form values.
+  KybApplicant applicant = 20;
+  // The submitted beneficial owners, in submission order.
+  repeated KybUbo ubos = 30;
+  // The form version the Applicant is bound to.
+  uint32 form_version = 40;
+  // Current lifecycle state.
+  ApplicantState state = 50;
+  // The rejection reason; absent unless the applicant is currently rejected.
+  optional string reject_reason = 60;
+  // The Applicant's current version; send it back on a transition
+  // to act on exactly this revision (a stale version is rejected as a conflict).
+  uint64 version = 70;
+}
+
+/** Identifies the submitted Applicant the Payout Provider reads, by payout requester and end-client reference. */
+message GetProviderKycApplicantRequest {
+  uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+}
+
+/** The submitted KYC Applicant: the bound form, the submitted values, the form version, and current lifecycle state. */
+message GetProviderKycApplicantResponse {
+  KycForm form = 10 [(buf.validate.field).required = true];
+  // The submitted values.
+  KycApplicant applicant = 20;
+  // The form version the Applicant is bound to.
+  uint32 form_version = 30;
+  // Current lifecycle state.
+  ApplicantState state = 40;
+  // The rejection reason; absent unless the applicant is currently rejected.
+  optional string reject_reason = 50;
+  // The Applicant's current version; send it back on a transition
+  // to act on exactly this revision (a stale version is rejected as a conflict).
+  uint64 version = 60;
+}
+
+/** Identifies the Applicant the Payout Provider approves, by payout requester and end-client reference. */
+message ApproveApplicantRequest {
+  uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  // The Applicant version being approved, from the Get*Applicant read the provider reviewed; a stale one is
+  // rejected as a conflict. no validation: any value is checked against the stored version.
+  uint64 version = 30;
+}
+
+message ApproveApplicantResponse {}
+
+/** Identifies the Applicant the Payout Provider rejects (by payout requester and end-client reference), plus the mandatory free-text reason. */
+message RejectApplicantRequest {
+  uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  // Mandatory free-text rejection reason (no predefined categories).
+  string reason = 30 [(buf.validate.field).string = {min_len: 1, max_len: 2000}];
+  // The Applicant version being rejected, from the Get*Applicant read the provider reviewed; a stale one is
+  // rejected as a conflict. no validation: any value is checked against the stored version.
+  uint64 version = 40;
+}
+
+message RejectApplicantResponse {}
+
+/** Lists applicants submitted to the calling Payout Provider, optionally filtered by form type, Payout Requester, and/or lifecycle state, one page at a time. */
+message ListProviderApplicantsRequest {
+  // optional filter; unset lists applicants of every form type (KYB and KYC).
+  optional FormType form_type = 10 [(buf.validate.field).enum = {defined_only: true, not_in: [0]}];
+  // optional filter; unset lists applicants from every Payout Requester. An explicit 0 matches no
+  // Payout Requester, so it is rejected — omit the field instead.
+  optional uint32 payout_requester_id = 20 [(buf.validate.field).uint32.gt = 0];
+  // filter; an empty list returns applicants in every (post-draft) state — pass [REQUESTED] for
+  // the review queue. DRAFT is never visible to a Payout Provider (an Applicant reaches it only once
+  // submitted), so it is not an accepted value.
+  repeated ApplicantState states = 30 [(buf.validate.field).repeated = {
+    unique: true,
+    items: {
+      enum: {
+        defined_only: true,
+        not_in: [0, 10]
+      }
+    }
+  }];
+  // no validation: absent = the first page at the default size; Page validates its own contents.
+  optional Page page = 40;
+}
+
+/** One page of the applicants of the requested form type submitted to the calling Payout Provider matching the filters. */
+message ListProviderApplicantsResponse {
+  /** One applicant in the Payout Provider's listing: the owning Payout Requester, the end-client reference, plus form type, lifecycle state, and bound form version. */
+  message Applicant {
+    // The Payout Requester that owns the Applicant.
+    uint32 payout_requester_id = 10;
+    // The Payout Requester's display name.
+    string payout_requester_name = 20;
+    // The end-client reference.
+    string client_id = 30;
+    // Current lifecycle state.
+    ApplicantState state = 40;
+    // KYB or KYC.
+    FormType form_type = 50;
+    // The form version the Applicant is bound to.
+    uint32 form_version = 60;
+  }
+  // The matching applicants on this page.
+  repeated Applicant applicants = 10;
+  // The page just read; has_next drives whether the caller asks for the next one.
+  PageInfo page_info = 20 [(buf.validate.field).required = true];
+}
