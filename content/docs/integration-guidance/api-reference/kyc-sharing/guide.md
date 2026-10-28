@@ -9,7 +9,7 @@ draft: false
 toc: true
 ---
 
-A payout provider can require KYB or KYC data about the end clients of a payout requester before it serves them. With KYC sharing, the requester sends that data through the KYB API, and the provider reviews it there.
+A payout provider can require KYB or KYC data about the end clients of a payout requester before it serves them. With KYC sharing, the requester sends that data through the KYB API, and the provider reviews it through the same API.
 
 The requester registers each end client as an **applicant**: a KYB applicant for a business, a KYC applicant for a person. It fills in the provider's form for each applicant and submits it for review. The provider approves or rejects it.
 
@@ -22,15 +22,14 @@ Both roles use [`KycFileService`](/docs/integration-guidance/api-reference/kyc-s
 
 ## Before You Start
 
-- **Consent.** The requester and the provider grant each other KYB access in the dashboard. Without that consent, the requester's create, get, and save calls and `UploadFile` fail with `PermissionDenied`.
+- **Consent.** The requester and the provider grant each other KYB access in the dashboard. Without it, the calls listed under [Errors](#errors) fail with `PermissionDenied`.
 - **Forms.** The provider builds and publishes its KYB and KYC forms in the dashboard. `ListProviderForms` returns the providers you share consent with, each with the form types it has published.
-- **Key pair.** Sign KYB API requests with a separate KYB key pair, which T-0 registers for you (see [Onboarding](/docs/network/onboarding/)). Your Network key does not work on the KYB API.
 
 ## Requests
 
-Sign each request with the headers and algorithm from [Request Authentication](/docs/integration-guidance/protocol/authentication/), using your KYB key pair.
+Sign each request with the headers and algorithm from [Request Authentication](/docs/integration-guidance/protocol/authentication/), using a separate KYB key pair that T-0 registers for you (see [Onboarding](/docs/network/onboarding/)). Your Network key does not work on the KYB API.
 
-Send each call as POST. The KYB API rejects signed GET requests, so do not enable `WithHTTPGet` in your Connect client.
+Send each call as POST. The KYB API rejects signed GET requests, so do not enable Connect GET in your client, such as `connect.WithHTTPGet()` in Go.
 
 ## Applicants
 
@@ -41,23 +40,23 @@ Each requester and provider pair has one applicant per `client_id`, KYB or KYC. 
 | State | Meaning |
 |---|---|
 | `APPLICANT_STATE_DRAFT` | The requester is filling in the form. The provider cannot see the applicant. |
-| `APPLICANT_STATE_REQUESTED` | The requester submitted the applicant. The provider has not decided yet. |
+| `APPLICANT_STATE_REQUESTED` | The requester submitted the applicant. The provider has not approved or rejected it. |
 | `APPLICANT_STATE_APPROVED` | The provider approved the applicant. |
 | `APPLICANT_STATE_REJECTED` | The provider rejected the applicant. `reject_reason` holds the provider's reason. |
 
 ## Requester Flow
 
 1. Call `ListProviderForms` to find the provider and check that it publishes the form type you need.
-2. Create the applicant with `CreateRequesterKybApplicant` or `CreateRequesterKycApplicant`. T-0 binds the applicant to the form version the provider has published at that moment, and later form versions do not change it. If you skip this call, the first save in step 5 creates the applicant, but you cannot read the form in step 3 before that.
+2. Create the applicant with `CreateRequesterKybApplicant` or `CreateRequesterKycApplicant`. T-0 binds the applicant to the form version the provider has published at that moment, and later form versions do not change it. If you skip this call, the first save in step 5 creates the applicant. Until then, the get calls in step 3 fail with `FailedPrecondition`.
 3. Read the form with `GetRequesterKybApplicant` or `GetRequesterKycApplicant`. The response holds the form and any stored values.
 4. Upload each document with `UploadFile` and put the returned `file_id` in the matching file field. See [Files](#files).
-5. Save the values with `SaveKybApplicant` or `SaveKycApplicant`. A save replaces all stored values, so send the full set each time. In draft, you can save an incomplete set. A rejected applicant needs a complete set, so withdraw it first to save a partial one.
+5. Save the values with `SaveKybApplicant` or `SaveKycApplicant`. A save replaces all stored values, so send the full set each time. In draft, you can save an incomplete set. For a rejected applicant, send a complete set, or withdraw it first to save a partial one.
 6. Once all required fields hold values, submit the draft or rejected applicant with `SubmitApplicant` and the `version` from your last read or save.
-7. Track the review with `ListRequesterApplicants` or a `Get` call. On a rejection, read `reject_reason`, save a complete set of corrected values, and submit again.
+7. Track the review with `ListRequesterApplicants`, `GetRequesterKybApplicant`, or `GetRequesterKycApplicant`. On a rejection, read `reject_reason`, save a complete set of corrected values, and submit again.
 
 ### Withdraw and Delete
 
-`WithdrawApplicant` returns an applicant to draft from any state and keeps its values. After you withdraw an applicant, approved or not, the provider's `Get` and `List` calls stop returning it until you submit it again.
+`WithdrawApplicant` returns an applicant to draft from any state and keeps its values. After you withdraw an applicant, approved or not, `ListProviderApplicants` stops returning it and the provider's get calls fail with `FailedPrecondition` until you submit it again.
 
 `DeleteApplicant` deletes a draft or rejected applicant together with its uploaded files. To delete a requested or approved applicant, withdraw it first. Deleting an applicant that does not exist succeeds.
 
@@ -76,15 +75,15 @@ Reads and saves return the applicant's `version`. `SubmitApplicant`, `WithdrawAp
 
 Read the fields to fill from the `form` in a `Get` response.
 
-- **Network-mandatory standard fields** carry the **Network mandatory** mark in the field catalogues [`StandardKybFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKybFieldType), [`StandardUboFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardUboFieldType), and [`StandardKycFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKycFieldType). `form.standard_fields` omits them, so add them to your form as required fields.
-- **Optional standard fields** appear in `form.standard_fields` when the provider chooses them, each with a `required` flag.
+- **Network-mandatory standard fields** carry the **Network mandatory** mark in the field catalogues [`StandardKybFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKybFieldType), [`StandardUboFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardUboFieldType), and [`StandardKycFieldType`](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKycFieldType). The `standard_fields` lists of the form and of its UBO sub-form leave them out, so add them as required fields when you render the form.
+- **Selectable standard fields** appear in those `standard_fields` lists when the provider selects them, each with a `required` flag.
 - **Custom fields** come from the provider, with their full definitions in `form.custom_fields`.
 
-The applicant messages `KybApplicant`, `KybUbo`, and `KycApplicant` define the value type, rules, and options of each standard field. See [Common](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/). Send date values as midnight UTC.
+The applicant messages `KybApplicant`, `KybUbo`, and `KycApplicant` define the value type, rules, and options of each standard field. See the [Common](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_common/) page. Send date values as midnight UTC.
 
 ## Files
 
-Upload and download files with the Connect streaming RPCs `KycFileService.UploadFile` and `KycFileService.DownloadFile`. The first message of each stream is `Metadata`. Each later message is a `Chunk` of at most 1 MiB, and a file holds at most 50 MiB.
+Upload and download files with the Connect streaming RPCs `KycFileService.UploadFile` and `KycFileService.DownloadFile`. The first message of each stream is `Metadata`. Each later message is a `Chunk` of at most 1 MiB. The size limit per file is 50 MiB. See the [File](/docs/integration-guidance/api-reference/kyc-sharing/manage_kyc_sharing_file/) page for the messages.
 
 - `UploadFile` returns a `file_id`. Put it in a file field as a `FileValue`.
 - Set `Metadata.upload_id` to make an upload safe to retry. A retry with the same `upload_id` returns the stored file. Without `upload_id`, each call stores a new file.
@@ -93,7 +92,7 @@ Upload and download files with the Connect streaming RPCs `KycFileService.Upload
 
 ## Lists
 
-`ListRequesterApplicants` and `ListProviderApplicants` return one page per call. Set `page.page` (from 1) and `page.size` (10 by default, 50 at most), and ask for the next page while `page_info.has_next` is true. To track state changes in your own system, poll these calls with a `states` filter.
+`ListRequesterApplicants` and `ListProviderApplicants` return one page per call. Set `page.page` (from 1) and `page.size` (10 by default, 50 at most), and ask for the next page while `page_info.has_next` is true. To track state changes in your own system, poll these calls with a `states` filter. The provider's filter does not accept `APPLICANT_STATE_DRAFT`.
 
 ## Errors
 

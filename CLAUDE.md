@@ -12,7 +12,7 @@ Hugo-based documentation site for t-0 network. API reference docs are auto-gener
 - **Important**: `protoc-gen-doc` pre-built release binaries are incompatible with protoc v28+. Always build from source with `go install`
 - The `PAGES` array in `gen.sh` is the single source of truth for which proto files to document. `ALL_PROTOS` is derived from it.
 - A `PAGES` entry is `proto|title|weight|subdir`. The optional `subdir` puts the page in a sub-section of the API reference (e.g. `kyc-sharing`), which needs its own hand-written `_index.md`.
-- `protoc-gen-doc` passes no custom proto options to the template. `gen.sh` reads `(network_mandatory) = true` from the proto source and prefixes those enum rows with **Network mandatory.**
+- `protoc-gen-doc` passes no custom proto options to the template. `gen.sh` reads `(network_mandatory) = true` from the proto source and prefixes the Description cell of those enum rows with **Network mandatory.** The option must sit on the same line as the enum value, or `gen.sh` misses it.
 - CI workflow (`.github/workflows/generate.yaml`) auto-generates docs on PRs that touch `proto/` or `content/docs/`
 
 ### Cross-file type links

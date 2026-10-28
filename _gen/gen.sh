@@ -45,7 +45,7 @@ PAGES=(
     "ivms101/v1/ivms/enum.proto|Travel Rule Enums|341"
     "tzero/v1/manage/kyc_sharing/applicant_requester.proto|Requester|344|kyc-sharing"
     "tzero/v1/manage/kyc_sharing/applicant_provider.proto|Provider|345|kyc-sharing"
-    "tzero/v1/manage/kyc_sharing/file.proto|Files|346|kyc-sharing"
+    "tzero/v1/manage/kyc_sharing/file.proto|File|346|kyc-sharing"
     "tzero/v1/manage/kyc_sharing/form.proto|Form|347|kyc-sharing"
     "tzero/v1/manage/kyc_sharing/common.proto|Common|348|kyc-sharing"
 )
