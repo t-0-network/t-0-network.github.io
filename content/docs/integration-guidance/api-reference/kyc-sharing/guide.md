@@ -52,7 +52,7 @@ Each requester and provider pair has one applicant per `client_id`, KYB or KYC. 
 3. Read the form with `GetRequesterKybApplicant` or `GetRequesterKycApplicant`. The response holds the form and any stored values.
 4. Upload each document with `UploadFile` and put the returned `file_id` in the matching file field. See [Files](#files).
 5. Save the values with `SaveKybApplicant` or `SaveKycApplicant`. A save replaces all stored values, so send the full set each time. In draft, you can save an incomplete set. A rejected applicant needs a complete set, so withdraw it first to save a partial one.
-6. Once all required fields hold values, submit with `SubmitApplicant` and the `version` from your last read or save.
+6. Once all required fields hold values, submit the draft or rejected applicant with `SubmitApplicant` and the `version` from your last read or save.
 7. Track the review with `ListRequesterApplicants` or a `Get` call. On a rejection, read `reject_reason`, save a complete set of corrected values, and submit again.
 
 ### Withdraw and Delete
