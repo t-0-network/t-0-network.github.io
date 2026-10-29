@@ -27,4 +27,4 @@ The verification process reverses the signing operation, extracting the timestam
 Proper signature verification is crucial for network security, as it ensures that incoming requests genuinely originate from the network and have not been tampered with during transmission. Providers should reject any requests that fail signature verification to prevent unauthorized access and maintain network integrity.
 
 ## App API
-Sign requests to the [App API](/docs/integration-guidance/app-api/) with the headers and algorithm above, using your App API key. The App API rejects requests signed with your Network key. See [App API Key](/docs/integration-guidance/app-api/#app-api-key).
+The [App API](/docs/integration-guidance/app-api/) uses the headers and algorithm above with its own keys. Sign your App API requests with your App API key, and verify calls from the App API against the App API public key. The Network keys do not work in either direction. See [App API Key](/docs/integration-guidance/app-api/#app-api-key) and [Signature Verification](/docs/integration-guidance/app-api/#signature-verification) on the App API page.
