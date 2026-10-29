@@ -1,0 +1,178 @@
+syntax = "proto3";
+
+package tzero.v1.manage.kyc_sharing;
+
+import "buf/validate/validate.proto";
+import "tzero/v1/manage/kyc_sharing/common.proto";
+
+// The Payout Provider sets the form up in the T-0 dashboard. That setup is dashboard only.
+
+/**
+ * KYB form definition: the provider's selected standard fields, custom fields, and UBO sub-form. Every
+ * network-mandatory standard field of the main form and of the UBO sub-form is part of the form and required.
+ * `standard_fields` never lists one, in a form-setup request or in any response. To render the form, add them
+ * from the `(network_mandatory)` enum value option.
+ */
+message KybForm {
+  option (buf.validate.message).cel = {
+    message: "standard_fields must not select the same field twice"
+    expression: "this.standard_fields.all(x, this.standard_fields.exists_one(y, y.field == x.field))"
+  };
+  option (buf.validate.message).cel = {
+    message: "custom_fields must not reuse an identifier"
+    expression: "this.custom_fields.all(x, this.custom_fields.exists_one(y, y.identifier == x.identifier))"
+  };
+
+  /**
+   * The no-duplicate rules — standard_fields by `field`, custom_fields by `identifier` — are enforced by the CEL
+   * above. standard_fields holds only the selectable fields the provider chose, each with its `required` choice;
+   * an empty list is valid.
+   */
+  repeated StandardField standard_fields = 10;
+  repeated FormField custom_fields = 20 [(buf.validate.field).repeated.max_items = 1000];
+
+  UboForm ubo_form = 30 [(buf.validate.field).required = true];
+
+  /**
+   * One selection of a KYB main-form standard field. The catalogue (StandardKybFieldType) is the source of truth
+   * for what exists.
+   */
+  message StandardField {
+    StandardKybFieldType field = 10 [(buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }];
+
+    bool required = 20;
+  }
+
+  /** UBO sub-form nested in the KYB form: the standard and custom fields collected per beneficial owner. */
+  message UboForm {
+    option (buf.validate.message).cel = {
+      message: "standard_fields must not select the same field twice"
+      expression: "this.standard_fields.all(x, this.standard_fields.exists_one(y, y.field == x.field))"
+    };
+    option (buf.validate.message).cel = {
+      message: "custom_fields must not reuse an identifier"
+      expression: "this.custom_fields.all(x, this.custom_fields.exists_one(y, y.identifier == x.identifier))"
+    };
+
+    /**
+     * Same no-duplicate rules as the main form, enforced by the CEL above. standard_fields holds only the
+     * selectable fields the provider chose, each with its `required` choice; an empty list is valid.
+     */
+    repeated StandardField standard_fields = 10;
+    repeated FormField custom_fields = 20 [(buf.validate.field).repeated.max_items = 1000];
+
+    /**
+     * One selection of a UBO sub-form standard field. Same shape and rule as
+     * KybForm.StandardField but typed over StandardUboFieldType.
+     */
+    message StandardField {
+      StandardUboFieldType field = 10 [(buf.validate.field).enum = {
+        defined_only: true
+        not_in: [0]
+      }];
+
+      bool required = 20;
+    }
+  }
+}
+
+/**
+ * KYC Form composition. No embedded sub-form — KYC is for private-person End
+ * Clients. Every network-mandatory standard field is part of the form and required.
+ * `standard_fields` never lists one, in a form-setup request or in any response. To render
+ * the form, add them from the `(network_mandatory)` enum value option.
+ */
+message KycForm {
+  option (buf.validate.message).cel = {
+    message: "standard_fields must not select the same field twice"
+    expression: "this.standard_fields.all(x, this.standard_fields.exists_one(y, y.field == x.field))"
+  };
+  option (buf.validate.message).cel = {
+    message: "custom_fields must not reuse an identifier"
+    expression: "this.custom_fields.all(x, this.custom_fields.exists_one(y, y.identifier == x.identifier))"
+  };
+
+  /**
+   * The no-duplicate rules — standard_fields by `field`, custom_fields by `identifier` — are enforced by the CEL
+   * above. standard_fields holds only the selectable fields the provider chose, each with its `required` choice;
+   * an empty list is valid.
+   */
+  repeated StandardField standard_fields = 10;
+  repeated FormField custom_fields = 20 [(buf.validate.field).repeated.max_items = 1000];
+
+  /**
+   * One selection of a KYC main-form standard field. Same shape and rule as
+   * KybForm.StandardField but typed over StandardKycFieldType.
+   */
+  message StandardField {
+    StandardKycFieldType field = 10 [(buf.validate.field).enum = {
+      defined_only: true
+      not_in: [0]
+    }];
+
+    bool required = 20;
+  }
+}
+
+/**
+ * Payout-Provider-declared custom field. Shared by KYB (main form + UBO
+ * sub-form) and KYC. The set of allowed types is fixed — one branch per type in `type`;
+ * each branch carries only the config that type needs.
+ */
+message FormField {
+  string identifier = 10 [(buf.validate.field).string = {
+    pattern: "^[a-z][a-z0-9_]*$",
+    min_len: 1,
+    max_len: 64
+  }];
+  string title = 20 [(buf.validate.field).string = {min_len: 1, max_len: 200}];
+  bool required = 40;
+
+  oneof type {
+    option (buf.validate.oneof).required = true;
+
+    Number number = 50;
+    String string = 60;
+    Date date = 70;
+    File file = 80;
+    Select single_select = 90;
+    Select multi_select = 100;
+  }
+
+  /** Numeric free-entry field; carries no extra configuration. */
+  message Number {}
+
+  /** Free-text field with an optional maximum length. */
+  message String {
+    // Maximum character length (absent ⇒ 10000, the cap of CustomFieldValue.string).
+    optional uint32 max_length = 10 [(buf.validate.field).uint32 = {gt: 0, lte: 10000}];
+  }
+
+  /** Date field; carries no extra configuration. */
+  message Date {}
+
+  /** File-upload field; carries no extra configuration. Upload size is bounded by the global server limit. */
+  message File {}
+
+  /**
+   * Single- or multi-select field. At least two options — a select with one or zero choices is
+   * meaningless.
+   */
+  message Select {
+    option (buf.validate.message).cel = {
+      message: "select options must not reuse a key"
+      expression: "this.options.all(x, this.options.exists_one(y, y.key == x.key))"
+    };
+
+    repeated Item options = 10 [(buf.validate.field).repeated.min_items = 2];
+
+    /** One selectable option: a stable `key` plus a display `title`. */
+    message Item {
+      string key = 10 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+      string title = 20 [(buf.validate.field).string = {min_len: 1, max_len: 200}];
+    }
+  }
+}
