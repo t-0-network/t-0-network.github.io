@@ -159,7 +159,7 @@ for what exists.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| field | [StandardKybFieldType](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKybFieldType) |  |  |
+| field | [StandardKybFieldType](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKybFieldType) |  |  |
 | required | [bool](../../scalar/#bool) |  |  |
 
 
@@ -194,7 +194,7 @@ KybForm.StandardField but typed over StandardUboFieldType.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| field | [StandardUboFieldType](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardUboFieldType) |  |  |
+| field | [StandardUboFieldType](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardUboFieldType) |  |  |
 | required | [bool](../../scalar/#bool) |  |  |
 
 
@@ -232,7 +232,7 @@ KybForm.StandardField but typed over StandardKycFieldType.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| field | [StandardKycFieldType](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKycFieldType) |  |  |
+| field | [StandardKycFieldType](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-StandardKycFieldType) |  |  |
 | required | [bool](../../scalar/#bool) |  |  |
 
 

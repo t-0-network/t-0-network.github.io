@@ -43,11 +43,11 @@ PAGES=(
     "tzero/v1/payment_intent/pay_in_provider.proto|Payment Intent Pay-In Provider|335"
     "ivms101/v1/ivms/ivms101.proto|Travel Rule Data|340"
     "ivms101/v1/ivms/enum.proto|Travel Rule Enums|341"
-    "tzero/v1/manage/kyc_sharing/applicant_requester.proto|Requester|344|kyc-sharing"
-    "tzero/v1/manage/kyc_sharing/applicant_provider.proto|Provider|345|kyc-sharing"
-    "tzero/v1/manage/kyc_sharing/file.proto|File|346|kyc-sharing"
-    "tzero/v1/manage/kyc_sharing/form.proto|Form|347|kyc-sharing"
-    "tzero/v1/manage/kyc_sharing/common.proto|Common|348|kyc-sharing"
+    "tzero/v1/manage/kyc_sharing/applicant_requester.proto|Requester|344|end-client-kyb"
+    "tzero/v1/manage/kyc_sharing/applicant_provider.proto|Provider|345|end-client-kyb"
+    "tzero/v1/manage/kyc_sharing/file.proto|File|346|end-client-kyb"
+    "tzero/v1/manage/kyc_sharing/form.proto|Form|347|end-client-kyb"
+    "tzero/v1/manage/kyc_sharing/common.proto|Common|348|end-client-kyb"
 )
 
 # Derive ALL_PROTOS from PAGES (single source of truth)
