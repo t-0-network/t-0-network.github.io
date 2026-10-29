@@ -18,11 +18,11 @@ The SDK is the fastest integration path. It handles request signing, signature v
 We recommend running it inside a standalone adapter service that sits between your system and the t-0 Network, keeping integration concerns isolated from your existing codebase and making SDK updates straightforward to roll out.
 You can run a single command to scaffold a pre-configured project, ready to deploy. Available for Go, TypeScript, Python, Java, and C# on [GitHub](https://github.com/t-0-network/provider-sdk), along with per-language documentation.
 
-## API Endpoints
+## Network API
+The Network API serves payments and payment intents, with their quotes. Its endpoints:
+
 * Production: `https://{{< param "api.domain.production" >}}`
 * Sandbox: `https://{{< param "api.domain.sandbox" >}}`
-
-KYC sharing runs on the [App API](../app-api/), which has its own endpoints and key pair.
 
 ### Egress IP Addresses
 The network calls your provider endpoints from these IP addresses:
@@ -31,6 +31,25 @@ The network calls your provider endpoints from these IP addresses:
 * Sandbox: `{{< param "egress.ip.sandbox" >}}`
 
 You decide whether to add them to your firewall allowlist. You must verify the signature of every request from the network. See sections 18.1 and 18.4 of [Schedule 1 of the Network Services Agreement](/network-services-agreement/#sch1).
+
+## Management API
+The Management API serves the features outside the payment flows. Its services sit in the `tzero.v1.manage` proto package, and each call path starts with `/tzero.v1.manage.`. The first feature on it is [End-Client KYB](/docs/network/end-client-kyb-flow/), with its services under [End-Client KYB](/docs/integration-guidance/api-reference/end-client-kyb/) in the API Reference. Its endpoints:
+
+* Production: `https://{{< param "app.api.domain.production" >}}`
+* Sandbox: `https://{{< param "app.api.domain.sandbox" >}}`
+
+### Management API Key
+
+{{% alert context="warning" %}}
+**The Management API uses its own key pair, apart from your Network key.** If you sign a Management API request with your Network key, the call fails with `Unauthenticated`.
+{{% /alert %}}
+
+Generate an ECDSA key pair for the Management API and send its public key to T-0 for registration (see [Onboarding](/docs/network/onboarding/)). Sign each request with the headers and algorithm from [Request Authentication](/docs/integration-guidance/protocol/authentication/), using the Management API key.
+
+To replace the key, send the new public key to T-0. The new key works as soon as T-0 registers it, and the old key keeps working for up to 5 minutes after that.
+
+### Requests
+Send each call as POST. The Management API rejects signed GET requests, so leave Connect GET off in your client. In Go, do not pass `connect.WithHTTPGet()`.
 
 ## Idempotency and Request Safety
 All network methods specify idempotency levels for safe retry behavior and duplicate prevention. See [Idempotency](idempotency) for the full reliability contract and provider implementation requirements.

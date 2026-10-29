@@ -85,11 +85,11 @@ The submitted KYB Applicant: the bound form, the submitted main-form values and 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| form | [KybForm](../../kyc-sharing/manage_kyc_sharing_form/#tzero-v1-manage-kyc_sharing-KybForm) |  |  |
-| applicant | [KybApplicant](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KybApplicant) |  | The submitted main-form values. |
-| ubos | [KybUbo](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KybUbo) | repeated | The submitted beneficial owners, in submission order. |
+| form | [KybForm](../../end-client-kyb/manage_kyc_sharing_form/#tzero-v1-manage-kyc_sharing-KybForm) |  |  |
+| applicant | [KybApplicant](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KybApplicant) |  | The submitted main-form values. |
+| ubos | [KybUbo](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KybUbo) | repeated | The submitted beneficial owners, in submission order. |
 | form_version | [uint32](../../scalar/#uint32) |  | The form version the Applicant is bound to. |
-| state | [ApplicantState](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) |  | Current lifecycle state. |
+| state | [ApplicantState](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) |  | Current lifecycle state. |
 | reject_reason | [string](../../scalar/#string) | optional | The rejection reason; absent unless the applicant is currently rejected. |
 | version | [uint64](../../scalar/#uint64) |  | The Applicant's current version; send it back on a transition to act on exactly this revision (a stale version is rejected as a conflict). |
 
@@ -124,10 +124,10 @@ The submitted KYC Applicant: the bound form, the submitted values, the form vers
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| form | [KycForm](../../kyc-sharing/manage_kyc_sharing_form/#tzero-v1-manage-kyc_sharing-KycForm) |  |  |
-| applicant | [KycApplicant](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KycApplicant) |  | The submitted values. |
+| form | [KycForm](../../end-client-kyb/manage_kyc_sharing_form/#tzero-v1-manage-kyc_sharing-KycForm) |  |  |
+| applicant | [KycApplicant](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KycApplicant) |  | The submitted values. |
 | form_version | [uint32](../../scalar/#uint32) |  | The form version the Applicant is bound to. |
-| state | [ApplicantState](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) |  | Current lifecycle state. |
+| state | [ApplicantState](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) |  | Current lifecycle state. |
 | reject_reason | [string](../../scalar/#string) | optional | The rejection reason; absent unless the applicant is currently rejected. |
 | version | [uint64](../../scalar/#uint64) |  | The Applicant's current version; send it back on a transition to act on exactly this revision (a stale version is rejected as a conflict). |
 
@@ -145,10 +145,10 @@ Lists applicants submitted to the calling Payout Provider, optionally filtered b
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| form_type | [FormType](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-FormType) | optional | optional filter; unset lists applicants of every form type (KYB and KYC). |
+| form_type | [FormType](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-FormType) | optional | optional filter; unset lists applicants of every form type (KYB and KYC). |
 | payout_requester_id | [uint32](../../scalar/#uint32) | optional | optional filter; unset lists applicants from every Payout Requester. An explicit 0 matches no Payout Requester, so it is rejected — omit the field instead. |
-| states | [ApplicantState](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) | repeated | filter; an empty list returns applicants in every (post-draft) state — pass [REQUESTED] for the review queue. DRAFT is never visible to a Payout Provider (an Applicant reaches it only once submitted), so it is not an accepted value. |
-| page | [Page](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-Page) | optional | no validation: absent = the first page at the default size; Page validates its own contents. |
+| states | [ApplicantState](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) | repeated | filter; an empty list returns applicants in every (post-draft) state — pass [REQUESTED] for the review queue. DRAFT is never visible to a Payout Provider (an Applicant reaches it only once submitted), so it is not an accepted value. |
+| page | [Page](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-Page) | optional | no validation: absent = the first page at the default size; Page validates its own contents. |
 
 
 
@@ -165,7 +165,7 @@ One page of the applicants of the requested form type submitted to the calling P
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | applicants | [ListProviderApplicantsResponse.Applicant](#tzero-v1-manage-kyc_sharing-ListProviderApplicantsResponse-Applicant) | repeated | The matching applicants on this page. |
-| page_info | [PageInfo](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-PageInfo) |  | The page just read; has_next drives whether the caller asks for the next one. |
+| page_info | [PageInfo](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-PageInfo) |  | The page just read; has_next drives whether the caller asks for the next one. |
 
 
 
@@ -184,8 +184,8 @@ One applicant in the Payout Provider's listing: the owning Payout Requester, the
 | payout_requester_id | [uint32](../../scalar/#uint32) |  | The Payout Requester that owns the Applicant. |
 | payout_requester_name | [string](../../scalar/#string) |  | The Payout Requester's display name. |
 | client_id | [string](../../scalar/#string) |  | The end-client reference. |
-| state | [ApplicantState](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) |  | Current lifecycle state. |
-| form_type | [FormType](../../kyc-sharing/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-FormType) |  | KYB or KYC. |
+| state | [ApplicantState](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) |  | Current lifecycle state. |
+| form_type | [FormType](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-FormType) |  | KYB or KYC. |
 | form_version | [uint32](../../scalar/#uint32) |  | The form version the Applicant is bound to. |
 
 

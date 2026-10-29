@@ -19,12 +19,11 @@ The `X-Public-Key` header contains the hex-encoded public key corresponding to t
 
 The `X-Signature-Timestamp` header contains the **Unix timestamp in milliseconds** used as the suffix during signature generation. The network validates that this timestamp is within one minute of the current time, rejecting requests with timestamps outside this window to prevent replay attacks.
 
+Sign your [Management API](/docs/integration-guidance/introduction/#management-api) requests with the same headers and algorithm, using your [Management API key](/docs/integration-guidance/introduction/#management-api-key).
+
 ## Signature Verification
 Providers must implement the corresponding signature verification logic for incoming network requests. The network signs all requests using its private key, with the public key available to all network participants for verification purposes.
 
 The verification process reverses the signing operation, extracting the timestamp from the `X-Signature-Timestamp` header, appending it to the request body, hashing the combined data with Keccak-256, and verifying the signature against the network's known public key.
 
 Proper signature verification is crucial for network security, as it ensures that incoming requests genuinely originate from the network and have not been tampered with during transmission. Providers should reject any requests that fail signature verification to prevent unauthorized access and maintain network integrity.
-
-## App API
-The [App API](/docs/integration-guidance/app-api/) uses the headers and algorithm above with its own keys. Sign your App API requests with your App API key, and verify calls from the App API against the App API public key. The Network keys do not work in either direction. See [App API Key](/docs/integration-guidance/app-api/#app-api-key) and [Signature Verification](/docs/integration-guidance/app-api/#signature-verification) on the App API page.
