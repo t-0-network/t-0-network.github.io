@@ -19,7 +19,7 @@ The `X-Public-Key` header contains the hex-encoded public key corresponding to t
 
 The `X-Signature-Timestamp` header contains the **Unix timestamp in milliseconds** used as the suffix during signature generation. The network validates that this timestamp is within one minute of the current time, rejecting requests with timestamps outside this window to prevent replay attacks.
 
-Sign your [Management API](/docs/integration-guidance/introduction/#management-api) requests with the same headers and algorithm, using your [Management API key](/docs/integration-guidance/introduction/#management-api-key).
+Sign your [Management API](/docs/integration-guidance/introduction/#management-api) requests the same way, with the same key. Before your first call, T-0 enables that key for the Management API. See [Management API Key](/docs/integration-guidance/introduction/#management-api-key).
 
 ## Signature Verification
 Providers must implement the corresponding signature verification logic for incoming network requests. The network signs all requests using its private key, with the public key available to all network participants for verification purposes.
