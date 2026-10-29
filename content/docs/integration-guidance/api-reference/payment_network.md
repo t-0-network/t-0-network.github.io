@@ -14,7 +14,7 @@ toc: true
 ## NetworkService
 Network surface for publishing quotes and initiating pay-out payments.
 
-All methods of this service are idempotent, meaning they are safe to retry and multiple calls with the same parameters will have no additional effect.
+All methods of this service are idempotent, meaning they are safe to retry and multiple calls with the same idempotency key will have no additional effect.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
@@ -459,8 +459,8 @@ or as pay-out amount, so that the settlement amount is calculated accordingly
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Amount in the pay-out currency |
-| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Settlement amount in the settlement currency |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Amount in the pay-out currency. At most 2 decimal places; trailing zeros are allowed; otherwise InvalidArgument. |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Settlement amount in the settlement currency. At most 2 decimal places; trailing zeros are allowed; otherwise InvalidArgument. |
 
 
 
