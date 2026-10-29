@@ -41,12 +41,12 @@ The Management API serves the features outside the payment flows. Its services s
 ### Management API Key
 
 {{% alert context="warning" %}}
-**The Management API uses its own key pair, apart from your Network key.** If you sign a Management API request with your Network key, the call fails with `Unauthenticated`.
+**Sign Management API requests with your Network key.** T-0 enables that key for the Management API. Until T-0 enables it, your calls fail with `Unauthenticated`.
 {{% /alert %}}
 
-Generate an ECDSA key pair for the Management API and send its public key to T-0 for registration (see [Onboarding](/docs/network/onboarding/)). Sign each request with the headers and algorithm from [Request Authentication](/docs/integration-guidance/protocol/authentication/), using the Management API key.
+Ask T-0 to enable your key (see [Onboarding](/docs/network/onboarding/)). Sign each request with the headers and algorithm from [Request Authentication](/docs/integration-guidance/protocol/authentication/).
 
-To replace the key, send the new public key to T-0. The new key works as soon as T-0 registers it, and the old key keeps working for up to 5 minutes after that.
+When you replace your Network key, send the new public key to T-0. On the Management API, the new key works as soon as T-0 enables it, and the old key keeps working for up to 5 minutes after that.
 
 ### Requests
 Send each call as POST. The Management API rejects signed GET requests, so leave Connect GET off in your client. In Go, do not pass `connect.WithHTTPGet()`.

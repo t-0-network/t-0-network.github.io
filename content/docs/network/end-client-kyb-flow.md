@@ -27,7 +27,7 @@ Before the first call, the requester and the provider set up End-Client KYB in t
 - **Consent.** The requester and the provider grant each other KYB access under **Core KYB Sharing → My Consents**. Without mutual consent, the calls listed under [Errors](#errors) fail with `PermissionDenied`.
 - **Forms.** The provider builds and publishes its KYB and KYC forms under **End-Client KYB → Applicant Requirements**.
 
-Each side signs its calls with its own [Management API key](/docs/integration-guidance/introduction/#management-api-key).
+Each side signs its calls with its Network key, after T-0 enables that key for the [Management API](/docs/integration-guidance/introduction/#management-api-key).
 
 ```mermaid
 sequenceDiagram
