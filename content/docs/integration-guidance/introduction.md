@@ -22,7 +22,7 @@ You can run a single command to scaffold a pre-configured project, ready to depl
 * Production: `https://{{< param "api.domain.production" >}}`
 * Sandbox: `https://{{< param "api.domain.sandbox" >}}`
 
-KYC sharing runs on the KYB API, which has its own host and key pair. See the [KYC Sharing Guide](/docs/integration-guidance/api-reference/kyc-sharing/guide/).
+KYC sharing runs on the [App API](../app-api/), which has its own endpoints and key pair.
 
 ### Egress IP Addresses
 The network calls your provider endpoints from these IP addresses:

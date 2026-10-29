@@ -37,3 +37,8 @@ title = 't-0 Network'
     [params.api.domain]
         sandbox = "API_DOMAIN_SANDBOX_PLACEHOLDER"
         production = "API_DOMAIN_PRODUCTION_PLACEHOLDER"
+    # CI replaces these with the APP_API_DOMAIN_* repository variables (see hugo.yaml).
+    # Hugo splits HUGO_PARAMS_* names on "_", so no key segment may contain one.
+    [params.app.api.domain]
+        sandbox = "APP_API_DOMAIN_SANDBOX_PLACEHOLDER"
+        production = "APP_API_DOMAIN_PRODUCTION_PLACEHOLDER"

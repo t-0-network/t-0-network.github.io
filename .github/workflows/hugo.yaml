@@ -30,11 +30,13 @@ jobs:
         env:
           API_DOMAIN_SANDBOX: ${{ vars.API_DOMAIN_SANDBOX }}
           API_DOMAIN_PRODUCTION: ${{ vars.API_DOMAIN_PRODUCTION }}
+          APP_API_DOMAIN_SANDBOX: ${{ vars.APP_API_DOMAIN_SANDBOX }}
+          APP_API_DOMAIN_PRODUCTION: ${{ vars.APP_API_DOMAIN_PRODUCTION }}
           EGRESS_IP_SANDBOX: ${{ vars.EGRESS_IP_SANDBOX }}
           EGRESS_IP_PRODUCTION: ${{ vars.EGRESS_IP_PRODUCTION }}
         run: |
           missing=0
-          for name in API_DOMAIN_SANDBOX API_DOMAIN_PRODUCTION EGRESS_IP_SANDBOX EGRESS_IP_PRODUCTION; do
+          for name in API_DOMAIN_SANDBOX API_DOMAIN_PRODUCTION APP_API_DOMAIN_SANDBOX APP_API_DOMAIN_PRODUCTION EGRESS_IP_SANDBOX EGRESS_IP_PRODUCTION; do
             if [ -z "${!name}" ]; then
               echo "::error::Repository variable $name is empty. Run pulumi up on the matching backend stack."
               missing=1
@@ -77,6 +79,8 @@ jobs:
           HUGO_PARAMS_EGRESS_IP_PRODUCTION: ${{ vars.EGRESS_IP_PRODUCTION }}
           HUGO_PARAMS_API_DOMAIN_SANDBOX: ${{ vars.API_DOMAIN_SANDBOX }}
           HUGO_PARAMS_API_DOMAIN_PRODUCTION: ${{ vars.API_DOMAIN_PRODUCTION }}
+          HUGO_PARAMS_APP_API_DOMAIN_SANDBOX: ${{ vars.APP_API_DOMAIN_SANDBOX }}
+          HUGO_PARAMS_APP_API_DOMAIN_PRODUCTION: ${{ vars.APP_API_DOMAIN_PRODUCTION }}
         run: |
           hugo \
             --gc \
