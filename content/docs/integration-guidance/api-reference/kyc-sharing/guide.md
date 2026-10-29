@@ -9,9 +9,9 @@ draft: false
 toc: true
 ---
 
-A payout provider can require KYB or KYC data about the end clients of a payout requester before it serves them. With KYC sharing, the requester sends that data through the KYB API, and the provider reviews it through the same API.
+A payout provider can require KYB or KYC data about the end clients of a payout requester before it serves them. With KYC sharing, the requester sends that data through the [App API](/docs/integration-guidance/app-api/), and the provider reviews it through the same API.
 
-The requester registers each end client as an **applicant**: a KYB applicant for a business, a KYC applicant for a person. It fills in the provider's form for each applicant and submits it for review. The provider approves or rejects it.
+The requester registers each end client as an **applicant**: a KYB applicant for a business, a KYC applicant for a person. It fills in the provider's form for each applicant and submits it for review. The provider approves or rejects it. [KYC Sharing Flow](/docs/network/kyc-sharing-flow/) shows the calls and the applicant states as diagrams.
 
 | Role | Service | Purpose |
 |---|---|---|
@@ -24,12 +24,11 @@ Both roles use [`KycFileService`](/docs/integration-guidance/api-reference/kyc-s
 
 - **Consent.** The requester and the provider grant each other KYB access in the dashboard. Without it, the calls listed under [Errors](#errors) fail with `PermissionDenied`.
 - **Forms.** The provider builds and publishes its KYB and KYC forms in the dashboard. `ListProviderForms` returns the providers you share consent with, each with the form types it has published.
+- **App API key.** T-0 registers a separate key pair for the App API. Your Network key does not work there. See [App API Key](/docs/integration-guidance/app-api/#app-api-key).
 
 ## Requests
 
-Sign each request with the headers and algorithm from [Request Authentication](/docs/integration-guidance/protocol/authentication/), using a separate KYB key pair that T-0 registers for you (see [Onboarding](/docs/network/onboarding/)). Your Network key does not work on the KYB API.
-
-Send each call as POST. The KYB API rejects signed GET requests, so do not enable Connect GET in your client, such as `connect.WithHTTPGet()` in Go.
+Send each call on this page as POST to the [App API endpoints](/docs/integration-guidance/app-api/#endpoints), signed with your App API key.
 
 ## Applicants
 
