@@ -1,0 +1,292 @@
+syntax = "proto3";
+
+package tzero.v1.manage.kyc_sharing;
+
+import "buf/validate/validate.proto";
+import "tzero/v1/manage/kyc_sharing/common.proto";
+import "tzero/v1/manage/kyc_sharing/form.proto";
+
+/** Payout-Requester-facing applicant RPCs: create an applicant, read its form pre-filled for editing, save values, submit for review, withdraw, and delete a draft. */
+service KycApplicantRequesterService {
+  /** Initiates a KYB applicant by binding a fresh draft to the payout provider's current form version. A repeat call for an already-created applicant returns AlreadyExists, and FailedPrecondition when the provider has no published KYB form. */
+  rpc CreateRequesterKybApplicant(CreateRequesterKybApplicantRequest) returns (CreateRequesterKybApplicantResponse);
+
+  /** Returns the KYB form at the version the applicant is bound to plus their stored values, for editing. Read-only: FailedPrecondition when the applicant does not exist — create it first — and InvalidArgument when the `client_id` has a KYC applicant. */
+  rpc GetRequesterKybApplicant(GetRequesterKybApplicantRequest) returns (GetRequesterKybApplicantResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  /** Initiates a KYC applicant by binding a fresh draft to the payout provider's current form version. A repeat call for an already-created applicant returns AlreadyExists, and FailedPrecondition when the provider has no published KYC form. */
+  rpc CreateRequesterKycApplicant(CreateRequesterKycApplicantRequest) returns (CreateRequesterKycApplicantResponse);
+
+  /** Returns the KYC form at the version the applicant is bound to plus their stored values, for editing. Read-only: FailedPrecondition when the applicant does not exist — create it first — and InvalidArgument when the `client_id` has a KYB applicant. */
+  rpc GetRequesterKycApplicant(GetRequesterKycApplicantRequest) returns (GetRequesterKycApplicantResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  /** Lists the calling Payout Requester's own applicants, optionally filtered by form type (KYB or KYC), Payout Provider, and/or lifecycle state. Paged: one page per call (default size 10), with `page_info.has_next` telling the caller whether to ask for the next one. */
+  rpc ListRequesterApplicants(ListRequesterApplicantsRequest) returns (ListRequesterApplicantsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  /** Lists the Payout Providers the calling Payout Requester has mutual granted consent with, each with the FormType values the provider has published. Only providers with at least one published KYB or KYC form appear. */
+  rpc ListProviderForms(ListProviderFormsRequest) returns (ListProviderFormsResponse) {
+    option idempotency_level = NO_SIDE_EFFECTS;
+  }
+
+  /** Stores the applicant's KYB values against the form version the client is bound to (the provider's current version on the first save), echoing the stored values for the edit UI. While the applicant is rejected, the values must fill every field its form requires; to save partial progress, withdraw it to draft first. */
+  rpc SaveKybApplicant(SaveKybApplicantRequest) returns (SaveKybApplicantResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+
+  /** Stores the applicant's KYC values against the form version the client is bound to (the provider's current version on the first save). While the applicant is rejected, the values must fill every field its form requires; to save partial progress, withdraw it to draft first. */
+  rpc SaveKycApplicant(SaveKycApplicantRequest) returns (SaveKycApplicantResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+
+  /**
+   * Submits a draft Applicant — or resubmits a rejected one — for review, moving it to
+   * `requested`. A no-op when the Applicant is already `requested`.
+   */
+  rpc SubmitApplicant(SubmitApplicantRequest) returns (SubmitApplicantResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+
+  /**
+   * Withdraws an Applicant back to `draft` from `requested`, `approved`, or `rejected`,
+   * retaining its field values. A no-op when already `draft`.
+   */
+  rpc WithdrawApplicant(WithdrawApplicantRequest) returns (WithdrawApplicantResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+
+  /**
+   * Deletes a `draft` or `rejected` Applicant, freeing its identity for a fresh Applicant for the same
+   * customer and provider; from `requested` or `approved`, withdraw to `draft` first.
+   * Provider-side review transitions (approve/reject) live on KycApplicantProviderService.
+   */
+  rpc DeleteApplicant(DeleteApplicantRequest) returns (DeleteApplicantResponse) {
+    option idempotency_level = IDEMPOTENT;
+  }
+}
+
+/** Identifies the applicant to create: the payout provider (whose KYB form is filled) plus the end-client reference. */
+message CreateRequesterKybApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+}
+
+/** The bound form version and lifecycle state of the freshly created applicant. */
+message CreateRequesterKybApplicantResponse {
+  // The form version the new draft is bound to.
+  uint32 form_version = 10;
+  // The new applicant's lifecycle state (draft).
+  ApplicantState state = 20;
+}
+
+/** Identifies the applicant: the payout provider (whose KYB form is filled) plus the end-client reference. */
+message GetRequesterKybApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+}
+
+/** The KYB form at the version the applicant is bound to plus the applicant's stored values, so the client can render and edit it in one call. */
+message GetRequesterKybApplicantResponse {
+  KybForm form = 10 [(buf.validate.field).required = true];
+  // Stored main-form values, absent until any values are saved.
+  KybApplicant applicant = 20;
+  // Stored beneficial owners, in submission order.
+  repeated KybUbo ubos = 30;
+  // The form version these values are bound to.
+  uint32 form_version = 40;
+  // Current lifecycle state.
+  ApplicantState state = 50;
+  // The rejection reason; absent unless the applicant is currently rejected.
+  optional string reject_reason = 60;
+  // The Applicant's current version; send it back on a transition
+  // to act on exactly this revision (a stale version is rejected as a conflict).
+  uint64 version = 70;
+}
+
+/** Identifies the applicant to create: the payout provider (whose KYC form is filled) plus the end-client reference. */
+message CreateRequesterKycApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+}
+
+/** The bound form version and lifecycle state of the freshly created applicant. */
+message CreateRequesterKycApplicantResponse {
+  // The form version the new draft is bound to.
+  uint32 form_version = 10;
+  // The new applicant's lifecycle state (draft).
+  ApplicantState state = 20;
+}
+
+/** Identifies the applicant: the payout provider (whose KYC form is filled) plus the end-client reference. */
+message GetRequesterKycApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+}
+
+/** The KYC form at the version the applicant is bound to plus the applicant's stored values. */
+message GetRequesterKycApplicantResponse {
+  KycForm form = 10 [(buf.validate.field).required = true];
+  // Stored values, absent until any values are saved.
+  KycApplicant applicant = 20;
+  // The form version these values are bound to.
+  uint32 form_version = 30;
+  // Current lifecycle state.
+  ApplicantState state = 40;
+  // The rejection reason; absent unless the applicant is currently rejected.
+  optional string reject_reason = 50;
+  // The Applicant's current version; send it back on a transition
+  // to act on exactly this revision (a stale version is rejected as a conflict).
+  uint64 version = 60;
+}
+
+/**
+ * Stores an applicant's KYB values. The form scope is implicit and the version is
+ * server-resolved to the client's bound form version (the provider's current version on the first save), so
+ * neither is sent.
+ */
+message SaveKybApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+
+  // The complete main-form snapshot, sent on every save; an empty applicant clears all stored main-form values
+  // (same snapshot rule as `ubos`).
+  KybApplicant applicant = 30 [(buf.validate.field).required = true];
+
+  // The full ordered UBO set (snapshot), at most 100 owners — position is the owner's index; a later save
+  // replaces the stored owners, and an omitted or empty list clears all stored owners.
+  repeated KybUbo ubos = 40 [(buf.validate.field).repeated.max_items = 100];
+}
+
+/** Stored values echoed back with the payout provider's form definition and the bound form_version, ready for the edit UI. */
+message SaveKybApplicantResponse {
+  KybForm form = 10 [(buf.validate.field).required = true];
+  // The stored main-form values echoed back.
+  KybApplicant applicant = 20;
+  // The stored beneficial owners, in submission order.
+  repeated KybUbo ubos = 30;
+  // The form version these values are bound to.
+  uint32 form_version = 40;
+  // The Applicant's version after this save; send it back on a
+  // transition (submit/withdraw) to act on exactly this revision without re-reading (a stale version is rejected as a conflict).
+  uint64 version = 50;
+}
+
+/** Stores an applicant's KYC values against the client's bound form version (the provider's current version on the first save). */
+message SaveKycApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+
+  // The complete snapshot, sent on every save; an empty applicant clears all stored values.
+  KycApplicant applicant = 30 [(buf.validate.field).required = true];
+}
+
+/** Stored KYC values echoed back with the payout provider's form definition and the bound form_version. */
+message SaveKycApplicantResponse {
+  KycForm form = 10 [(buf.validate.field).required = true];
+  // The stored values echoed back.
+  KycApplicant applicant = 20;
+  // The form version these values are bound to.
+  uint32 form_version = 30;
+  // The Applicant's version after this save; send it back on a
+  // transition (submit/withdraw) to act on exactly this revision without re-reading (a stale version is rejected as a conflict).
+  uint64 version = 40;
+}
+
+/** Identifies the `draft` or `rejected` Applicant the Payout Requester deletes, by payout provider and end-client reference. */
+message DeleteApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+}
+
+message DeleteApplicantResponse {}
+
+/** Identifies the Applicant the Payout Requester submits for review, by payout provider and end-client reference. */
+message SubmitApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  // The Applicant version being submitted, from the last Get*Applicant read or save (0 is the initial version);
+  // a stale one is rejected as a conflict. no validation: any value is checked against the stored version.
+  uint64 version = 30;
+}
+
+message SubmitApplicantResponse {}
+
+/** Identifies the Applicant the Payout Requester withdraws to `draft`, by payout provider and end-client reference. */
+message WithdrawApplicantRequest {
+  uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  // The Applicant version being withdrawn, from the last Get*Applicant read or save; a stale one is rejected
+  // as a conflict. no validation: any value is checked against the stored version.
+  uint64 version = 30;
+}
+
+message WithdrawApplicantResponse {}
+
+/** Lists the calling Payout Requester's own applicants, optionally filtered by form type, Payout Provider, and/or lifecycle state, one page at a time. */
+message ListRequesterApplicantsRequest {
+  // optional filter; unset lists applicants of every form type (KYB and KYC).
+  optional FormType form_type = 10 [(buf.validate.field).enum = {defined_only: true, not_in: [0]}];
+  // optional filter; unset lists applicants across every Payout Provider. An explicit 0 matches no
+  // Payout Provider, so it is rejected — omit the field instead.
+  optional uint32 payout_provider_id = 20 [(buf.validate.field).uint32.gt = 0];
+  // filter; an empty list returns applicants in every state.
+  repeated ApplicantState states = 30 [(buf.validate.field).repeated = {
+    unique: true,
+    items: {
+      enum: {
+        defined_only: true,
+        not_in: [0]
+      }
+    }
+  }];
+  // no validation: absent = the first page at the default size; Page validates its own contents.
+  optional Page page = 40;
+}
+
+/** One page of the calling Payout Requester's applicants of the requested form type matching the filters. */
+message ListRequesterApplicantsResponse {
+  /** One applicant in the Payout Requester's listing: the target Payout Provider, the end-client reference, plus form type, lifecycle state, and bound form version. */
+  message Applicant {
+    // The Payout Provider the Applicant targets.
+    uint32 payout_provider_id = 10;
+    // The Payout Provider's display name.
+    string payout_provider_name = 20;
+    // The end-client reference.
+    string client_id = 30;
+    // Current lifecycle state.
+    ApplicantState state = 40;
+    // KYB or KYC.
+    FormType form_type = 50;
+    // The form version the Applicant is bound to.
+    uint32 form_version = 60;
+  }
+  // The matching applicants on this page.
+  repeated Applicant applicants = 10;
+  // The page just read; has_next drives whether the caller asks for the next one.
+  PageInfo page_info = 20 [(buf.validate.field).required = true];
+}
+
+/** Carries no fields — the calling Payout Requester is taken from the auth context. */
+message ListProviderFormsRequest {}
+
+/** The Payout Providers the calling Payout Requester has mutual consent with, each with the form types it publishes. */
+message ListProviderFormsResponse {
+  // The consented providers, each with ≥1 published form type.
+  repeated ProviderForms provider_forms = 10;
+
+  /** One consented Payout Provider: its id, display name, and the form types it has published (KYB and/or KYC). */
+  message ProviderForms {
+    // The form types this provider publishes (KYB and/or KYC), at least one.
+    repeated FormType form_types = 30;
+    // The consented Payout Provider's id.
+    uint32 payout_provider_id = 40;
+    // The Payout Provider's display name.
+    string payout_provider_name = 50;
+  }
+}
+
