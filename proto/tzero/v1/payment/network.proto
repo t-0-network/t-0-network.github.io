@@ -243,10 +243,21 @@ message GetQuoteResponse {
 }
 
 message CreatePaymentRequest{
+  /**
+   * Unique client generated id for this payment.
+   * A `failure` result creates no payment and leaves the id free. To try the same payment again,
+   * resend this id, also when the retry changes the amount or the quote. If an earlier call under
+   * this id was accepted, the response is that `accepted` result, or `AlreadyExists` when the amount
+   * or currency differs from the accepted payment.
+   * Once a payment is accepted, the id belongs to it, so a new attempt after a payout failure takes a new id.
+   * Each extra part of a split payment is a new payment and takes a new id.
+   * Do not retry a `failure` under a new id: an overlapping call under the old id can be accepted,
+   * and the payment is then paid out twice.
+   */
   string payment_client_id = 10 [(buf.validate.field).string = {
     min_len: 1,
     max_len: 64
-  }]; // unique client generated id for this payment
+  }];
 
   PaymentAmount amount = 30 [(buf.validate.field).required = true]; // payment amount - should be either pay-out amount or settlement amount
 

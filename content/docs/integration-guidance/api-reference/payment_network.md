@@ -167,7 +167,7 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_client_id | [string](../scalar/#string) |  | unique client generated id for this payment |
+| payment_client_id | [string](../scalar/#string) |  | Unique client generated id for this payment. A `failure` result creates no payment and leaves the id free. To try the same payment again, resend this id, also when the retry changes the amount or the quote. If an earlier call under this id was accepted, the response is that `accepted` result, or `AlreadyExists` when the amount or currency differs from the accepted payment. Once a payment is accepted, the id belongs to it, so a new attempt after a payout failure takes a new id. Each extra part of a split payment is a new payment and takes a new id. Do not retry a `failure` under a new id: an overlapping call under the old id can be accepted, and the payment is then paid out twice. |
 | amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  | payment amount - should be either pay-out amount or settlement amount |
 | currency | [string](../scalar/#string) |  | pay-out currency |
 | payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | pay-out payment details |
