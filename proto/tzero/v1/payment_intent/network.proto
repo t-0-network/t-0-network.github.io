@@ -246,7 +246,7 @@ message GetQuoteResponse {
 /**
  * Request to browse the pay-in quotes available to the calling beneficiary.
  */
-message GetQuotesRequest {} // caller resolved from the signed identity; the browse is unfiltered
+message GetQuotesRequest {} // the browse is unfiltered
 
 /**
  * The pay-in quotes the caller can collect against, grouped by currency.

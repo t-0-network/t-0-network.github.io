@@ -20,7 +20,7 @@ service QuoteService {
   }
 }
 
-message GetQuotesRequest {} // caller resolved from the signed identity; the browse is unfiltered
+message GetQuotesRequest {} // the browse is unfiltered
 
 message GetQuotesResponse {
   // One entry per currency that has at least one quoting provider.

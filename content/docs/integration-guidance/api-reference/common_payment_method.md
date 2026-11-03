@@ -776,7 +776,6 @@ addressed by IBAN.
 | payment_reference | [string](../scalar/#string) |  |  |
 | bank_name | [string](../scalar/#string) |  | Beneficiary's bank name |
 | bank_country | [string](../scalar/#string) |  | Beneficiary's bank country (ISO 3166-1 alpha-2) |
-| account_currency | [string](../scalar/#string) | optional | Account currency (ISO 4217) |
 | intermediary_bank | [PaymentDetails.Swift.IntermediaryBank](#tzero-v1-common-PaymentDetails-Swift-IntermediaryBank) |  |  |
 
 

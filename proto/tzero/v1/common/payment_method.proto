@@ -430,6 +430,8 @@ message PaymentDetails {
   message Swift {
     option (payment_method_type) = PAYMENT_METHOD_TYPE_SWIFT;
 
+    reserved 80; // was: optional string account_currency
+
     // Beneficiary's bank SWIFT/BIC code (8 or 11 characters). The party prefix is alphanumeric.
     string swift_code = 10 [(buf.validate.field).string = {
       min_len: 8,
@@ -470,12 +472,6 @@ message PaymentDetails {
     string bank_country = 70 [(buf.validate.field).string = {
       len: 2,
       pattern: "^[A-Z]{2}$"
-    }];
-
-    // Account currency (ISO 4217)
-    optional string account_currency = 80 [(buf.validate.field).string = {
-      len: 3,
-      pattern: "^[A-Z]{3}$"
     }];
 
     IntermediaryBank intermediary_bank = 90;
