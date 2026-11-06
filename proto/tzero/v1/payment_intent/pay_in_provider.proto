@@ -8,13 +8,13 @@ import "buf/validate/validate.proto";
 import "ivms101/v1/ivms/ivms101.proto";
 
 /**
- * Pay-in provider surface for the Payment Intent flow.
+ * Collection Provider surface for the Payment Intent flow.
  *
- * Pay-in providers are those who:
+ * Collection Providers are those who:
  * - Receive fiat payments from end-users
  * - Publish payment intent (pay-in) quotes to the network
  * - Confirm when payments are received via ConfirmFundsReceived
- * - Settles periodically with the beneficiary provider
+ * - Settle periodically with the Collection Requester
  *
  * Provides the payment details presented to end-users for making payments.
  */
@@ -89,20 +89,20 @@ message GetPaymentDetailsRequest {
   TravelRuleData travel_rule = 60  [(buf.validate.field).required = true];
 
   /**
-   * The T-0 provider ID of the beneficiary provider (the FI the funds are
-   * destined for). Stable, opaque identifier for the beneficiary.
+   * The T-0 provider ID of the Collection Requester (the FI the funds are
+   * destined for). Stable, opaque identifier for the Collection Requester.
    */
   uint32 beneficiary_provider_id = 70 [(buf.validate.field).uint32.gt = 0];
 
   message TravelRuleData {
     /**
      * The natural or legal person or legal arrangement who is identified
-     * by the beneficiary provider as the receiver of the requested payment.
+     * by the Collection Requester as the receiver of the requested payment.
      */
     repeated ivms101.Person beneficiary = 20 [(buf.validate.field).repeated.min_items = 1];
 
     /**
-     * Beneficiary provider travel rule data.
+     * Collection Requester travel rule data.
      */
     ivms101.LegalPerson beneficiary_provider = 30 [(buf.validate.field).required = true];
 

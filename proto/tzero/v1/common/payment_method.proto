@@ -431,6 +431,7 @@ message PaymentDetails {
     option (payment_method_type) = PAYMENT_METHOD_TYPE_SWIFT;
 
     reserved 80; // was: optional string account_currency
+    reserved "account_currency";
 
     // Beneficiary's bank SWIFT/BIC code (8 or 11 characters). The party prefix is alphanumeric.
     string swift_code = 10 [(buf.validate.field).string = {
@@ -841,20 +842,20 @@ message PaymentDetails {
     }];
 
     message Business {
-      // Business license number - 18 digits
+      // Business license number (Unified Social Credit Code) - 18 digits or uppercase letters
       string license_number = 10 [(buf.validate.field).string = {
         min_len: 18,
         max_len: 18,
-        pattern: "^[0-9]{18}$"
+        pattern: "^[0-9A-Z]{18}$"
       }];
     }
 
     message Person {
-      // ID number - 18 digits
+      // ID number - 17 digits followed by a digit or X
       string id_number = 10 [(buf.validate.field).string = {
         min_len: 18,
         max_len: 18,
-        pattern: "^[0-9]{18}$"
+        pattern: "^[0-9]{17}[0-9X]$"
       }];
     }
   }
