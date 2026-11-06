@@ -145,9 +145,8 @@ message GetRequesterKycApplicantResponse {
 }
 
 /**
- * Stores an applicant's KYB values. The form scope is implicit and the version is
- * server-resolved to the client's bound form version (the provider's current version on the first save), so
- * neither is sent.
+ * Stores an applicant's KYB values against the client's bound form version (the provider's current version on the
+ * first save).
  */
 message SaveKybApplicantRequest {
   uint32 payout_provider_id = 10 [(buf.validate.field).uint32.gt = 0];
@@ -160,6 +159,11 @@ message SaveKybApplicantRequest {
   // The full ordered UBO set (snapshot), at most 100 owners — position is the owner's index; a later save
   // replaces the stored owners, and an omitted or empty list clears all stored owners.
   repeated KybUbo ubos = 40 [(buf.validate.field).repeated.max_items = 100];
+
+  // The form version the values were filled against. When the client is bound to a different version (on the first
+  // save, the provider's current version), the save fails with FailedPrecondition and stores nothing: read the form
+  // again (Create, then Get, for a new applicant) and refill the values. Unset skips this check.
+  optional uint32 form_version = 50 [(buf.validate.field).uint32.gt = 0];
 }
 
 /** Stored values echoed back with the payout provider's form definition and the bound form_version, ready for the edit UI. */
@@ -183,6 +187,11 @@ message SaveKycApplicantRequest {
 
   // The complete snapshot, sent on every save; an empty applicant clears all stored values.
   KycApplicant applicant = 30 [(buf.validate.field).required = true];
+
+  // The form version the values were filled against. When the client is bound to a different version (on the first
+  // save, the provider's current version), the save fails with FailedPrecondition and stores nothing: read the form
+  // again (Create, then Get, for a new applicant) and refill the values. Unset skips this check.
+  optional uint32 form_version = 40 [(buf.validate.field).uint32.gt = 0];
 }
 
 /** Stored KYC values echoed back with the payout provider's form definition and the bound form_version. */
@@ -244,7 +253,7 @@ message ListRequesterApplicantsRequest {
       }
     }
   }];
-  // no validation: absent = the first page at the default size; Page validates its own contents.
+  // no validation: absent = the first page at the default size.
   optional Page page = 40;
 }
 
@@ -271,7 +280,6 @@ message ListRequesterApplicantsResponse {
   PageInfo page_info = 20 [(buf.validate.field).required = true];
 }
 
-/** Carries no fields — the calling Payout Requester is taken from the auth context. */
 message ListProviderFormsRequest {}
 
 /** The Payout Providers the calling Payout Requester has mutual consent with, each with the form types it publishes. */

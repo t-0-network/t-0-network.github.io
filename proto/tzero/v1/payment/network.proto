@@ -169,7 +169,7 @@ message GetQuoteResponse {
   /**
    * All best quotes from providers with credit lines.
    * Each quote is that provider's best effective price for the requested amount:
-   * the lowest settlement amount, and on a tie the largest pay-out amount.
+   * the lowest settlement amount, and on a tie the largest (settlement amount - fix) * rate.
    * Each quote indicates whether it can be executed immediately.
    * Always returned alongside success/failure - providers can compare alternatives or see options when no executable quote exists.
    */
@@ -197,7 +197,8 @@ message GetQuoteResponse {
       REASON_UNSPECIFIED = 0;
       // No candidate quote was returned for the requested currency / payment method
       // (e.g. no published quote, all expired, no credit line configured between
-      // the providers, or the requested amount exceeds the provider's max_amount band).
+      // the providers, the requested amount exceeds the provider's max_amount band,
+      // or a settlement_amount leaves no pay-out amount after the provider's fix).
       REASON_QUOTE_NOT_FOUND = 10;
       // At least one provider quoted, but none has enough credit / prefunding
       // headroom to execute the requested amount. Inspect `all_quotes[].settlement`
@@ -227,7 +228,7 @@ message GetQuoteResponse {
     tzero.v1.common.Decimal fix = 70;
 
     /**
-     * Settlement details between pay-in and pay-out providers.
+     * Settlement details between the Payout Requester and the Payout Provider.
      * All amounts are in USD (settlement currency).
      */
     message Settlement {
@@ -269,7 +270,7 @@ message CreatePaymentRequest{
 
   message TravelRuleData {
     /**
-     * the natural or legal person that requests payment with originating provider
+     * the natural or legal person that requests payment with the Payout Requester
      */
     repeated ivms101.Person originator = 10 [(buf.validate.field).repeated.min_items = 1];
 
@@ -280,7 +281,7 @@ message CreatePaymentRequest{
     repeated ivms101.Person beneficiary = 20 [(buf.validate.field).repeated.min_items = 1];
 
     /**
-     * Legal entity ID of the originating provider.
+     * Legal entity ID of the Payout Requester.
      * Required when the provider has multiple registered legal entities.
      * If the provider has a single entity, this field may be omitted.
      */
@@ -340,7 +341,8 @@ message CreatePaymentResponse {
       REASON_UNSPECIFIED = 0;
       // No candidate quote was returned for the requested currency / payment method
       // (e.g. no published quote, all expired, no credit line configured between
-      // the providers, or the requested amount exceeds the provider's max_amount band).
+      // the providers, the requested amount exceeds the provider's max_amount band,
+      // or a settlement_amount leaves no pay-out amount after the provider's fix).
       REASON_QUOTE_NOT_FOUND = 10;
       // At least one provider quoted, but none has enough credit / prefunding
       // headroom to execute the requested amount. Call GetQuote to inspect
@@ -353,7 +355,7 @@ message CreatePaymentResponse {
       // The pinned quote's expires_at has passed. Auto-retry by calling GetQuote
       // to obtain a fresh quote id and re-submit with it.
       REASON_QUOTE_EXPIRED = 40;
-      // The pinned quote id does not exist for the pay-in/pay-out provider pair.
+      // The pinned quote id does not exist for the Payout Requester / Payout Provider pair.
       // Indicates a client-side plumbing bug (stale / mismatched id); no auto-retry
       // will succeed until the client fixes quote propagation.
       REASON_QUOTE_ID_UNKNOWN = 50;
@@ -368,7 +370,7 @@ message ConfirmPayoutRequest {
   uint64 payout_id = 20 [(buf.validate.field).uint64.gt = 0, deprecated = true]; // deprecated, this is 1->1 mapping between payment and payout ids
 
   /**
-  * Payment receipt might contain metadata about payment recognizable by pay-in provider.
+  * Payment receipt might contain metadata about payment recognizable by the Payout Requester.
   */
   optional tzero.v1.common.PaymentReceipt receipt = 30;
 }
@@ -402,21 +404,21 @@ message CompleteManualAmlCheckResponse {
 
   message Approved {
     /**
-    * updated amount based on updated quote approved by the  pay-in provider
+    * updated amount based on updated quote approved by the Payout Requester
      */
     tzero.v1.common.Decimal pay_out_amount = 10 [(buf.validate.field).required = true];
 
-    /* updated settlement amount based on updated quote approved by the  pay-in provider */
+    /* updated settlement amount based on updated quote approved by the Payout Requester */
     tzero.v1.common.Decimal settlement_amount = 20 [(buf.validate.field).required = true];
 
     /* unique identifier of the updated pay-out quote */
     int64 pay_out_quote_id = 30 [(buf.validate.field).int64.gt = 0];
 
-    /* client_quote_id of the updated pay-out quote assigned by pay-out provider */
+    /* client_quote_id of the updated pay-out quote assigned by the Payout Provider */
     string pay_out_client_quote_id = 40 [(buf.validate.field).string.max_len = 64];
   }
 
-  // Rejected means that the updated quotes were rejected by pay-in provider, and the payout provider should not proceed
+  // Rejected means that the updated quotes were rejected by the Payout Requester, and the Payout Provider should not proceed
   // with the payout.
   message Rejected {}
 }
@@ -442,7 +444,7 @@ message PaymentAmount {
 
 enum QuoteType {
   QUOTE_TYPE_UNSPECIFIED = 0;
-  QUOTE_TYPE_REALTIME = 1; // real-time quote must be valid at least for 30 seconds (TBD)
+  QUOTE_TYPE_REALTIME = 1;
 }
 
 message FinalizePayoutRequest {
@@ -456,7 +458,7 @@ message FinalizePayoutRequest {
 
   message Success {
     /**
-    * Payment receipt might contain metadata about payment recognizable by pay-in provider.
+    * Payment receipt might contain metadata about payment recognizable by the Payout Requester.
     */
     optional tzero.v1.common.PaymentReceipt receipt = 30;
   }

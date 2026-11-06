@@ -212,7 +212,7 @@ The KYC form at the version the applicant is bound to plus the applicant's store
 <a name="tzero-v1-manage-kyc_sharing-ListProviderFormsRequest"></a>
 
 ### ListProviderFormsRequest
-Carries no fields — the calling Payout Requester is taken from the auth context.
+
 
 
 This message has no fields defined.
@@ -267,7 +267,7 @@ Lists the calling Payout Requester's own applicants, optionally filtered by form
 | form_type | [FormType](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-FormType) | optional | optional filter; unset lists applicants of every form type (KYB and KYC). |
 | payout_provider_id | [uint32](../../scalar/#uint32) | optional | optional filter; unset lists applicants across every Payout Provider. An explicit 0 matches no Payout Provider, so it is rejected — omit the field instead. |
 | states | [ApplicantState](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) | repeated | filter; an empty list returns applicants in every state. |
-| page | [Page](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-Page) | optional | no validation: absent = the first page at the default size; Page validates its own contents. |
+| page | [Page](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-Page) | optional | no validation: absent = the first page at the default size. |
 
 
 
@@ -316,9 +316,8 @@ One applicant in the Payout Requester's listing: the target Payout Provider, the
 <a name="tzero-v1-manage-kyc_sharing-SaveKybApplicantRequest"></a>
 
 ### SaveKybApplicantRequest
-Stores an applicant's KYB values. The form scope is implicit and the version is
-server-resolved to the client's bound form version (the provider's current version on the first save), so
-neither is sent.
+Stores an applicant's KYB values against the client's bound form version (the provider's current version on the
+first save).
 
 
 | Field | Type | Label | Description |
@@ -327,6 +326,7 @@ neither is sent.
 | client_id | [string](../../scalar/#string) |  |  |
 | applicant | [KybApplicant](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KybApplicant) |  | The complete main-form snapshot, sent on every save; an empty applicant clears all stored main-form values (same snapshot rule as `ubos`). |
 | ubos | [KybUbo](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KybUbo) | repeated | The full ordered UBO set (snapshot), at most 100 owners — position is the owner's index; a later save replaces the stored owners, and an omitted or empty list clears all stored owners. |
+| form_version | [uint32](../../scalar/#uint32) | optional | The form version the values were filled against. When the client is bound to a different version (on the first save, the provider's current version), the save fails with FailedPrecondition and stores nothing: read the form again (Create, then Get, for a new applicant) and refill the values. Unset skips this check. |
 
 
 
@@ -365,6 +365,7 @@ Stores an applicant's KYC values against the client's bound form version (the pr
 | payout_provider_id | [uint32](../../scalar/#uint32) |  |  |
 | client_id | [string](../../scalar/#string) |  |  |
 | applicant | [KycApplicant](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-KycApplicant) |  | The complete snapshot, sent on every save; an empty applicant clears all stored values. |
+| form_version | [uint32](../../scalar/#uint32) | optional | The form version the values were filled against. When the client is bound to a different version (on the first save, the provider's current version), the save fails with FailedPrecondition and stores nothing: read the form again (Create, then Get, for a new applicant) and refill the values. Unset skips this check. |
 
 
 

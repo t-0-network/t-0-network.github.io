@@ -133,7 +133,7 @@ message ListProviderApplicantsRequest {
       }
     }
   }];
-  // no validation: absent = the first page at the default size; Page validates its own contents.
+  // no validation: absent = the first page at the default size.
   optional Page page = 40;
 }
 

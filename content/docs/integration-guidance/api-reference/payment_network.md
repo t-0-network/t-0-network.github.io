@@ -103,10 +103,10 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated amount based on updated quote approved by the  pay-in provider |
-| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated settlement amount based on updated quote approved by the  pay-in provider |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated amount based on updated quote approved by the Payout Requester |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated settlement amount based on updated quote approved by the Payout Requester |
 | pay_out_quote_id | [int64](../scalar/#int64) |  | unique identifier of the updated pay-out quote |
-| pay_out_client_quote_id | [string](../scalar/#string) |  | client_quote_id of the updated pay-out quote assigned by pay-out provider |
+| pay_out_client_quote_id | [string](../scalar/#string) |  | client_quote_id of the updated pay-out quote assigned by the Payout Provider |
 
 
 
@@ -117,7 +117,7 @@ This message has no fields defined.
 <a name="tzero-v1-payment-CompleteManualAmlCheckResponse-Rejected"></a>
 
 ### CompleteManualAmlCheckResponse.Rejected
-Rejected means that the updated quotes were rejected by pay-in provider, and the payout provider should not proceed
+Rejected means that the updated quotes were rejected by the Payout Requester, and the Payout Provider should not proceed
 with the payout.
 
 
@@ -138,7 +138,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | payment_id | [uint64](../scalar/#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
 | payout_id | [uint64](../scalar/#uint64) |  | **Deprecated.** deprecated, this is 1->1 mapping between payment and payout ids |
-| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by the Payout Requester. |
 
 
 
@@ -188,9 +188,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
+| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with the Payout Requester |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
-| originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the originating provider. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
+| originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the Payout Requester. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
 
 
 
@@ -312,7 +312,7 @@ Deprecated: presettlement flow is being removed. This message will no longer be 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by the Payout Requester. |
 
 
 
@@ -362,7 +362,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | success | [GetQuoteResponse.Success](#tzero-v1-payment-GetQuoteResponse-Success) |  | A suitable quote was found for the provided parameters, with available credit or pre-settlement option. Use the returned quoteId to call CreatePayment. |
 | failure | [GetQuoteResponse.Failure](#tzero-v1-payment-GetQuoteResponse-Failure) |  | Failure response - means the quote was not found for the specified parameters, or provider limits would exceed by processing the payment amount with the specified amount. |
-| all_quotes | [GetQuoteResponse.ProviderQuote](#tzero-v1-payment-GetQuoteResponse-ProviderQuote) | repeated | All best quotes from providers with credit lines. Each quote is that provider's best effective price for the requested amount: the lowest settlement amount, and on a tie the largest pay-out amount. Each quote indicates whether it can be executed immediately. Always returned alongside success/failure - providers can compare alternatives or see options when no executable quote exists. |
+| all_quotes | [GetQuoteResponse.ProviderQuote](#tzero-v1-payment-GetQuoteResponse-ProviderQuote) | repeated | All best quotes from providers with credit lines. Each quote is that provider's best effective price for the requested amount: the lowest settlement amount, and on a tie the largest (settlement amount - fix) * rate. Each quote indicates whether it can be executed immediately. Always returned alongside success/failure - providers can compare alternatives or see options when no executable quote exists. |
 
 
 
@@ -412,7 +412,7 @@ Contains settlement status and calculated amounts for the payment request.
 <a name="tzero-v1-payment-GetQuoteResponse-ProviderQuote-Settlement"></a>
 
 ### GetQuoteResponse.ProviderQuote.Settlement
-Settlement details between pay-in and pay-out providers.
+Settlement details between the Payout Requester and the Payout Provider.
 All amounts are in USD (settlement currency).
 
 
@@ -564,11 +564,11 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
-| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, or the requested amount exceeds the provider's max_amount band). |
+| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, the requested amount exceeds the provider's max_amount band, or a settlement_amount leaves no pay-out amount after the provider's fix). |
 | REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | At least one provider quoted, but none has enough credit / prefunding headroom to execute the requested amount. Call GetQuote to inspect `all_quotes[].settlement` for the per-provider prefunding gap. |
 | REASON_AMOUNT_EXCEEDS_QUOTE_BAND | 30 | The pinned quote's band cannot cover the requested amount. The quote is still live; retry with a smaller amount, split the payment across bands, or request a fresh GetQuote for a quote that covers the full amount. |
 | REASON_QUOTE_EXPIRED | 40 | The pinned quote's expires_at has passed. Auto-retry by calling GetQuote to obtain a fresh quote id and re-submit with it. |
-| REASON_QUOTE_ID_UNKNOWN | 50 | The pinned quote id does not exist for the pay-in/pay-out provider pair. Indicates a client-side plumbing bug (stale / mismatched id); no auto-retry will succeed until the client fixes quote propagation. |
+| REASON_QUOTE_ID_UNKNOWN | 50 | The pinned quote id does not exist for the Payout Requester / Payout Provider pair. Indicates a client-side plumbing bug (stale / mismatched id); no auto-retry will succeed until the client fixes quote propagation. |
 
 
 
@@ -580,7 +580,7 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
-| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, or the requested amount exceeds the provider's max_amount band). |
+| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, the requested amount exceeds the provider's max_amount band, or a settlement_amount leaves no pay-out amount after the provider's fix). |
 | REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | At least one provider quoted, but none has enough credit / prefunding headroom to execute the requested amount. Inspect `all_quotes[].settlement` for the per-provider prefunding gap. |
 
 
@@ -593,7 +593,7 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | QUOTE_TYPE_UNSPECIFIED | 0 |  |
-| QUOTE_TYPE_REALTIME | 1 | real-time quote must be valid at least for 30 seconds (TBD) |
+| QUOTE_TYPE_REALTIME | 1 |  |
 
 
  <!-- end enums -->

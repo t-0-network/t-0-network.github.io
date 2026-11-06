@@ -20,11 +20,11 @@ service QuoteService {
   }
 }
 
-message GetQuotesRequest {} // the browse is unfiltered
+message GetQuotesRequest {}
 
 message GetQuotesResponse {
   // One entry per currency that has at least one quoting provider.
-  repeated CurrencyQuote quotes = 10; // no validation: any count is valid, including none
+  repeated CurrencyQuote quotes = 10;
 
   /** All pay-out quotes for one currency, grouped by payment method. */
   message CurrencyQuote {
