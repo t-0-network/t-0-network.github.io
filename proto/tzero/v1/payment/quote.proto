@@ -3,28 +3,30 @@ syntax = "proto3";
 package tzero.v1.payment;
 
 import "tzero/v1/common/common.proto";
+import "tzero/v1/common/timeout.proto";
 import "tzero/v1/common/payment_method.proto";
 import "google/protobuf/timestamp.proto";
 import "buf/validate/validate.proto";
 
 /**
- * Network surface for browsing published pay-out quotes.
+ * Network surface for browsing the pay-out quotes available to the caller.
  */
 service QuoteService {
   /** Lists the active pay-out quotes the caller can transact against, grouped by currency, then
    * payment method: for each, the payout providers it holds a credit line with, the caller's
-   * balance with each, and their tiered rate bands. Indicative — request a priced quote via
+   * balance with each, and the tiered rate bands for each. Indicative — request a priced quote via
    * GetQuote to act on one. */
   rpc GetQuotes(GetQuotesRequest) returns (GetQuotesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   }
 }
 
-message GetQuotesRequest {} // the browse is unfiltered
+message GetQuotesRequest {}
 
 message GetQuotesResponse {
   // One entry per currency that has at least one quoting provider.
-  repeated CurrencyQuote quotes = 10; // no validation: any count is valid, including none
+  repeated CurrencyQuote quotes = 10;
 
   /** All pay-out quotes for one currency, grouped by payment method. */
   message CurrencyQuote {
@@ -43,10 +45,10 @@ message GetQuotesResponse {
       // The payout providers quoting this currency and method that the caller holds a credit line with.
       repeated ProviderQuote provider_quotes = 20 [(buf.validate.field).repeated = {min_items: 1}];
 
-      /** One payout provider's offering for the enclosing currency and method: the caller's balance
-       * with the provider plus its tiered rate bands. */
+      /** The quotes of one payout provider for the enclosing currency and method: the caller's balance
+       * with the provider plus the tiered rate bands. */
       message ProviderQuote {
-        /** The payout provider that published these quotes. */
+        /** The payout provider that executes payouts under these quotes. */
         int32 provider_id = 10 [(buf.validate.field).int32.gt = 0];
 
         /** The caller's credit standing with this provider (USD, currency-agnostic). */
@@ -69,7 +71,7 @@ message GetQuotesResponse {
           tzero.v1.common.Decimal available = 20 [(buf.validate.field).required = true];
         }
 
-        /** One pricing band: the rate and fixed fee that apply for a pay-out amount up to max_amount. */
+        /** One pricing band: the rate and fixed charge that apply for a pay-out amount up to max_amount. */
         message Quote {
           int64 quote_id = 10 [(buf.validate.field).int64.gt = 0];
 

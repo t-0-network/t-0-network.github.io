@@ -5,27 +5,29 @@ package tzero.v1.payment_intent;
 import "buf/validate/validate.proto";
 import "ivms101/v1/ivms/ivms101.proto";
 import "tzero/v1/common/common.proto";
+import "tzero/v1/common/timeout.proto";
 import "tzero/v1/common/payment_method.proto";
 
 /**
- * Beneficiary provider surface for payment intent status notifications.
+ * Collection Requester surface for payment intent status notifications.
  *
- * Beneficiary providers are those who:
+ * Collection Requesters are those who:
  * - Create payment intents via CreatePaymentIntent
  * - Receive settlement (in settlement currency via configured blockchain network)
  * - Need to be notified of payment status changes
  *
  * Notifications are delivered when:
- * - Funds have been received from the payer by pay-in provider
+ * - Funds have been received from the payer by the Collection Provider
  */
 service BeneficiaryService {
   /**
-   * PaymentIntentUpdate notifies the beneficiary provider of status changes.
+   * PaymentIntentUpdate notifies the Collection Requester of status changes.
    *
    * Delivery is retried on failure or timeout; handling must be idempotent.
    */
   rpc PaymentIntentUpdate(PaymentIntentUpdateRequest) returns (PaymentIntentUpdateResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   }
 }
 
@@ -45,19 +47,19 @@ message PaymentIntentUpdateRequest {
   oneof update {
     option (buf.validate.oneof).required = true;
     /**
-     * Funds were received from the payer by pay-in provider.
+     * Funds were received from the payer by the Collection Provider.
      */
     FundsReceived funds_received = 20;
   }
 
   /**
-   * Notification that funds were received from the payer by pay-in provider.
+   * Notification that funds were received from the payer by the Collection Provider.
    *
    */
   message FundsReceived {
     /**
-     * The settlement amount credited to the beneficiary balance.
-     * This is calculated as: (source_amount / rate) - fix
+     * The settlement amount credited to the Collection Requester's balance.
+     * This is calculated as: (payment_amount / rate) - fix
      *
      * Note: Fees are NOT deducted from this amount. Fees are tracked
      * separately and settled in periodic fee settlements.
@@ -82,7 +84,7 @@ message PaymentIntentUpdateRequest {
 
     /**
      * Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id), forwarded from ConfirmFundsReceived.
-     * Reconcile against the beneficiary's records; serves as the anchor for dispute resolution.
+     * Reconcile against the Collection Requester's records; serves as the anchor for dispute resolution.
      */
     string transaction_reference = 50 [(buf.validate.field).string = {
       min_len: 1
@@ -90,13 +92,13 @@ message PaymentIntentUpdateRequest {
     }];
 
     /**
-     * Travel rule data of the pay-in provider's legal entity that received the funds.
-     * Present when the pay-in provider has registered travel rule data.
+     * Travel rule data of the Collection Provider's legal entity that received the funds.
+     * Present when the Collection Provider has registered travel rule data.
      */
     TravelRuleData travel_rule_data = 60 [(buf.validate.field).required = true];
 
     /**
-     * Flat USD surcharge retained by the pay-in provider per transfer.
+     * Flat USD surcharge retained by the Collection Provider per transfer.
      * Already subtracted from settlement_amount.
      * Settlement is computed as (payment_amount / rate) - fix.
      */
@@ -106,14 +108,14 @@ message PaymentIntentUpdateRequest {
     }];
 
     /**
-     * The pay-in provider that collected the funds — the counterparty whose balance moved
+     * The Collection Provider that collected the funds — the counterparty whose balance moved
      * against this intent. Distinguishes providers that share a payment method.
      */
     uint32 pay_in_provider_id = 80 [(buf.validate.field).uint32 = {gt: 0, lte: 2147483647}];
 
     message TravelRuleData {
       /**
-       * IVMS101 legal person data of the originating provider's legal entity.
+       * IVMS101 legal person data of the Collection Provider's legal entity.
        */
       ivms101.LegalPerson originator_provider = 30 [(buf.validate.field).required = true];
     }

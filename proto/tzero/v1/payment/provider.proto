@@ -5,6 +5,7 @@ package tzero.v1.payment;
 import "tzero/v1/common/payment_method.proto";
 import "tzero/v1/common/payment_receipt.proto";
 import "tzero/v1/common/common.proto";
+import "tzero/v1/common/timeout.proto";
 import "ivms101/v1/ivms/ivms101.proto";
 import "google/protobuf/timestamp.proto";
 import "buf/validate/validate.proto";
@@ -22,6 +23,7 @@ service ProviderService {
    */
   rpc PayOut(PayoutRequest) returns (PayoutResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   };
 
   /**
@@ -30,6 +32,7 @@ service ProviderService {
    */
   rpc UpdatePayment(UpdatePaymentRequest) returns (UpdatePaymentResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   };
 
   /**
@@ -37,6 +40,7 @@ service ProviderService {
    */
   rpc UpdateLimit(UpdateLimitRequest) returns (UpdateLimitResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   };
 
   /**
@@ -45,14 +49,16 @@ service ProviderService {
    */
   rpc AppendLedgerEntries(AppendLedgerEntriesRequest) returns (AppendLedgerEntriesResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   };
 
   /**
-    * Approves the final pay-out quotes — the "Last Look" before payment executes.
-    * Applies after a manual AML check completes, when one was required.
+    * Approves the final pay-out quote — the "Last Look" after a manual AML check, before the payout executes.
+    * The network can repeat this call for the same `payment_id` with a different quote, rate and amounts: answer each call from the values it carries, not with an earlier answer for that `payment_id`.
   */
   rpc ApprovePaymentQuotes(ApprovePaymentQuoteRequest) returns (ApprovePaymentQuoteResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 29};
   };
 }
 
@@ -135,8 +141,7 @@ message AppendLedgerEntriesRequest {
       uint64 fee_settlement_id = 10 [(buf.validate.field).uint64.gt = 0];
       // Fee settlement amount in USD, truncated to cents. Equals the
       // SETTLEMENT_OUT credit this fee produces. The fee always flows to the
-      // network from the provider receiving this callback, so the descriptor
-      // carries no provider_id.
+      // network from the provider receiving this callback.
       tzero.v1.common.Decimal amount_usd = 20 [
         (buf.validate.field).required = true,
         (buf.validate.field).cel = {
@@ -147,7 +152,7 @@ message AppendLedgerEntriesRequest {
     }
 
     /**
-     * Funds were received from the payer by the pay-in provider, creating the
+     * Funds were received from the payer by the Collection Provider, creating the
      * inter-provider obligation to settle. The descriptor fields mirror values
      * the entries already encode; the entries remain authoritative for balances.
      * Only payment_intent_id is guaranteed non-zero; the remaining descriptor
@@ -155,8 +160,8 @@ message AppendLedgerEntriesRequest {
      */
     message PiFundsReceived {
       uint64 payment_intent_id = 10 [(buf.validate.field).uint64.gt = 0];
-      uint32 pay_in_provider_id = 20;
-      uint32 beneficiary_provider_id = 30;
+      uint32 pay_in_provider_id = 20; // the Collection Provider that received the funds
+      uint32 beneficiary_provider_id = 30; // the Collection Requester that created the intent
       // no validation: descriptor mirror of the entries, which are authoritative for balances
       tzero.v1.common.Decimal settlement_amount = 40;
       // no validation: descriptor mirror of the entries, which are authoritative for balances
@@ -238,7 +243,7 @@ message PayoutRequest {
   optional tzero.v1.common.PaymentDetails payout_details = 60;
 
   /**
-   * Pay-in provider id which initiated the pay out.
+   * ID of the Payout Requester that initiated the payout.
    */
   uint32 pay_in_provider_id = 80 [(buf.validate.field).uint32.gt = 0];
 
@@ -246,7 +251,7 @@ message PayoutRequest {
 
   message TravelRuleData {
     /*
-     * the natural or legal person that requests payment with originating provider
+     * the natural or legal person that requests payment with the Payout Requester
      */
     repeated ivms101.Person originator = 10 [(buf.validate.field).repeated.min_items = 1];
 
@@ -257,7 +262,7 @@ message PayoutRequest {
     repeated ivms101.Person beneficiary = 20 [(buf.validate.field).repeated.min_items = 1];
 
     /**
-     * IVMS101 travel rule data of the originating provider's legal entity.
+     * IVMS101 travel rule data of the Payout Requester's legal entity.
      * Taken from the originator entity in the corresponding CreatePaymentRequest.
      */
     optional ivms101.Person originator_provider = 30;
@@ -275,7 +280,7 @@ message PayoutResponse {
   oneof result {
     option (buf.validate.oneof).required = true;
     /**
-     * Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to
+     * Accepted response - means the payout was accepted by the Payout Provider, which is then obligated to
      * make a pay-out.
      */
     Accepted accepted = 20;
@@ -286,7 +291,7 @@ message PayoutResponse {
 
     /**
      * Manual AML check required - means the payout provider requires additional Anti-Money Laundering (AML)
-     * verification before the payment can proceed. The pay-out provider will need to perform the manual AML check
+     * verification before the payment can proceed. The Payout Provider will need to perform the manual AML check
      * and then call CompleteManualAmlCheck rpc with the result of the check.
      */
     ManualAmlCheck manual_aml_check = 40;
@@ -326,7 +331,7 @@ message UpdatePaymentRequest {
   oneof result {
     option (buf.validate.oneof).required = true;
     /**
-     * Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to
+     * Accepted response - means the payout was accepted by the Payout Provider, which is then obligated to
      * make a pay-out.
      */
     Accepted accepted = 20;
@@ -343,7 +348,7 @@ message UpdatePaymentRequest {
     Confirmed confirmed = 40;
 
     /*
-     * In case of manual AML check, pay-out provider needs to perform additional checks and then call CompleteManualAmlCheck
+     * In case of manual AML check, the Payout Provider needs to perform additional checks and then call CompleteManualAmlCheck
      * rpc with the result of the check.
      */
     ManualAmlCheck manual_aml_check = 50;
@@ -368,7 +373,7 @@ message UpdatePaymentRequest {
         expression: "this.unscaled > 0"
       }
     ];
-    /** Fixed USD markup the network applied to this payout. */
+    /** Fixed charge in USD included in the settlement amount for this payout. */
     tzero.v1.common.Decimal fix = 40 [
       (buf.validate.field).required = true,
       (buf.validate.field).cel = {
@@ -397,12 +402,12 @@ message UpdatePaymentRequest {
     // Additive-only. Consumers must treat unknown values as UNSPECIFIED.
     enum Reason {
       REASON_UNSPECIFIED = 0;
-      REASON_NO_QUOTE_AFTER_AML_APPROVAL = 1; // AML review completed, but the pay-out provider no longer has a valid quote available.
-      REASON_QUOTE_REJECTED_AFTER_AML_APPROVAL = 2; // AML review completed and a new quote was required, but the pay-in provider rejected the updated quote (e.g. due to rate change after AML delay).
-      REASON_AML_RISK_CHECK_FAILED = 3; // Payment was rejected by the pay-out provider because the AML / risk checks failed.
-      REASON_CREDIT_LIMIT_EXCEEDED_AFTER_AML_APPROVAL = 4; // AML review completed and a new quote was found, but the updated settlement amount exceeds the credit limit between the pay-in and pay-out providers.
-      REASON_REJECTED_BY_BENEFICIARY = 5; // Pay-out provider rejected the initial PayOut request (no AML check involved).
-      REASON_FINALIZE_FAILURE = 6; // Pay-out provider accepted initially, then reported failure via FinalizePayout (e.g. payment rails rejected).
+      REASON_NO_QUOTE_AFTER_AML_APPROVAL = 1; // AML review completed, but the Payout Provider no longer has a valid quote available.
+      REASON_QUOTE_REJECTED_AFTER_AML_APPROVAL = 2; // AML review completed and a new quote was required, but the Payout Requester rejected the updated quote (e.g. due to rate change after AML delay).
+      REASON_AML_RISK_CHECK_FAILED = 3; // Payment was rejected by the Payout Provider because the AML / risk checks failed.
+      REASON_CREDIT_LIMIT_EXCEEDED_AFTER_AML_APPROVAL = 4; // AML review completed and a new quote was found, but the updated settlement amount exceeds the credit limit between the Payout Requester and the Payout Provider.
+      REASON_REJECTED_BY_BENEFICIARY = 5; // The Payout Provider rejected the initial PayOut request (no AML check involved).
+      REASON_FINALIZE_FAILURE = 6; // The Payout Provider accepted initially, then reported failure via FinalizePayout (e.g. payment rails rejected).
     }
   }
 
@@ -415,7 +420,7 @@ message UpdatePaymentRequest {
     google.protobuf.Timestamp paid_out_at = 10;
 
     /**
-    * Payment receipt might contain metadata about payment recognizable by pay-in provider.
+    * Payment receipt might contain metadata about payment recognizable by the Payout Requester.
     */
     optional tzero.v1.common.PaymentReceipt receipt = 20;
   }
@@ -440,7 +445,7 @@ message UpdateLimitRequest {
     int64 version = 10 [(buf.validate.field).int64.gte = 0];
     /**
      * the Id of the counterparty provider, e.g. the provider that is providing the credit limit.
-     * It's usually the payOut provider, which provides the credit line to the payIn provider.
+     * Usually the Payout Provider, which extends the credit line to the Payout Requester.
      */
     int32 counterpart_id = 15 [(buf.validate.field).int32.gt = 0];
     /**
@@ -466,9 +471,6 @@ message UpdateLimitRequest {
   }
 }
 
-/**
- * Empty message - means no response is needed.
- */
 message UpdateLimitResponse {}
 
 message ApprovePaymentQuoteRequest {
@@ -511,6 +513,11 @@ message ApprovePaymentQuoteRequest {
   ];
 }
 
+/**
+ * An answer is not the payment outcome. `UpdatePayment` reports the outcome:
+ * `UpdatePaymentRequest.Accepted` carries the final rate, fixed charge and settlement amount, and
+ * `UpdatePaymentRequest.Failed` ends the payment.
+ */
 message ApprovePaymentQuoteResponse {
   oneof result {
     option (buf.validate.oneof).required = true;

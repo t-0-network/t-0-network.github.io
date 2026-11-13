@@ -142,7 +142,7 @@ message FormField {
     Select multi_select = 100;
   }
 
-  /** Numeric free-entry field; carries no extra configuration. */
+  /** Numeric free-entry field. */
   message Number {}
 
   /** Free-text field with an optional maximum length. */
@@ -151,10 +151,10 @@ message FormField {
     optional uint32 max_length = 10 [(buf.validate.field).uint32 = {gt: 0, lte: 10000}];
   }
 
-  /** Date field; carries no extra configuration. */
+  /** Date field. */
   message Date {}
 
-  /** File-upload field; carries no extra configuration. Upload size is bounded by the global server limit. */
+  /** File-upload field. */
   message File {}
 
   /**
