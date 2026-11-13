@@ -47,7 +47,7 @@ service KycApplicantProviderService {
 /** Identifies the submitted Applicant the Payout Provider reads, by payout requester and end-client reference. */
 message GetProviderKybApplicantRequest {
   uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
-  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 50}];
 }
 
 /** The submitted KYB Applicant: the bound form, the submitted main-form values and beneficial owners, the form version, and current lifecycle state. */
@@ -71,7 +71,7 @@ message GetProviderKybApplicantResponse {
 /** Identifies the submitted Applicant the Payout Provider reads, by payout requester and end-client reference. */
 message GetProviderKycApplicantRequest {
   uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
-  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 50}];
 }
 
 /** The submitted KYC Applicant: the bound form, the submitted values, the form version, and current lifecycle state. */
@@ -93,7 +93,7 @@ message GetProviderKycApplicantResponse {
 /** Identifies the Applicant the Payout Provider approves, by payout requester and end-client reference. */
 message ApproveApplicantRequest {
   uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
-  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 50}];
   // The Applicant version being approved, from the Get*Applicant read the provider reviewed; a stale one is
   // rejected as a conflict. no validation: any value is checked against the stored version.
   uint64 version = 30;
@@ -104,7 +104,7 @@ message ApproveApplicantResponse {}
 /** Identifies the Applicant the Payout Provider rejects (by payout requester and end-client reference), plus the mandatory free-text reason. */
 message RejectApplicantRequest {
   uint32 payout_requester_id = 10 [(buf.validate.field).uint32.gt = 0];
-  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 64}];
+  string client_id = 20 [(buf.validate.field).string = {min_len: 1, max_len: 50}];
   // Mandatory free-text rejection reason (no predefined categories).
   string reason = 30 [(buf.validate.field).string = {min_len: 1, max_len: 2000}];
   // The Applicant version being rejected, from the Get*Applicant read the provider reviewed; a stale one is
@@ -133,7 +133,7 @@ message ListProviderApplicantsRequest {
       }
     }
   }];
-  // no validation: absent = the first page at the default size; Page validates its own contents.
+  // no validation: absent = the first page at the default size.
   optional Page page = 40;
 }
 

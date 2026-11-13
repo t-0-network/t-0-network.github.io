@@ -49,7 +49,7 @@ message UploadFileRequest {
     // the same value as the applicant's client_id.
     string client_id = 20 [(buf.validate.field).string = {
       min_len: 1,
-      max_len: 64
+      max_len: 50
     }];
 
     // Original uploaded filename, advisory only. Optional — API clients may omit it.
@@ -100,7 +100,7 @@ message DownloadFileRequest {
   // the same value as the applicant's client_id.
   string client_id = 40 [(buf.validate.field).string = {
     min_len: 1,
-    max_len: 64
+    max_len: 50
   }];
 }
 

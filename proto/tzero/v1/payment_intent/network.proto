@@ -6,15 +6,16 @@ import "buf/validate/validate.proto";
 import "google/protobuf/timestamp.proto";
 import "ivms101/v1/ivms/ivms101.proto";
 import "tzero/v1/common/common.proto";
+import "tzero/v1/common/timeout.proto";
 import "tzero/v1/common/payment_method.proto";
 
 /**
  * PaymentIntentService provides Payment Intent APIs for providers.
  *
  * Payment Intent is a flow where:
- * 1. Beneficiary provider creates a payment intent specifying amount/currency
+ * 1. Collection Requester creates a payment intent specifying amount/currency
  * 2. End-user pays via one of the returned payment options
- * 3. Pay-in provider confirms funds received
+ * 3. Collection Provider confirms funds received
  * 4. Settlement will happen periodically between providers
  */
 service PaymentIntentService {
@@ -24,6 +25,7 @@ service PaymentIntentService {
    */
   rpc UpdateQuote(UpdateQuoteRequest) returns (UpdateQuoteResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   }
 
   /**
@@ -37,14 +39,16 @@ service PaymentIntentService {
    * at the time of ConfirmFundsReceived.
    */
   rpc GetQuote(GetQuoteRequest) returns (GetQuoteResponse) {
-    option idempotency_level = IDEMPOTENT;
+    option idempotency_level = NO_SIDE_EFFECTS;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   }
 
   /** Lists the active pay-in quotes the caller can collect against, grouped by currency, then
-   * payment method: for each, the pay-in providers permitted to the caller and their tiered rate
+   * payment method: for each, the Collection Providers permitted to the caller and their tiered rate
    * bands. Indicative — request a priced quote via GetQuote to act on one. */
   rpc GetQuotes(GetQuotesRequest) returns (GetQuotesResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   }
 
   /**
@@ -52,6 +56,7 @@ service PaymentIntentService {
    */
   rpc CreatePaymentIntent(CreatePaymentIntentRequest) returns (CreatePaymentIntentResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   }
 
   /**
@@ -60,6 +65,7 @@ service PaymentIntentService {
    */
   rpc ConfirmFundsReceived(ConfirmFundsReceivedRequest) returns (ConfirmFundsReceivedResponse) {
     option idempotency_level = IDEMPOTENT;
+    option (tzero.v1.common.timeout) = {seconds: 30};
   }
 }
 
@@ -121,7 +127,7 @@ message UpdateQuoteRequest {
       ];
 
       /**
-       * Fixed charge in USD retained by the pay-in provider per transfer.
+       * Fixed charge in USD retained by the Collection Provider per transfer.
        * Covers flat operational costs that do not scale with amount
        * (wire fees, rail fees, compliance checks).
        * Subtracted from the settlement amount: settlement = (amount / rate) - fix.
@@ -163,7 +169,7 @@ message GetQuoteRequest {
   ];
 
   /**
-   * Optional list of pay-in provider IDs to filter by.
+   * Optional list of Collection Provider IDs to filter by.
    * When specified, only quotes from these providers are returned.
    * When empty, quotes from all providers are returned.
    */
@@ -187,13 +193,13 @@ message GetQuoteResponse {
     repeated IndicativeQuote best_quotes = 10;
     /**
      * Available indicative quotes.
-     * Each entry represents a different pay-in provider and payment method combination.
+     * Each entry represents a different Collection Provider and payment method combination.
      * Use CreatePaymentIntent to get the actual payment details for making a payment.
      */
     repeated IndicativeQuote all_quotes = 20;
 
     /**
-     * Represents an indicative quote from a pay-in provider.
+     * Represents an indicative quote from a Collection Provider.
      */
     message IndicativeQuote {
       /**
@@ -205,14 +211,14 @@ message GetQuoteResponse {
       }];
 
       /**
-       * The T-0 provider ID of the pay-in provider offering this quote.
+       * The T-0 provider ID of the Collection Provider offering this quote.
        */
       uint32 provider_id = 20;
 
       /**
        * Indicative exchange rate USD/XXX (base currency is always USD).
        *
-       * Note: This is indicative only. The actual rate is determined when pay-in provider calls ConfirmFundsReceived
+       * Note: This is indicative only. The actual rate is determined when the Collection Provider calls ConfirmFundsReceived
        */
       tzero.v1.common.Decimal indicative_rate = 30 [
         (buf.validate.field).required = true,
@@ -223,7 +229,7 @@ message GetQuoteResponse {
       ];
 
       /**
-       * Indicative fixed charge in USD retained by the pay-in provider per transfer.
+       * Indicative fixed charge in USD retained by the Collection Provider per transfer.
        * Settlement is calculated as (amount / indicative_rate) - indicative_fix.
        * Indicative only: the actual fix is locked in at ConfirmFundsReceived time.
        */
@@ -244,16 +250,16 @@ message GetQuoteResponse {
 }
 
 /**
- * Request to browse the pay-in quotes available to the calling beneficiary.
+ * Request to browse the pay-in quotes available to the calling Collection Requester.
  */
-message GetQuotesRequest {} // the browse is unfiltered
+message GetQuotesRequest {}
 
 /**
  * The pay-in quotes the caller can collect against, grouped by currency.
  */
 message GetQuotesResponse {
   /** One entry per pay-in currency with at least one quoting permitted provider. */
-  repeated CurrencyQuote quotes = 10; // no validation: any count is valid, including none
+  repeated CurrencyQuote quotes = 10;
 
   /** All pay-in quotes for one currency, grouped by payment method. */
   message CurrencyQuote {
@@ -273,12 +279,12 @@ message GetQuotesResponse {
         not_in: [0]
       }];
 
-      /** The permitted pay-in providers quoting this currency and payment method. */
+      /** The permitted Collection Providers quoting this currency and payment method. */
       repeated ProviderQuote provider_quotes = 20 [(buf.validate.field).repeated = {min_items: 1}];
 
-      /** One pay-in provider's offering for the enclosing currency and payment method. */
+      /** One Collection Provider's offering for the enclosing currency and payment method. */
       message ProviderQuote {
-        /** The T-0 provider ID of the pay-in provider that published these bands. */
+        /** The T-0 provider ID of the Collection Provider that published these bands. */
         uint32 provider_id = 10;
 
         /** Tiered rate bands, ascending by max_amount. */
@@ -308,7 +314,7 @@ message GetQuotesResponse {
             }
           ];
 
-          /** Fixed charge in USD retained by the pay-in provider per transfer. */
+          /** Fixed charge in USD retained by the Collection Provider per transfer. */
           tzero.v1.common.Decimal fix = 30 [
             (buf.validate.field).required = true,
             (buf.validate.field).cel = {
@@ -343,7 +349,7 @@ message PaymentIntentPayInDetails {
   }];
 
   /**
-   * The T-0 provider ID of the pay-in provider offering this option.
+   * The T-0 provider ID of the Collection Provider offering this option.
    */
   uint32 provider_id = 20;
 
@@ -363,7 +369,7 @@ message CreatePaymentIntentRequest {
    * Provider-supplied unique identifier for this payment intent.
    * Used for idempotency - subsequent requests with the same external_reference
    * return the existing payment_intent_id instead of creating a new one.
-   * Should be unique per beneficiary provider.
+   * Should be unique per Collection Requester.
    */
   string external_reference = 10 [(buf.validate.field).string = {
     min_len: 1
@@ -398,7 +404,7 @@ message CreatePaymentIntentRequest {
   TravelRuleData travel_rule_data = 40 [(buf.validate.field).required = true];
 
   /**
-   * Optional list of pay-in provider IDs to consider.
+   * Optional list of Collection Provider IDs to consider.
    * When specified, only quotes from these providers will be used.
    * When empty, all available providers are considered.
    */
@@ -517,7 +523,7 @@ message ConfirmFundsReceivedRequest {
 
   /**
    * Pay-in's rail-native reference (SEPA EndToEndId, SWIFT UETR, PIX e2e_id) — do not generate.
-   * Forwarded to the beneficiary for end-to-end tracking and dispute resolution.
+   * Forwarded to the Collection Requester for end-to-end tracking and dispute resolution.
    */
   string transaction_reference = 40 [(buf.validate.field).string = {
     min_len: 1
@@ -525,7 +531,7 @@ message ConfirmFundsReceivedRequest {
   }];
 
   /**
-   * Legal entity ID of the pay-in provider that received the funds.
+   * Legal entity ID of the Collection Provider that received the funds.
    * Required when the provider has multiple registered legal entities.
    * If the provider has a single entity, this field may be omitted.
    */
@@ -547,13 +553,13 @@ message ConfirmFundsReceivedResponse {
 
   /**
    * Funds accepted - settlement will proceed.
-   * The beneficiary provider will receive a PaymentIntentUpdate notification
+   * The Collection Requester will receive a PaymentIntentUpdate notification
    * with settlement details.
    */
   message Accept {
     /**
-     * The settlement amount in USD that the pay-in provider owes the
-     * beneficiary provider for this payment intent. Locked from the chosen
+     * The settlement amount in USD that the Collection Provider owes the
+     * Collection Requester for this payment intent. Locked from the chosen
      * quote at confirm-time as (payment_amount / rate) − fix.
      */
     tzero.v1.common.Decimal settlement_amount = 10 [
@@ -566,7 +572,7 @@ message ConfirmFundsReceivedResponse {
 
     /**
      * USD/<pay-in currency> exchange rate locked in for this settlement.
-     * Matches the rate forwarded to the beneficiary in PaymentIntentUpdate.FundsReceived.
+     * Matches the rate forwarded to the Collection Requester in PaymentIntentUpdate.FundsReceived.
      */
     tzero.v1.common.Decimal rate = 20 [
       (buf.validate.field).required = true,
@@ -577,7 +583,7 @@ message ConfirmFundsReceivedResponse {
     ];
 
     /**
-     * Flat USD charge retained by the pay-in provider per transfer,
+     * Flat USD charge retained by the Collection Provider per transfer,
      * already subtracted from settlement_amount.
      * Settlement is computed as (payment_amount / rate) − fix.
      */
@@ -602,8 +608,8 @@ message ConfirmFundsReceivedResponse {
       REJECT_REASON_NO_ACTIVE_QUOTE = 20;
       REJECT_REASON_PROVIDER_NOT_ALLOWED = 30;
       /**
-       * The pay-in amount would yield a zero or negative beneficiary
-       * settlement (pay_in / rate − fix) at every active quote.
+       * The pay-in amount would yield a zero or negative settlement to the Collection Requester
+       * (pay_in / rate − fix) at every active quote.
        */
       REJECT_REASON_AMOUNT_TOO_SMALL = 40;
       /**
