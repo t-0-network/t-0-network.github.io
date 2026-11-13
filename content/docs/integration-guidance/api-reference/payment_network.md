@@ -12,17 +12,15 @@ toc: true
 <a name="tzero-v1-payment-NetworkService"></a>
 
 ## NetworkService
-Network surface for publishing quotes and initiating pay-out payments.
-
-All methods of this service are idempotent, meaning they are safe to retry and multiple calls with the same idempotency key will have no additional effect.
+Publishes quotes and creates pay-out payments. Every method is safe to retry.
 
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
-| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Publishes pay-in and pay-out quotes (FX rates) into the network. Quotes carry tiered pricing bands and an expiration timestamp. Full snapshot: omitted quotes are deleted. |
-| GetQuote | [GetQuoteRequest](#tzero-v1-payment-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment-GetQuoteResponse) | Request the best available quote for a payout in a specific currency, for a given amount. If the payout quote exists, but the credit limit is exceeded, this quote will not be considered. |
-| CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Submit a request to create a new payment for the specified pay-out currency. QuoteId is the optional parameter. If the quoteId is specified, it must be a valid quoteId previously returned by GetQuote. If the quoteId is not specified, a suitable quote is selected for the pay-out currency and amount, as GetQuote does. |
-| ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Informs the network that a payout has been completed, specifying the payment ID and payout ID from the original payout request. deprecated, use the FinalizePayout rpc instead. |
-| FinalizePayout | [FinalizePayoutRequest](#tzero-v1-payment-FinalizePayoutRequest) | [FinalizePayoutResponse](#tzero-v1-payment-FinalizePayoutResponse) | Report the final outcome of a payout to the network, identified by the payment id from the original PayoutRequest, as either success (with an optional receipt) or failure with a reason. Supersedes the deprecated ConfirmPayout, which could only signal completion. |
+| UpdateQuote | [UpdateQuoteRequest](#tzero-v1-payment-UpdateQuoteRequest) | [UpdateQuoteResponse](#tzero-v1-payment-UpdateQuoteResponse) | Publishes pay-out quotes. Each request is a full snapshot: a quote left out is deleted. |
+| GetQuote | [GetQuoteRequest](#tzero-v1-payment-GetQuoteRequest) | [GetQuoteResponse](#tzero-v1-payment-GetQuoteResponse) | Returns the best pay-out quote for an amount. A quote whose credit line cannot cover the amount is not picked. |
+| CreatePayment | [CreatePaymentRequest](#tzero-v1-payment-CreatePaymentRequest) | [CreatePaymentResponse](#tzero-v1-payment-CreatePaymentResponse) | Creates a pay-out payment. With quote_id, the payment uses that quote from GetQuote. Without it, the best quote is picked, as GetQuote does. |
+| ConfirmPayout | [ConfirmPayoutRequest](#tzero-v1-payment-ConfirmPayoutRequest) | [ConfirmPayoutResponse](#tzero-v1-payment-ConfirmPayoutResponse) | Reports that a payout is complete. Deprecated: use FinalizePayout. |
+| FinalizePayout | [FinalizePayoutRequest](#tzero-v1-payment-FinalizePayoutRequest) | [FinalizePayoutResponse](#tzero-v1-payment-FinalizePayoutResponse) | Reports the final result of a payout: success with an optional receipt, or failure with a reason. |
 | CompleteManualAmlCheck | [CompleteManualAmlCheckRequest](#tzero-v1-payment-CompleteManualAmlCheckRequest) | [CompleteManualAmlCheckResponse](#tzero-v1-payment-CompleteManualAmlCheckResponse) | Reports the result of a manual AML check on a payment. On approval, the response carries the updated settlement/payout amount and quotes. |
 
  <!-- end services -->
@@ -103,10 +101,10 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated amount based on updated quote approved by the  pay-in provider |
-| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated settlement amount based on updated quote approved by the  pay-in provider |
+| pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated amount based on updated quote approved by the Payout Requester |
+| settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | updated settlement amount based on updated quote approved by the Payout Requester |
 | pay_out_quote_id | [int64](../scalar/#int64) |  | unique identifier of the updated pay-out quote |
-| pay_out_client_quote_id | [string](../scalar/#string) |  | client_quote_id of the updated pay-out quote assigned by pay-out provider |
+| pay_out_client_quote_id | [string](../scalar/#string) |  | client_quote_id of the updated pay-out quote assigned by the Payout Provider |
 
 
 
@@ -117,7 +115,7 @@ This message has no fields defined.
 <a name="tzero-v1-payment-CompleteManualAmlCheckResponse-Rejected"></a>
 
 ### CompleteManualAmlCheckResponse.Rejected
-Rejected means that the updated quotes were rejected by pay-in provider, and the payout provider should not proceed
+Rejected means that the updated quotes were rejected by the Payout Requester, and the Payout Provider should not proceed
 with the payout.
 
 
@@ -138,7 +136,7 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | payment_id | [uint64](../scalar/#uint64) |  | payment id assigned by the network, this is the same payment id that was provided in the PayoutRequest |
 | payout_id | [uint64](../scalar/#uint64) |  | **Deprecated.** deprecated, this is 1->1 mapping between payment and payout ids |
-| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by the Payout Requester. |
 
 
 
@@ -167,11 +165,11 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| payment_client_id | [string](../scalar/#string) |  | Unique client generated id for this payment. A `failure` result creates no payment and leaves the id free. To try the same payment again, resend this id, also when the retry changes the amount or the quote. If an earlier call under this id was accepted, the response is that `accepted` result, or `AlreadyExists` when the amount or currency differs from the accepted payment. Once a payment is accepted, the id belongs to it, so a new attempt after a payout failure takes a new id. Each extra part of a split payment is a new payment and takes a new id. Do not retry a `failure` under a new id: an overlapping call under the old id can be accepted, and the payment is then paid out twice. |
+| payment_client_id | [string](../scalar/#string) |  | Client id of the payment. To retry, resend the same id, also with a new amount or quote. Once accepted, the id returns that payment, or AlreadyExists if the amount or currency differs. A retry of a `failure` under a new id can pay the payment out twice. |
 | amount | [PaymentAmount](#tzero-v1-payment-PaymentAmount) |  | payment amount - should be either pay-out amount or settlement amount |
 | currency | [string](../scalar/#string) |  | pay-out currency |
 | payment_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) |  | pay-out payment details |
-| quote_id | [QuoteId](#tzero-v1-payment-QuoteId) | optional | if specified, must be a valid quoteId that was previously returned by GetQuote otherwise last available quote will be used |
+| quote_id | [QuoteId](#tzero-v1-payment-QuoteId) | optional | a quote from GetQuote; without it, the best quote is picked |
 | travel_rule_data | [CreatePaymentRequest.TravelRuleData](#tzero-v1-payment-CreatePaymentRequest-TravelRuleData) |  | travel rule data |
 
 
@@ -188,9 +186,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
+| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with the Payout Requester |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
-| originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the originating provider. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
+| originator_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity of the Payout Requester. Required only when the provider has more than one. |
 
 
 
@@ -208,8 +206,8 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | payment_client_id | [string](../scalar/#string) |  | client generated id supplied in the request |
 | accepted | [CreatePaymentResponse.Accepted](#tzero-v1-payment-CreatePaymentResponse-Accepted) |  | The payment was accepted and will be passed to the payout provider. A suitable quote was found for the pay-out currency and amount. |
-| settlement_required | [CreatePaymentResponse.SettlementRequired](#tzero-v1-payment-CreatePaymentResponse-SettlementRequired) |  | **Deprecated.** Deprecated: Settlement required response - presettlement flow is being removed. This response type will no longer be returned. |
-| failure | [CreatePaymentResponse.Failure](#tzero-v1-payment-CreatePaymentResponse-Failure) |  | The payment was not accepted — e.g. no suitable quote exists for the pay-out currency and amount, or the credit limit is exceeded for the available quotes. |
+| settlement_required | [CreatePaymentResponse.SettlementRequired](#tzero-v1-payment-CreatePaymentResponse-SettlementRequired) |  | **Deprecated.** Deprecated: no longer returned. |
+| failure | [CreatePaymentResponse.Failure](#tzero-v1-payment-CreatePaymentResponse-Failure) |  | The payment was not accepted. The reason says why. |
 
 
 
@@ -255,7 +253,7 @@ This message has no fields defined.
 <a name="tzero-v1-payment-CreatePaymentResponse-SettlementRequired"></a>
 
 ### CreatePaymentResponse.SettlementRequired
-Deprecated: presettlement flow is being removed. This message will no longer be used.
+Deprecated: no longer used.
 
 
 | Field | Type | Label | Description |
@@ -312,7 +310,7 @@ Deprecated: presettlement flow is being removed. This message will no longer be 
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by the Payout Requester. |
 
 
 
@@ -361,8 +359,8 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | success | [GetQuoteResponse.Success](#tzero-v1-payment-GetQuoteResponse-Success) |  | A suitable quote was found for the provided parameters, with available credit or pre-settlement option. Use the returned quoteId to call CreatePayment. |
-| failure | [GetQuoteResponse.Failure](#tzero-v1-payment-GetQuoteResponse-Failure) |  | Failure response - means the quote was not found for the specified parameters, or provider limits would exceed by processing the payment amount with the specified amount. |
-| all_quotes | [GetQuoteResponse.ProviderQuote](#tzero-v1-payment-GetQuoteResponse-ProviderQuote) | repeated | All best quotes from providers with credit lines. Each quote is that provider's best effective price for the requested amount: the lowest settlement amount, and on a tie the largest pay-out amount. Each quote indicates whether it can be executed immediately. Always returned alongside success/failure - providers can compare alternatives or see options when no executable quote exists. |
+| failure | [GetQuoteResponse.Failure](#tzero-v1-payment-GetQuoteResponse-Failure) |  | No quote can serve the request. The reason says why. |
+| all_quotes | [GetQuoteResponse.ProviderQuote](#tzero-v1-payment-GetQuoteResponse-ProviderQuote) | repeated | The best quote of each provider with a credit line, for the requested amount. Returned with both success and failure. |
 
 
 
@@ -389,7 +387,7 @@ This message has no fields defined.
 <a name="tzero-v1-payment-GetQuoteResponse-ProviderQuote"></a>
 
 ### GetQuoteResponse.ProviderQuote
-Best quote from a provider with credit line configured.
+Best quote for each provider with a credit line configured.
 Contains settlement status and calculated amounts for the payment request.
 
 
@@ -412,7 +410,7 @@ Contains settlement status and calculated amounts for the payment request.
 <a name="tzero-v1-payment-GetQuoteResponse-ProviderQuote-Settlement"></a>
 
 ### GetQuoteResponse.ProviderQuote.Settlement
-Settlement details between pay-in and pay-out providers.
+Settlement details between the Payout Requester and the Payout Provider.
 All amounts are in USD (settlement currency).
 
 
@@ -442,7 +440,7 @@ All amounts are in USD (settlement currency).
 | quote_id | [QuoteId](#tzero-v1-payment-QuoteId) |  | id of the payout quote |
 | pay_out_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | pay-out amount in pay-out currency if the quote from response is used |
 | settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | settlement amount in settlement currency if the quote from response is used |
-| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed charge in USD included in settlement_amount. settlement_amount = (pay_out_amount / rate) + fix. |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed charge in USD, included in settlement_amount. The settlement amount is rounded up to the cent, and the pay-out amount is rounded down. |
 
 
 
@@ -453,8 +451,7 @@ All amounts are in USD (settlement currency).
 <a name="tzero-v1-payment-PaymentAmount"></a>
 
 ### PaymentAmount
-Payment amount could be specified either as settlement amount and then converted to corresponding amount of pay-out amount
-or as pay-out amount, so that the settlement amount is calculated accordingly
+The amount as a pay-out amount or as a settlement amount. The other amount is computed from it.
 
 
 | Field | Type | Label | Description |
@@ -493,7 +490,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| pay_out | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | Zero or more quotes for pay-out operations, each quote must have a unique currency, and one or more bands, with the unique client_quote_id for each band. |
+| pay_out | [UpdateQuoteRequest.Quote](#tzero-v1-payment-UpdateQuoteRequest-Quote) | repeated | Pay-out quotes. Each band has a unique client_quote_id. |
 
 
 
@@ -513,7 +510,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | quote_type | [QuoteType](#tzero-v1-payment-QuoteType) |  | **Deprecated.** Deprecated: rate type is no longer used; the server ignores the value. |
 | payment_method | [tzero.v1.common.PaymentMethodType](../common_payment_method/#tzero-v1-common-PaymentMethodType) |  | Payment method must be specified |
 | bands | [UpdateQuoteRequest.Quote.Band](#tzero-v1-payment-UpdateQuoteRequest-Quote-Band) | repeated | list of bands for this quote |
-| expiration | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | expiration time of the quote |
+| expiration | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | Expiration time of the quote. Must be at least the network's minimum quote validity after the network receives the request; otherwise InvalidArgument. |
 | timestamp | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | timestamp quote was created |
 
 
@@ -533,7 +530,7 @@ Base currency is always USD, so the quotes are always in USD/currency format.
 | client_quote_id | [string](../scalar/#string) |  | unique client generated id for this band |
 | max_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Maximum amount of USD this band applies to. |
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | USD/currency rate |
-| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) | optional | Fixed charge in USD applied per transfer on top of the exchange rate. This covers payment method costs (e.g. wire transfer fees). Added to the settlement amount: settlement = (amount / rate) + fix. Defaults to 0 when absent — no fixed charge applied. |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) | optional | Fixed charge in USD per transfer, added to the settlement amount. Absent means no charge. |
 
 
 
@@ -564,11 +561,12 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
-| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, or the requested amount exceeds the provider's max_amount band). |
-| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | At least one provider quoted, but none has enough credit / prefunding headroom to execute the requested amount. Call GetQuote to inspect `all_quotes[].settlement` for the per-provider prefunding gap. |
-| REASON_AMOUNT_EXCEEDS_QUOTE_BAND | 30 | The pinned quote's band cannot cover the requested amount. The quote is still live; retry with a smaller amount, split the payment across bands, or request a fresh GetQuote for a quote that covers the full amount. |
-| REASON_QUOTE_EXPIRED | 40 | The pinned quote's expires_at has passed. Auto-retry by calling GetQuote to obtain a fresh quote id and re-submit with it. |
-| REASON_QUOTE_ID_UNKNOWN | 50 | The pinned quote id does not exist for the pay-in/pay-out provider pair. Indicates a client-side plumbing bug (stale / mismatched id); no auto-retry will succeed until the client fixes quote propagation. |
+| REASON_QUOTE_NOT_FOUND | 10 | No quote fits the currency, payment method and amount, or no credit line exists. |
+| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | Quotes exist, but no credit line covers the amount. GetQuote shows the prefunding each provider needs. |
+| REASON_AMOUNT_EXCEEDS_QUOTE_BAND | 30 | The amount is above the pinned quote's maximum. Retry with a smaller amount, or with a new quote from GetQuote. |
+| REASON_QUOTE_EXPIRED | 40 | The pinned quote has expired. Retry with a new quote from GetQuote. |
+| REASON_QUOTE_ID_UNKNOWN | 50 | The pinned quote id is unknown. A retry with the same quote id fails again. |
+| REASON_AMOUNT_TOO_SMALL | 60 | The settlement_amount is too small to pay out anything after the quote's fix. Retry with a larger settlement_amount. |
 
 
 
@@ -580,8 +578,9 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
-| REASON_QUOTE_NOT_FOUND | 10 | No candidate quote was returned for the requested currency / payment method (e.g. no published quote, all expired, no credit line configured between the providers, or the requested amount exceeds the provider's max_amount band). |
-| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | At least one provider quoted, but none has enough credit / prefunding headroom to execute the requested amount. Inspect `all_quotes[].settlement` for the per-provider prefunding gap. |
+| REASON_QUOTE_NOT_FOUND | 10 | No quote fits the currency, payment method and amount, or no credit line exists. |
+| REASON_CREDIT_OR_PREDEPOSIT_REQUIRED | 20 | Quotes exist, but no credit line covers the amount. all_quotes shows the prefunding each provider needs. |
+| REASON_AMOUNT_TOO_SMALL | 30 | The settlement_amount is too small to pay out anything after the quote's fix. Retry with a larger settlement_amount. |
 
 
 
@@ -593,7 +592,7 @@ This message has no fields defined.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | QUOTE_TYPE_UNSPECIFIED | 0 |  |
-| QUOTE_TYPE_REALTIME | 1 | real-time quote must be valid at least for 30 seconds (TBD) |
+| QUOTE_TYPE_REALTIME | 1 |  |
 
 
  <!-- end enums -->

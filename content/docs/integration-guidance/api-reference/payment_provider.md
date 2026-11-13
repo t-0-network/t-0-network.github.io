@@ -22,7 +22,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | UpdatePayment | [UpdatePaymentRequest](#tzero-v1-payment-UpdatePaymentRequest) | [UpdatePaymentResponse](#tzero-v1-payment-UpdatePaymentResponse) | Reports the current status of a payment — either a success or a failure. This method should be idempotent, meaning that multiple calls with the same idempotency key will have no additional effect. |
 | UpdateLimit | [UpdateLimitRequest](#tzero-v1-payment-UpdateLimitRequest) | [UpdateLimitResponse](#tzero-v1-payment-UpdateLimitResponse) | Delivers updated credit limit and credit usage. |
 | AppendLedgerEntries | [AppendLedgerEntriesRequest](#tzero-v1-payment-AppendLedgerEntriesRequest) | [AppendLedgerEntriesResponse](#tzero-v1-payment-AppendLedgerEntriesResponse) | Carries ledger-entry updates for the provider's accounts. It can be used to keep track of the provider's exposure to other participants and other important financial events. (see the list in the message below) |
-| ApprovePaymentQuotes | [ApprovePaymentQuoteRequest](#tzero-v1-payment-ApprovePaymentQuoteRequest) | [ApprovePaymentQuoteResponse](#tzero-v1-payment-ApprovePaymentQuoteResponse) | Approves the final pay-out quotes — the "Last Look" before payment executes. Applies after a manual AML check completes, when one was required. |
+| ApprovePaymentQuotes | [ApprovePaymentQuoteRequest](#tzero-v1-payment-ApprovePaymentQuoteRequest) | [ApprovePaymentQuoteResponse](#tzero-v1-payment-ApprovePaymentQuoteResponse) | Approves the final pay-out quote — the "Last Look" after a manual AML check, before the payout executes. The network can repeat this call for the same `payment_id` with a different quote, rate and amounts: answer each call from the values it carries, not with an earlier answer for that `payment_id`. |
 
  <!-- end services -->
 
@@ -95,7 +95,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | fee_settlement_id | [uint64](../scalar/#uint64) |  |  |
-| amount_usd | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fee settlement amount in USD, truncated to cents. Equals the SETTLEMENT_OUT credit this fee produces. The fee always flows to the network from the provider receiving this callback, so the descriptor carries no provider_id. |
+| amount_usd | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fee settlement amount in USD, truncated to cents. Equals the SETTLEMENT_OUT credit this fee produces. The fee always flows to the network from the provider receiving this callback. |
 
 
 
@@ -122,7 +122,7 @@ All methods of this service must be idempotent, meaning they are safe to retry a
 <a name="tzero-v1-payment-AppendLedgerEntriesRequest-Transaction-PiFundsReceived"></a>
 
 ### AppendLedgerEntriesRequest.Transaction.PiFundsReceived
-Funds were received from the payer by the pay-in provider, creating the
+Funds were received from the payer by the Collection Provider, creating the
 inter-provider obligation to settle. The descriptor fields mirror values
 the entries already encode; the entries remain authoritative for balances.
 Only payment_intent_id is guaranteed non-zero; the remaining descriptor
@@ -132,8 +132,8 @@ fields may be zero-valued.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | payment_intent_id | [uint64](../scalar/#uint64) |  |  |
-| pay_in_provider_id | [uint32](../scalar/#uint32) |  |  |
-| beneficiary_provider_id | [uint32](../scalar/#uint32) |  |  |
+| pay_in_provider_id | [uint32](../scalar/#uint32) |  | the Collection Provider that received the funds |
+| beneficiary_provider_id | [uint32](../scalar/#uint32) |  | the Collection Requester that created the intent |
 | settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | no validation: descriptor mirror of the entries, which are authoritative for balances |
 | beneficiary_fee | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | no validation: descriptor mirror of the entries, which are authoritative for balances |
 | pay_in_fee | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | no validation: descriptor mirror of the entries, which are authoritative for balances |
@@ -207,7 +207,9 @@ This message has no fields defined.
 <a name="tzero-v1-payment-ApprovePaymentQuoteResponse"></a>
 
 ### ApprovePaymentQuoteResponse
-
+An answer is not the payment outcome. `UpdatePayment` reports the outcome:
+`UpdatePaymentRequest.Accepted` carries the final rate, fixed charge and settlement amount, and
+`UpdatePaymentRequest.Failed` ends the payment.
 
 
 | Field | Type | Label | Description |
@@ -261,7 +263,7 @@ This message has no fields defined.
 | client_quote_id | [string](../scalar/#string) |  | client quote id of the quote used for this payout (the provider provides the quote IDs in the UpdateQuote rpc) This is the identifier of the quote that was used to calculate the payout amount. |
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout This is the amount that should be paid out to the recipient. |
 | payout_details | [tzero.v1.common.PaymentDetails](../common_payment_method/#tzero-v1-common-PaymentDetails) | optional | Payment details specifying how the payout should be made (bank transfer, crypto transfer, etc.). |
-| pay_in_provider_id | [uint32](../scalar/#uint32) |  | Pay-in provider id which initiated the pay out. |
+| pay_in_provider_id | [uint32](../scalar/#uint32) |  | ID of the Payout Requester that initiated the payout. |
 | travel_rule_data | [PayoutRequest.TravelRuleData](#tzero-v1-payment-PayoutRequest-TravelRuleData) |  |  |
 
 
@@ -278,9 +280,9 @@ This message has no fields defined.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with originating provider |
+| originator | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person that requests payment with the Payout Requester |
 | beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | the natural or legal person or legal arrangement who is identified by the originator as the receiver of the requested payment. |
-| originator_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | IVMS101 travel rule data of the originating provider's legal entity. Taken from the originator entity in the corresponding CreatePaymentRequest. |
+| originator_provider | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | IVMS101 travel rule data of the Payout Requester's legal entity. Taken from the originator entity in the corresponding CreatePaymentRequest. |
 
 
 
@@ -297,9 +299,9 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | beneficiary_provider_legal_entity_id | [uint32](../scalar/#uint32) | optional | Legal entity ID of the payout provider handling this transaction. Required when the provider has multiple registered legal entities. If the provider has a single entity, this field may be omitted. |
-| accepted | [PayoutResponse.Accepted](#tzero-v1-payment-PayoutResponse-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
+| accepted | [PayoutResponse.Accepted](#tzero-v1-payment-PayoutResponse-Accepted) |  | Accepted response - means the payout was accepted by the Payout Provider, which is then obligated to make a pay-out. |
 | failed | [PayoutResponse.Failed](#tzero-v1-payment-PayoutResponse-Failed) |  | Failure response - means the payout was not executed successfully, e.g. the payout provider could not process the payout. |
-| manual_aml_check | [PayoutResponse.ManualAmlCheck](#tzero-v1-payment-PayoutResponse-ManualAmlCheck) |  | Manual AML check required - means the payout provider requires additional Anti-Money Laundering (AML) verification before the payment can proceed. The pay-out provider will need to perform the manual AML check and then call CompleteManualAmlCheck rpc with the result of the check. |
+| manual_aml_check | [PayoutResponse.ManualAmlCheck](#tzero-v1-payment-PayoutResponse-ManualAmlCheck) |  | Manual AML check required - means the payout provider requires additional Anti-Money Laundering (AML) verification before the payment can proceed. The Payout Provider will need to perform the manual AML check and then call CompleteManualAmlCheck rpc with the result of the check. |
 
 
 
@@ -375,7 +377,7 @@ All the amounts are in USD
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | version | [int64](../scalar/#int64) |  | Incrementally growing for the provider - same as in Ledger. |
-| counterpart_id | [int32](../scalar/#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. It's usually the payOut provider, which provides the credit line to the payIn provider. |
+| counterpart_id | [int32](../scalar/#int32) |  | the Id of the counterparty provider, e.g. the provider that is providing the credit limit. Usually the Payout Provider, which extends the credit line to the Payout Requester. |
 | payout_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | payout_limit = credit_limit - credit_usage - reserve, negative value means credit limit is exceeded, e.g. if counterparty decreased credit limit. no validation: any sign is valid. |
 | credit_limit | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This is the credit limit that the counterparty is willing to extend to the provider. |
 | credit_usage | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | This is the credit usage that the provider has used so far. It is the sum of all payouts made by the provider minus the settlement net (settlement balance). It could be negative if the provider has received more in settlements than made payouts. |
@@ -390,7 +392,7 @@ All the amounts are in USD
 <a name="tzero-v1-payment-UpdateLimitResponse"></a>
 
 ### UpdateLimitResponse
-Empty message - means no response is needed.
+
 
 
 This message has no fields defined.
@@ -410,10 +412,10 @@ This message has no fields defined.
 | ----- | ---- | ----- | ----------- |
 | payment_id | [uint64](../scalar/#uint64) |  | payment_id is a payment id in the T-0 network. The upper bound is the largest value the network assigns, so a provider can store it in a signed 64-bit column. |
 | payment_client_id | [string](../scalar/#string) |  | payment_client_id is a payment id assigned by the client, this is the same id that was provided in the CreatePaymentRequest. |
-| accepted | [UpdatePaymentRequest.Accepted](#tzero-v1-payment-UpdatePaymentRequest-Accepted) |  | Accepted response - means the payout was accepted by the pay-out provider and pay-out provider is obligated to make a pay-out. |
+| accepted | [UpdatePaymentRequest.Accepted](#tzero-v1-payment-UpdatePaymentRequest-Accepted) |  | Accepted response - means the payout was accepted by the Payout Provider, which is then obligated to make a pay-out. |
 | failed | [UpdatePaymentRequest.Failed](#tzero-v1-payment-UpdatePaymentRequest-Failed) |  | Payment failed and would not be retried. |
 | confirmed | [UpdatePaymentRequest.Confirmed](#tzero-v1-payment-UpdatePaymentRequest-Confirmed) |  | Confirmed response - final state meaning the payout was executed successfully and the payment is now complete. This happens when the payout is successfully processed by the payout provider, and the payment was made to the recipient. |
-| manual_aml_check | [UpdatePaymentRequest.ManualAmlCheck](#tzero-v1-payment-UpdatePaymentRequest-ManualAmlCheck) |  | In case of manual AML check, pay-out provider needs to perform additional checks and then call CompleteManualAmlCheck rpc with the result of the check. |
+| manual_aml_check | [UpdatePaymentRequest.ManualAmlCheck](#tzero-v1-payment-UpdatePaymentRequest-ManualAmlCheck) |  | In case of manual AML check, the Payout Provider needs to perform additional checks and then call CompleteManualAmlCheck rpc with the result of the check. |
 
 
 
@@ -432,7 +434,7 @@ This message has no fields defined.
 | payout_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | amount in currency of the payout |
 | travel_rule_data | [UpdatePaymentRequest.Accepted.TravelRuleData](#tzero-v1-payment-UpdatePaymentRequest-Accepted-TravelRuleData) |  |  |
 | rate | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Exchange rate the network applied to this payout, pay-out currency per USD. |
-| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed USD markup the network applied to this payout. |
+| fix | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Fixed charge in USD included in the settlement amount for this payout. |
 | settlement_amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | Final USD obligation persisted by the network for this accepted payout. |
 
 
@@ -466,7 +468,7 @@ This message has no fields defined.
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
 | paid_out_at | [google.protobuf.Timestamp](../scalar/#google-protobuf-Timestamp) |  | Time of the payout. No validation: the field is absent when the exact payout time is not known, so treat absence as unknown and fall back to the provider's own recorded time for this update rather than rejecting the callback. |
-| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by pay-in provider. |
+| receipt | [tzero.v1.common.PaymentReceipt](../common_payment_receipt/#tzero-v1-common-PaymentReceipt) | optional | Payment receipt might contain metadata about payment recognizable by the Payout Requester. |
 
 
 
@@ -557,12 +559,12 @@ Additive-only. Consumers must treat unknown values as UNSPECIFIED.
 | Name | Number | Description |
 | ---- | ------ | ----------- |
 | REASON_UNSPECIFIED | 0 |  |
-| REASON_NO_QUOTE_AFTER_AML_APPROVAL | 1 | AML review completed, but the pay-out provider no longer has a valid quote available. |
-| REASON_QUOTE_REJECTED_AFTER_AML_APPROVAL | 2 | AML review completed and a new quote was required, but the pay-in provider rejected the updated quote (e.g. due to rate change after AML delay). |
-| REASON_AML_RISK_CHECK_FAILED | 3 | Payment was rejected by the pay-out provider because the AML / risk checks failed. |
-| REASON_CREDIT_LIMIT_EXCEEDED_AFTER_AML_APPROVAL | 4 | AML review completed and a new quote was found, but the updated settlement amount exceeds the credit limit between the pay-in and pay-out providers. |
-| REASON_REJECTED_BY_BENEFICIARY | 5 | Pay-out provider rejected the initial PayOut request (no AML check involved). |
-| REASON_FINALIZE_FAILURE | 6 | Pay-out provider accepted initially, then reported failure via FinalizePayout (e.g. payment rails rejected). |
+| REASON_NO_QUOTE_AFTER_AML_APPROVAL | 1 | AML review completed, but the Payout Provider no longer has a valid quote available. |
+| REASON_QUOTE_REJECTED_AFTER_AML_APPROVAL | 2 | AML review completed and a new quote was required, but the Payout Requester rejected the updated quote (e.g. due to rate change after AML delay). |
+| REASON_AML_RISK_CHECK_FAILED | 3 | Payment was rejected by the Payout Provider because the AML / risk checks failed. |
+| REASON_CREDIT_LIMIT_EXCEEDED_AFTER_AML_APPROVAL | 4 | AML review completed and a new quote was found, but the updated settlement amount exceeds the credit limit between the Payout Requester and the Payout Provider. |
+| REASON_REJECTED_BY_BENEFICIARY | 5 | The Payout Provider rejected the initial PayOut request (no AML check involved). |
+| REASON_FINALIZE_FAILURE | 6 | The Payout Provider accepted initially, then reported failure via FinalizePayout (e.g. payment rails rejected). |
 
 
  <!-- end enums -->

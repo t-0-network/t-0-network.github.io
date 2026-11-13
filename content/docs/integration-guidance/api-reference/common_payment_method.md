@@ -170,7 +170,7 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| license_number | [string](../scalar/#string) |  | Business license number - 18 digits |
+| license_number | [string](../scalar/#string) |  | Business license number (Unified Social Credit Code) - 18 digits or uppercase letters |
 
 
 
@@ -186,7 +186,7 @@ The China National Advanced Payment System
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| id_number | [string](../scalar/#string) |  | ID number - 18 digits |
+| id_number | [string](../scalar/#string) |  | ID number - 17 digits followed by a digit or X |
 
 
 
