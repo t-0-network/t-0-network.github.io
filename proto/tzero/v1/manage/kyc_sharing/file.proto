@@ -18,12 +18,11 @@ service KycFileService {
   rpc UploadFile(stream UploadFileRequest) returns (UploadFileResponse);
 
   /**
-   * Server-streaming download of a previously uploaded file. The first response
-   * message carries Metadata (content type, advisory original name); the rest are
-   * Chunks of the file bytes. The file is identified by its id plus the (Payout
-   * Requester, Payout Provider, client) tuple it must belong to; access is granted
-   * to the owning requester (any state) and to the provider once the matching
-   * application is past draft.
+   * Server-streaming download of a previously uploaded file: the first response
+   * message carries Metadata (content type, advisory original name), the rest are
+   * Chunks of the file bytes. The file's Payout Requester can download it at any
+   * time, and its Payout Provider once the matching application is past draft; any
+   * other caller gets the same error as for a missing file.
    */
   rpc DownloadFile(DownloadFileRequest) returns (stream DownloadFileResponse) {
     option idempotency_level = NO_SIDE_EFFECTS;
@@ -49,7 +48,7 @@ message UploadFileRequest {
     // the same value as the applicant's client_id.
     string client_id = 20 [(buf.validate.field).string = {
       min_len: 1,
-      max_len: 64
+      max_len: 50
     }];
 
     // Original uploaded filename, advisory only. Optional — API clients may omit it.
@@ -87,21 +86,9 @@ message UploadFileResponse {
 }
 
 message DownloadFileRequest {
-  // Stable id of the file to download.
+  // Stable id of the file to download, as returned by UploadFile and carried in
+  // the applicant's FileValue fields.
   int64 file_id = 10 [(buf.validate.field).int64 = {gt: 0}];
-
-  // The Payout Requester that owns the file (its originator).
-  uint32 payout_requester_id = 20 [(buf.validate.field).uint32 = {gt: 0}];
-
-  // The Payout Provider whose form the file was uploaded against.
-  uint32 payout_provider_id = 30 [(buf.validate.field).uint32 = {gt: 0}];
-
-  // The Payout Requester's own reference for the end client (applicant),
-  // the same value as the applicant's client_id.
-  string client_id = 40 [(buf.validate.field).string = {
-    min_len: 1,
-    max_len: 64
-  }];
 }
 
 message DownloadFileResponse {
