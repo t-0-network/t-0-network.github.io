@@ -43,7 +43,7 @@ each branch carries only the config that type needs.
 <a name="tzero-v1-manage-kyc_sharing-FormField-Date"></a>
 
 ### FormField.Date
-Date field; carries no extra configuration.
+Date field.
 
 
 This message has no fields defined.
@@ -56,7 +56,7 @@ This message has no fields defined.
 <a name="tzero-v1-manage-kyc_sharing-FormField-File"></a>
 
 ### FormField.File
-File-upload field; carries no extra configuration. Upload size is bounded by the global server limit.
+File-upload field.
 
 
 This message has no fields defined.
@@ -69,7 +69,7 @@ This message has no fields defined.
 <a name="tzero-v1-manage-kyc_sharing-FormField-Number"></a>
 
 ### FormField.Number
-Numeric free-entry field; carries no extra configuration.
+Numeric free-entry field.
 
 
 This message has no fields defined.
