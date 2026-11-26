@@ -19,7 +19,7 @@ receives a stable file id to reference it; both sides can download it later.
 | Method Name | Request Type | Response Type | Description |
 | ----------- | ------------ | ------------- | ------------|
 | UploadFile | [UploadFileRequest](#tzero-v1-manage-kyc_sharing-UploadFileRequest) stream | [UploadFileResponse](#tzero-v1-manage-kyc_sharing-UploadFileResponse) | Client-streaming upload (first message Metadata, then Chunks) that stores the file and returns its id. A retry with the same optional Metadata.upload_id returns the originally stored file; without it, each call stores a new file. |
-| DownloadFile | [DownloadFileRequest](#tzero-v1-manage-kyc_sharing-DownloadFileRequest) | [DownloadFileResponse](#tzero-v1-manage-kyc_sharing-DownloadFileResponse) stream | Server-streaming download of a previously uploaded file. The first response message carries Metadata (content type, advisory original name); the rest are Chunks of the file bytes. The file is identified by its id plus the (Payout Requester, Payout Provider, client) tuple it must belong to; access is granted to the owning requester (any state) and to the provider once the matching application is past draft. |
+| DownloadFile | [DownloadFileRequest](#tzero-v1-manage-kyc_sharing-DownloadFileRequest) | [DownloadFileResponse](#tzero-v1-manage-kyc_sharing-DownloadFileResponse) stream | Server-streaming download of a previously uploaded file: the first response message carries Metadata (content type, advisory original name), the rest are Chunks of the file bytes. The file's Payout Requester can download it at any time, and its Payout Provider once the matching application is past draft; any other caller gets the same error as for a missing file. |
 
  <!-- end services -->
 
@@ -35,10 +35,7 @@ receives a stable file id to reference it; both sides can download it later.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| file_id | [int64](../../scalar/#int64) |  | Stable id of the file to download. |
-| payout_requester_id | [uint32](../../scalar/#uint32) |  | The Payout Requester that owns the file (its originator). |
-| payout_provider_id | [uint32](../../scalar/#uint32) |  | The Payout Provider whose form the file was uploaded against. |
-| client_id | [string](../../scalar/#string) |  | The Payout Requester's own reference for the end client (applicant), the same value as the applicant's client_id. |
+| file_id | [int64](../../scalar/#int64) |  | Stable id of the file to download, as returned by UploadFile and carried in the applicant's FileValue fields. |
 
 
 

@@ -12,13 +12,13 @@ toc: true
 <a name="tzero-v1-payment_intent-PayInProviderService"></a>
 
 ## PayInProviderService
-Pay-in provider surface for the Payment Intent flow.
+Collection Provider surface for the Payment Intent flow.
 
-Pay-in providers are those who:
+Collection Providers are those who:
 - Receive fiat payments from end-users
 - Publish payment intent (pay-in) quotes to the network
 - Confirm when payments are received via ConfirmFundsReceived
-- Settles periodically with the beneficiary provider
+- Settle periodically with the Collection Requester
 
 Provides the payment details presented to end-users for making payments.
 
@@ -46,7 +46,7 @@ Request for payment details.
 | currency | [string](../scalar/#string) |  | The currency for the pay-in. ISO 4217 currency code (e.g., "EUR", "GBP", "KES"). |
 | amount | [tzero.v1.common.Decimal](../common_common/#tzero-v1-common-Decimal) |  | The amount to be paid in the specified currency. |
 | travel_rule | [GetPaymentDetailsRequest.TravelRuleData](#tzero-v1-payment_intent-GetPaymentDetailsRequest-TravelRuleData) |  | Travel rule data for this payment |
-| beneficiary_provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the beneficiary provider (the FI the funds are destined for). Stable, opaque identifier for the beneficiary. |
+| beneficiary_provider_id | [uint32](../scalar/#uint32) |  | The T-0 provider ID of the Collection Requester (the FI the funds are destined for). Stable, opaque identifier for the Collection Requester. |
 
 
 
@@ -62,8 +62,8 @@ Request for payment details.
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | The natural or legal person or legal arrangement who is identified by the beneficiary provider as the receiver of the requested payment. |
-| beneficiary_provider | [ivms101.LegalPerson](../ivms_ivms101/#ivms101-LegalPerson) |  | Beneficiary provider travel rule data. |
+| beneficiary | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | repeated | The natural or legal person or legal arrangement who is identified by the Collection Requester as the receiver of the requested payment. |
+| beneficiary_provider | [ivms101.LegalPerson](../ivms_ivms101/#ivms101-LegalPerson) |  | Collection Requester travel rule data. |
 | payer | [ivms101.Person](../ivms_ivms101/#ivms101-Person) | optional | Optional travel rule data of the payer |
 
 

@@ -22,7 +22,7 @@ Decimal 123.45 equals to unscaled=12345 and exponent=-2 (e.g. unscaled * 10^expo
 
 | Field | Type | Label | Description |
 | ----- | ---- | ----- | ----------- |
-| unscaled | [int64](../scalar/#int64) |  |  |
+| unscaled | [int64](../scalar/#int64) |  | no validation: whether a sign or range rule applies depends on the amount, so the field that holds the Decimal sets it. |
 | exponent | [int32](../scalar/#int32) |  |  |
 
 

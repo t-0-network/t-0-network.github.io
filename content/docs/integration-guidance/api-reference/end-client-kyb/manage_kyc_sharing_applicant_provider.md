@@ -148,7 +148,7 @@ Lists applicants submitted to the calling Payout Provider, optionally filtered b
 | form_type | [FormType](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-FormType) | optional | optional filter; unset lists applicants of every form type (KYB and KYC). |
 | payout_requester_id | [uint32](../../scalar/#uint32) | optional | optional filter; unset lists applicants from every Payout Requester. An explicit 0 matches no Payout Requester, so it is rejected — omit the field instead. |
 | states | [ApplicantState](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-ApplicantState) | repeated | filter; an empty list returns applicants in every (post-draft) state — pass [REQUESTED] for the review queue. DRAFT is never visible to a Payout Provider (an Applicant reaches it only once submitted), so it is not an accepted value. |
-| page | [Page](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-Page) | optional | no validation: absent = the first page at the default size; Page validates its own contents. |
+| page | [Page](../../end-client-kyb/manage_kyc_sharing_common/#tzero-v1-manage-kyc_sharing-Page) | optional | no validation: absent = the first page at the default size. |
 
 
 
